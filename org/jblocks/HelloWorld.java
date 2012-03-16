@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.jblocks;
 
 /**
@@ -10,13 +6,23 @@ package org.jblocks;
  */
 public class HelloWorld {
 
-
     /**
      * 
-     * @param args 
+     * @param args
      */
     public static void main(String[] args) {
-        System.out.println("Hello World from ZeroLuck!");
-        System.out.println("I am happy! It works! :D");
+        /*
+         * Hello World from ZeroLuck!
+         * 
+         * But I think we will have some problems:
+         * I am using Netbeans and you Eclipse.
+         * What do you think about that?
+         * 
+         * And where should we start?
+         * A GUI-System?
+         *
+         */
+
+        System.out.println("Hello World!");
     }
 }
