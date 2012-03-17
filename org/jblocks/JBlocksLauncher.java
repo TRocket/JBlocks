@@ -13,6 +13,7 @@ public class JBlocksLauncher {
 	 */
 	public static void main(String[] args) {
 		// TODO run JBlocks
+		JBlocks jb = new JBlocks();
 
 	}
 
