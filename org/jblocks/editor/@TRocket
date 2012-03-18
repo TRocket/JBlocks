@@ -1,4 +1,20 @@
-I am working here on a BlockEditor.
-I saw that you are working on one too...
-Can you work on other things? Because we need just one :D
+1:
+    I am working here on a BlockEditor.
+    I saw that you are working on one too...
 
+    Can you stop this and start with "Block-Store" for blocks?
+    I think we should add an integrated "Block-Store" where you can share 
+    and download blocks (native and "BYOB-Blocks").
+    A native block could be a static method in a class, and a "BYOB-Block"
+    could be a block which people can create like in BYOB.
+    Can you organize a server for the Block-Store too?
+    Thanks!
+
+2: 
+    I am not sure it is a good idea to use JFrames.
+    I think we should put all in a "JBlocksPane" which we can put in a JFrame
+    AND a JApplet.
+
+
+What do you think about that?
+(I hope you can understand my english)
