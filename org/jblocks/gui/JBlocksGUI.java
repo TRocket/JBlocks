@@ -13,7 +13,10 @@ import org.jblocks.JBlocks;
  * 
  */
 public class JBlocksGUI extends JFrame {
-
+public static final int JBLOCKS = 0;
+public static final int CLASSICSCRATCH = 1;
+public static final int SCRATCHTWO = 2;
+public int layoutstyle;
     /**
      * @throws HeadlessException
      */
@@ -21,4 +24,16 @@ public class JBlocksGUI extends JFrame {
         super();
         this.setTitle("JBlocks" + JBlocks.LONGVERSIONNAME);
     }
+	/**
+	 * @return the layoutstyle
+	 */
+	public int getLayoutstyle() {
+		return layoutstyle;
+	}
+	/**
+	 * @param layoutstyle the layoutstyle to set
+	 */
+	public void setLayoutstyle(int layoutstyle) {
+		this.layoutstyle = layoutstyle;
+	}
 }
