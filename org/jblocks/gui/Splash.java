@@ -5,9 +5,12 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import org.jblocks.JBlocks;
 
 
 
@@ -16,13 +19,23 @@ public class Splash extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = -6966282063729475150L;
+        private static BufferedImage splashImage;
+        
+        static {
+            try {
+                splashImage = ImageIO.read(JBlocks.class.getResourceAsStream("res/splash.png"));
+            } catch (IOException ex) {
+                throw new ExceptionInInitializerError(ex);
+            }
+        }
+        
 	ImagePanel image;
 	String text;
 	JPanel panel = new JPanel();
 	JProgressBar progbar;
 	public Splash(){
 		progbar = new JProgressBar();
-		image = new ImagePanel();
+		image = new ImagePanel(splashImage);
 		panel.add(image);
 		this.add(image);
 		

@@ -1,65 +1,62 @@
 package org.jblocks.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
+import java.awt.Image;
 import javax.swing.JPanel;
 
-import org.jblocks.JBlocks;
-
-
+/**
+ * 
+ * A swing component which displays an image. <br />
+ * 
+ * @author TRocket
+ * @author ZeroLuck
+ */
 public class ImagePanel extends JPanel {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7450533410948027737L;
-	private BufferedImage image;
-	private String text;
+    private static final long serialVersionUID = 7450533410948027737L;
+    private Image image;
+    private String text;
 
-	public ImagePanel() {
-		text = "";
-		try {
-			// this.setOpaque(false);
-			image = ImageIO.read(JBlocks.class.getResource("res/jblocks splash.png"));
-		} catch (IOException ex) {
-			System.err.println("error finding image");
-		}
-			
-		
-	}
-	
-	public ImagePanel(String path){
-		try {
-			// this.setOpaque(false);
-			image = ImageIO.read(new File(path));
-		} catch (IOException ex) {
-			System.err.println("error finding image");
-		}
-		
-	}
+    /**
+     * @throws NullPointerException if img is null.
+     * @param img 
+     */
+    public ImagePanel(Image img) {
+        if (img == null) {
+            throw new NullPointerException("image is null!");
+        }
+        image = img;
+        setPreferredSize(new Dimension(image.getWidth(this), image.getHeight(null)));
+    }
 
-	@Override
-	public void paintComponent(Graphics g) {
-		g.drawImage(image, 0, 0, null); // see javadoc for more info on the
-										// parameters
-		//text = "test8";
-		g.setColor(new Color(0, 46, 184));
-		g.drawString(text, 350, 350);
-		//g.drawChars(text.toCharArray(), 0, text.toCharArray().length, 350, 350);
-		
-	}
+    @Override
+    public void paintComponent(Graphics g) {
+        g.drawImage(image, 0, 0, null); // see javadoc for more info on the
 
-	public String getText() {
-		return text;
-	}
+        if (text != null) {
+            g.setColor(new Color(0, 46, 184));
+            g.drawString(text, image.getWidth(this) - g.getFontMetrics().stringWidth(text) - 30,
+                    image.getHeight(this) - g.getFontMetrics().getHeight() - 30);
+        }
 
-	public void setText(String text) {
-		this.text = text;
-	}
+    }
 
+    /**
+     * 
+     * @return the text next to the image, or null if no one is defined!
+     */
+    public String getText() {
+        return text;
+    }
+
+    /**
+     * 
+     * @param text the text to display next to the image
+     */
+    public void setText(String text) {
+        this.text = text;
+        repaint();
+    }
 }

@@ -9,18 +9,16 @@ import org.jblocks.JBlocks;
 /**
  * 
  * @author TRocket
- *
+ * @author ZeroLuck
+ * 
  */
 public class JBlocksGUI extends JFrame {
 
-	/**
-	 * @throws HeadlessException
-	 */
-	public JBlocksGUI() throws HeadlessException {
-		super();
-		this.setTitle("JBlocks" + JBlocks.LONGVERSIONNAME);
-	}
-
-	
-	
+    /**
+     * @throws HeadlessException
+     */
+    public JBlocksGUI() throws HeadlessException {
+        super();
+        this.setTitle("JBlocks" + JBlocks.LONGVERSIONNAME);
+    }
 }
