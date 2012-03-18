@@ -29,13 +29,13 @@ public class Splash extends JFrame {
             }
         }
         
-	ImagePanel image;
+	JImagePanel image;
 	String text;
 	JPanel panel = new JPanel();
 	JProgressBar progbar;
 	public Splash(){
 		progbar = new JProgressBar();
-		image = new ImagePanel(splashImage);
+		image = new JImagePanel(splashImage);
 		panel.add(image);
 		this.add(image);
 		

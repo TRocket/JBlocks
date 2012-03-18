@@ -13,7 +13,7 @@ import javax.swing.JPanel;
  * @author TRocket
  * @author ZeroLuck
  */
-public class ImagePanel extends JPanel {
+public class JImagePanel extends JPanel {
 
     private static final long serialVersionUID = 7450533410948027737L;
     private Image image;
@@ -23,7 +23,7 @@ public class ImagePanel extends JPanel {
      * @throws NullPointerException if img is null.
      * @param img 
      */
-    public ImagePanel(Image img) {
+    public JImagePanel(Image img) {
         if (img == null) {
             throw new NullPointerException("image is null!");
         }
@@ -45,7 +45,7 @@ public class ImagePanel extends JPanel {
 
     /**
      * 
-     * @return the text next to the image, or null if no one is defined!
+     * @return the text next to the image, or null if no text is defined!
      */
     public String getText() {
         return text;
