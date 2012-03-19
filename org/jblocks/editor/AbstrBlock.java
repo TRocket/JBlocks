@@ -9,7 +9,7 @@ import java.awt.Rectangle;
 import javax.swing.JComponent;
 
 /**
- * An abstract class for Blocks. <br />
+ * An abstract class for blocks. <br />
  * It handles block inputs and other things. <br />
  * The background color is used as the color for the whole block. <br />
  * <br />
@@ -32,7 +32,7 @@ public abstract class AbstrBlock extends JComponent {
 
         this.setLayout(null);
         this.setOpaque(true);
-        this.setBackground(new Color(255, 0x20, 0x20));
+        this.setBackground(Color.GREEN);
         this.setBorder(null);
     }
 
