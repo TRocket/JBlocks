@@ -21,6 +21,18 @@ import javax.swing.JComponent;
 public abstract class AbstrInput extends JComponent {
 
     private JComponent comp;
+    private JScriptPane pane;
+
+    /**
+     * @throws NullPointerException if p is null.
+     * @param p the script pane for this block-input.
+     */
+    public AbstrInput(JScriptPane p) {
+        if (pane == null) {
+            throw new NullPointerException();
+        }
+        pane = p;
+    }
 
     /**
      * 
@@ -76,7 +88,7 @@ public abstract class AbstrInput extends JComponent {
         Insets in = getBorderInsets(dim.width, dim.width);
         dim.width += in.left + in.right;
         dim.height += in.top + in.bottom;
-        
+
         comp.setLocation(in.left, in.top);
         setPreferredSize(dim);
     }

@@ -32,7 +32,7 @@ public abstract class AbstrBlock extends JComponent {
 
         this.setLayout(null);
         this.setOpaque(true);
-        this.setBackground(Color.GREEN);
+        this.setBackground(new Color(0xD6900A)); // <- TEST
         this.setBorder(null);
     }
 
@@ -49,7 +49,8 @@ public abstract class AbstrBlock extends JComponent {
      * This should be implemented to paint the block's border. <br />
      * @see #getBorderInsets(int, int) 
      */
-    public abstract void drawBorder(Graphics g);
+    @Override
+    public abstract void paintBorder(Graphics g);
 
     /**
      * This should be implemented to return the insets of the block's border <br />
@@ -73,10 +74,11 @@ public abstract class AbstrBlock extends JComponent {
         Component[] components = getComponents();
 
         int idx = 0;
-        int yoff = 0, xoff = 0;
+        int yoff = 2, xoff;
         while (idx < components.length) {
             int lineH = 0, lineW = 0;
             int i = idx;
+            xoff = 2;
 
             while (i < components.length && xoff < MAX_BLOCK_WIDTH) {
                 Component comp = components[i++];
@@ -87,7 +89,7 @@ public abstract class AbstrBlock extends JComponent {
                 xoff += size.width + INPUT_X_PADDING;
             }
             lineW = xoff;
-            xoff = 0;
+            xoff = 2;
 
             while (idx < components.length && xoff < MAX_BLOCK_WIDTH) {
                 Component comp = components[idx++];
@@ -103,15 +105,15 @@ public abstract class AbstrBlock extends JComponent {
                 w = lineW;
             }
             if (idx < components.length) {
-                yoff += INPUT_Y_PADDING;
-            }
+                yoff += INPUT_Y_PADDING + lineH;
+            }else
             yoff += lineH;
 
         }
-        h = yoff;
+        h = yoff + 2;
 
         Insets border = getBorderInsets(w, h);
-        
+
         for (int i = 0; i < components.length; i++) {
             Component comp = components[i];
             int x = comp.getX() + border.left;
@@ -139,6 +141,6 @@ public abstract class AbstrBlock extends JComponent {
         g.setColor(back);
         g.fillRect(rect.x, rect.y, rect.width, rect.height);
 
-        drawBorder(g);
+        paintBorder(g);
     }
 }
