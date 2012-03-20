@@ -11,7 +11,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Polygon;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 
@@ -19,10 +18,23 @@ import java.awt.Stroke;
  *
  * @author ZeroLuck
  */
-public class BooleanBlock extends ReporterBlock {
+public class JBooleanBlock extends JReporterBlock {
 
-    public BooleanBlock(JScriptPane p) {
+    public JBooleanBlock(JScriptPane p) {
         super(p);
+    }
+
+    private static Polygon getPlg(Dimension size) {
+        Polygon plg = new Polygon();
+
+        plg.addPoint(1, size.height / 2);
+        plg.addPoint(size.height / 2, 1);
+        plg.addPoint(size.width - size.height / 2, 1);
+        plg.addPoint(size.width - 2, size.height / 2);
+        plg.addPoint(size.width - size.height / 2 - 1, size.height - 2);
+        plg.addPoint(size.height / 2 - 1, size.height - 2);
+
+        return plg;
     }
 
     @Override
@@ -33,19 +45,11 @@ public class BooleanBlock extends ReporterBlock {
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
         Dimension size = getSize();
-        Color col =  getBackground();
-        Rectangle clip = g.getClipBounds();
+        Color col = getBackground();
         Stroke basic = g.getStroke();
 
-        Polygon plg = new Polygon();
-
-        plg.addPoint(1, size.height / 2);
-        plg.addPoint(size.height / 2, 1);
-        plg.addPoint(size.width - size.height / 2, 1);
-        plg.addPoint(size.width - 2, size.height / 2);
-        plg.addPoint(size.width - size.height / 2 - 1, size.height - 2);
-        plg.addPoint(size.height / 2 - 1, size.height - 2);
-
+        Polygon plg = getPlg(size);
+        
         g.setColor(col);
         g.fillPolygon(plg);
 
@@ -57,11 +61,15 @@ public class BooleanBlock extends ReporterBlock {
                 RenderingHints.VALUE_ANTIALIAS_OFF);
 
         g.setStroke(basic);
-        g.setClip(clip);
     }
 
     @Override
     public Insets getBorderInsets(int width, int height) {
-        return new Insets(2, height /2, 2, height /2);
+        return new Insets(2, height / 2, 2, height / 2);
+    }
+
+    @Override
+    public boolean contains(int x, int y) {
+        return getPlg(getSize()).contains(x, y);
     }
 }

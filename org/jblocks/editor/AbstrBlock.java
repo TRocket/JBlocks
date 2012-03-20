@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import javax.swing.JComponent;
 
@@ -35,7 +36,7 @@ public abstract class AbstrBlock extends JComponent {
         this.setBackground(new Color(0xD6900A)); // <- TEST
         this.setBorder(null);
     }
-
+    
     @Override
     public Dimension getPreferredSize() {
         if (!isValid()) {
@@ -61,12 +62,32 @@ public abstract class AbstrBlock extends JComponent {
      * @return the insets of the border.
      */
     public abstract Insets getBorderInsets(int width, int height);
+    
+    /**
+     * 
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract boolean contains(int x, int y);
+    
+    /**
+     * 
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean contains(Point p) {
+        return contains(p.x, p.y);
+    }
 
     /* Settings... */
     private static final int MAX_BLOCK_WIDTH = 150;
     private static final int INPUT_X_PADDING = 7;
     private static final int INPUT_Y_PADDING = 5;
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
     @Override
     public void doLayout() {
         int w = 0, h = 0;
@@ -126,6 +147,9 @@ public abstract class AbstrBlock extends JComponent {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void paintComponent(Graphics g) {
         Insets border = getBorderInsets(getWidth(), getHeight());

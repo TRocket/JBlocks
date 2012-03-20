@@ -1,6 +1,7 @@
 package org.jblocks.editor;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
@@ -17,17 +18,23 @@ public class Test {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         JScriptPane pane = new JScriptPane();
 
-        HatBlock block = new HatBlock(pane);
+        JHatBlock block = new JHatBlock(pane);
         block.add(new JLabel("Wenn Taste"));
         block.add(new javax.swing.JComboBox<String>(new String[]{"space", "a", "b", "c"}));
         block.add(new JLabel("gedrückt."));
 
-        ReporterBlock rb = new ReporterBlock(pane);
+        JReporterBlock rb = new JReporterBlock(pane);
         rb.add(new JLabel("Hallo Welt"));
 
-        BooleanBlock rb2 = new BooleanBlock(pane);
-        rb2.add(new JLabel("Test Reporter"));
+        JReporterBlock rb2 = new JReporterBlock(pane);
+        rb2.add(new JLabel("Test Command"));
+        rb2.add(new javax.swing.JCheckBox());
         rb.add(rb2);
+        
+        AbstrBlock rb3 = new JBooleanBlock(pane);
+        rb3.add(new JLabel("Test Command"));
+        rb3.add(new javax.swing.JCheckBox());
+        rb.add(rb3);
 
         block.add(rb);
 

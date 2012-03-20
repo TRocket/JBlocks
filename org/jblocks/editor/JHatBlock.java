@@ -9,6 +9,8 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
+import javax.swing.JComponent;
 
 /**
  *
@@ -16,15 +18,16 @@ import java.awt.Stroke;
  * 
  * @author ZeroLuck
  */
-public class HatBlock extends AbstrBlock implements Adapter {
+public class JHatBlock extends AbstrBlock implements Adapter {
 
     private static final float RND_X = 1 / 1.5F;
     private static final int RND_Y = 20;
-    private static final int LEFT_RIGHT = 3;
+    private static final int LEFT = 3;
+    private static final int RIGHT = 2;
     private static final int BOTTOM = 7;
     private static final int ADAPTER_W = 15;
 
-    public HatBlock(JScriptPane pane) {
+    public JHatBlock(JScriptPane pane) {
         super(pane);
     }
 
@@ -56,7 +59,7 @@ public class HatBlock extends AbstrBlock implements Adapter {
         g.setColor(dark);
         g.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.drawOval(0, 1, rndx, rndy - 1);
-        g.drawLine(rndx + 1, RND_Y - 2, size.width - 5, RND_Y - 2);
+        g.drawLine(rndx + 1, RND_Y - 2, size.width - 3, RND_Y - 2);
 
         g.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.setClip(clip);
@@ -67,14 +70,14 @@ public class HatBlock extends AbstrBlock implements Adapter {
         g.setColor(shadow);
         g.drawLine(1, RND_Y, 2, size.height - BOTTOM);
 
+        g.setStroke(basic);
         g.setColor(darkShadow);
         g.drawLine(size.width - 1, RND_Y, size.width - 1, size.height - BOTTOM);
         g.setColor(shadow);
-        g.drawLine(size.width - 3, RND_Y - 2, size.width - 3, size.height - BOTTOM);
+        g.drawLine(size.width - 2, RND_Y - 2, size.width - 2, size.height - BOTTOM);
 
         // draw BOTTOM
-        g.setStroke(basic);
-        g.setClip(0, size.height - BOTTOM, size.width, BOTTOM);
+        g.setClip(new Rectangle(0, size.height - BOTTOM, size.width, BOTTOM).intersection(clip));
 
         g.setColor(shadow);
         g.drawLine(0, size.height - BOTTOM, size.width, size.height - BOTTOM);
@@ -93,12 +96,34 @@ public class HatBlock extends AbstrBlock implements Adapter {
 
     @Override
     public Insets getBorderInsets(int width, int height) {
-        return new Insets(RND_Y, LEFT_RIGHT, BOTTOM, LEFT_RIGHT);
+        return new Insets(RND_Y, LEFT, BOTTOM, RIGHT);
     }
 
     @Override
     public Rectangle getAdapterBounds() {
         Dimension size = getSize();
         return new Rectangle(15, size.height - BOTTOM - 5, ADAPTER_W, BOTTOM + 4);
+    }
+
+    @Override
+    public boolean contains(int x, int y) {
+        Dimension size = getSize();
+        if (y > RND_Y && y < size.height - BOTTOM && x > LEFT && x < size.width - RIGHT) {
+            return true;
+        }
+
+        final int rndx = (int) (size.width * RND_X);
+        final int rndy = RND_Y * 2;
+
+        Ellipse2D.Float elp = new Ellipse2D.Float(0, 0, rndx, rndy);
+        if (elp.contains(x, y)) {
+            return true;
+        }
+
+        Rectangle rect = new Rectangle(15, size.height - BOTTOM, ADAPTER_W, BOTTOM);
+        if (rect.contains(x, y)) {
+            return true;
+        }
+        return false;
     }
 }

@@ -6,23 +6,24 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.Rectangle;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.geom.RoundRectangle2D;
 
 /**
  *
  * @author ZeroLuck
  */
-public class ReporterBlock extends AbstrBlock {
+public class JReporterBlock extends AbstrBlock {
 
-    public ReporterBlock(JScriptPane pane) {
+    public JReporterBlock(JScriptPane pane) {
         super(pane);
     }
 
     @Override
     public void paintBorder(Graphics grp) {
-        if (this instanceof BooleanBlock) {
+        if (this instanceof JBooleanBlock) {
             throw new Error();
         }
         Graphics2D g = (Graphics2D) grp;
@@ -32,7 +33,6 @@ public class ReporterBlock extends AbstrBlock {
 
         Dimension size = getSize();
         Color col = getBackground();
-        Rectangle clip = g.getClipBounds();
         Stroke basic = g.getStroke();
 
         g.setColor(col);
@@ -46,11 +46,20 @@ public class ReporterBlock extends AbstrBlock {
                 RenderingHints.VALUE_ANTIALIAS_OFF);
 
         g.setStroke(basic);
-        g.setClip(clip);
     }
 
     @Override
     public Insets getBorderInsets(int width, int height) {
-        return new Insets(2, height / 2, 2, height / 2);
+        return new Insets(2, height / 4, 2, height / 4);
+    }
+
+    @Override
+    public boolean contains(int x, int y) {
+        Dimension size = getSize();
+        
+        RoundRectangle2D.Float rect = new RoundRectangle2D
+            .Float(0, 0, size.width, size.height, size.height / 2, size.height / 2);
+        
+        return rect.contains(x, y);
     }
 }
