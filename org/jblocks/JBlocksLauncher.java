@@ -1,5 +1,8 @@
 package org.jblocks;
 
+import org.jblocks.blockloader.BlockLoader;
+import org.jblocks.blocks.whengreenflagpressedjhatblock.WhenGreenFlagPressedJHatBlock;
+
 /**
  * 
  * Main-Class for Desktop-Application.
@@ -17,6 +20,8 @@ public class JBlocksLauncher {
         // TODO run JBlocks
         JBlocks jb = new JBlocks();
         jb.init();
+        BlockLoader bl = new BlockLoader();
+        bl.load(WhenGreenFlagPressedJHatBlock.class.getResourceAsStream("block.xml"));
 
     }
 }

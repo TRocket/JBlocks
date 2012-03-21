@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://jblocks.org/block" xmlns:tns="http://www.example.org/block" elementFormDefault="qualified">
+<element name="block">
+<complexType>
+<attribute name="type" type="string"></attribute>
+<attribute name="class" type="string"></attribute>
+</complexType>
+</element>
+</schema>

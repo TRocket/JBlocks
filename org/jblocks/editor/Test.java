@@ -2,6 +2,8 @@ package org.jblocks.editor;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.lang.reflect.Constructor;
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
@@ -14,11 +16,26 @@ import javax.swing.UIManager;
  */
 public class Test {
 
-    public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
+    	
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         JScriptPane pane = new JScriptPane();
+       System.out.println("loading block...");
 
-        JHatBlock block = new JHatBlock(pane);
+    	   @SuppressWarnings("unchecked")
+		Class<? extends AbstrBlock> cl = (Class<? extends AbstrBlock>) Class.forName("org.jblocks.blocks.whengreenflagpressedjhatblock.WhenGreenFlagPressedJHatBlock");
+       	@SuppressWarnings("rawtypes")
+		Class partype = JScriptPane.class;
+       	@SuppressWarnings("rawtypes")
+		Constructor ct = cl.getConstructor(partype);
+           AbstrBlock blockx = (AbstrBlock) ct.newInstance(pane);
+	
+       
+        
+        System.out.println("loaded block");
+
+        
+    	JHatBlock block = new JHatBlock(pane);
         block.add(new JLabel("Wenn Taste"));
         block.add(new javax.swing.JComboBox<String>(new String[]{"space", "a", "b", "c"}));
         block.add(new JLabel("gedrückt."));
@@ -43,7 +60,10 @@ public class Test {
         block.setLocation(50, 50);
 
         pane.add(block);
+        blockx.setSize(block.getPreferredSize());
+        blockx.setLocation(0, 0);
 
+        pane.add(blockx);
 
         JFrame frm = new JFrame("Script-Pane : Test");
         frm.setSize(500, 400);
