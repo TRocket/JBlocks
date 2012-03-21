@@ -24,10 +24,10 @@ public class Test {
 
         @SuppressWarnings("unchecked")
         Class<? extends AbstrBlock> cl = (Class<? extends AbstrBlock>) Class.forName("org.jblocks.blocks.whengreenflagpressedjhatblock.WhenGreenFlagPressedJHatBlock");
-        
+
         @SuppressWarnings("rawtypes")
         Class partype = JScriptPane.class;
-        
+
         @SuppressWarnings("rawtypes")
         Constructor ct = cl.getConstructor(partype);
         AbstrBlock blockx = (AbstrBlock) ct.newInstance(pane);
@@ -42,9 +42,10 @@ public class Test {
         block.add(new javax.swing.JComboBox<String>(new String[]{"space", "a", "b", "c"}));
         block.add(new JLabel("gedrückt."));
 
+
         JReporterBlock rb = new JReporterBlock(pane);
         rb.add(new JLabel("Hallo Welt"));
-
+        
         JReporterBlock rb2 = new JReporterBlock(pane);
         rb2.add(new JLabel("Test Command"));
         rb2.add(new javax.swing.JCheckBox());
@@ -56,13 +57,20 @@ public class Test {
         rb.add(rb3);
 
         block.add(rb);
-
+        
+        JCommandBlock block3 = new JCommandBlock(pane);
+        block3.add(new JLabel("Say "));
+        JReporterInput inp1 = new JReporterInput(pane);
+        inp1.reset();
+        block3.add(inp1);
+        
+        pane.add(block3);
         pane.add(block);
 
         pane.add(blockx);
 
         pane.cleanup();
-        
+
         JFrame frm = new JFrame("Script-Pane : Test");
         frm.setSize(500, 400);
         frm.setLocationByPlatform(true);

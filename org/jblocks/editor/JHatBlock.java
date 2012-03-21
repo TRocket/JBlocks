@@ -10,7 +10,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
-import javax.swing.JComponent;
 
 /**
  *
@@ -24,7 +23,7 @@ public class JHatBlock extends AbstrBlock implements Adapter {
     private static final int RND_Y = 20;
     private static final int LEFT = 3;
     private static final int RIGHT = 2;
-    private static final int BOTTOM = 7;
+    private static final int BOTTOM = 6;
     private static final int ADAPTER_W = 15;
 
     public JHatBlock(JScriptPane pane) {
@@ -32,7 +31,7 @@ public class JHatBlock extends AbstrBlock implements Adapter {
     }
 
     @Override
-    public void paintBorder(Graphics grp) {
+    public void paintBlockBorder(Graphics grp) {
         Color col = new Color(0xD6900A); //getBackground();
         Color dark = Color.BLACK;
         Color shadow = col.darker();

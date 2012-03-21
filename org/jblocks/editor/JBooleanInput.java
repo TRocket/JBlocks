@@ -1,3 +1,7 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package org.jblocks.editor;
 
 import java.awt.BasicStroke;
@@ -12,11 +16,13 @@ import java.awt.Stroke;
 
 /**
  *
+ * Input class for boolean-blocks. <br />
+ * 
  * @author ZeroLuck
  */
-public class JBooleanBlock extends JReporterBlock {
+public class JBooleanInput extends AbstrInput {
 
-    public JBooleanBlock(JScriptPane p) {
+    public JBooleanInput(JScriptPane p) {
         super(p);
     }
 
@@ -34,6 +40,27 @@ public class JBooleanBlock extends JReporterBlock {
     }
 
     @Override
+    public boolean contains(int x, int y) {
+        return getPlg(getSize()).contains(x, y);
+    }
+
+    @Override
+    public boolean accepts(AbstrBlock block) {
+        return block instanceof JBooleanBlock;
+    }
+
+    @Override
+    public Insets getBorderInsets(int width, int height) {
+        return new Insets(2, height / 2, 2, height / 2);
+    }
+
+    private static Color bright(Color c, float f) {
+        return new Color(Math.min((int) (c.getRed() * f), 255),
+                Math.min((int) (c.getGreen() * f), 255),
+                Math.min((int) (c.getBlue() * f), 255));
+    }
+
+    @Override
     public void paintBlockBorder(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
 
@@ -45,11 +72,11 @@ public class JBooleanBlock extends JReporterBlock {
         Stroke basic = g.getStroke();
 
         Polygon plg = getPlg(size);
-        
-        g.setColor(col);
+
+        g.setColor(bright(col, 1.1F));
         g.fillPolygon(plg);
 
-        g.setStroke(new java.awt.BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
+        g.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
         g.setColor(col.darker());
         g.drawPolygon(plg);
 
@@ -60,12 +87,12 @@ public class JBooleanBlock extends JReporterBlock {
     }
 
     @Override
-    public Insets getBorderInsets(int width, int height) {
-        return new Insets(2, height / 2, 2, height / 2);
+    public Dimension getDefaultSize() {
+        return new Dimension(20, 12);
     }
 
     @Override
-    public boolean contains(int x, int y) {
-        return getPlg(getSize()).contains(x, y);
+    public void reset() {
+        setInput(null);
     }
 }

@@ -1,9 +1,11 @@
 package org.jblocks.editor;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Rectangle;
 import javax.swing.JComponent;
 
 /**
@@ -29,7 +31,7 @@ public abstract class AbstrInput extends JComponent {
      * @param p the script pane for this block-input.
      */
     public AbstrInput(JScriptPane p) {
-        if (pane == null) {
+        if (p == null) {
             throw new NullPointerException();
         }
         pane = p;
@@ -50,7 +52,7 @@ public abstract class AbstrInput extends JComponent {
     public boolean contains(Point p) {
         return contains(p.x, p.y);
     }
-    
+
     /**
      * 
      * @return returns true if the input-field accepts this block as an input.
@@ -71,8 +73,7 @@ public abstract class AbstrInput extends JComponent {
      * @param g the graphics object on which to draw.
      * @see #getBorderInsets(int, int) 
      */
-    @Override
-    public abstract void paintBorder(Graphics g);
+    public abstract void paintBlockBorder(Graphics g);
 
     /**
      * @return returns the size which is used when this input-field has no input.
@@ -83,7 +84,7 @@ public abstract class AbstrInput extends JComponent {
      * 
      * Sets the default input-field's input component. <br />
      */
-    public abstract JComponent reset();
+    public abstract void reset();
 
     @Override
     public Dimension getPreferredSize() {
@@ -91,6 +92,32 @@ public abstract class AbstrInput extends JComponent {
             doLayout();
         }
         return super.getPreferredSize();
+    }
+
+    /**
+     * 
+     * Layouts the whole HatBlock. <br />
+     */
+    protected void layoutRoot() {
+        pane.validate();  // not a very clean implementation. (fixme)
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        Insets border = getBorderInsets(getWidth(), getHeight());
+        Color back = getBackground();
+
+        Dimension size = getSize();
+        Rectangle rect = new Rectangle(
+                border.left,
+                border.top,
+                size.width - border.left - border.right,
+                size.height - border.top - border.bottom);
+
+        g.setColor(back);
+        g.fillRect(rect.x, rect.y, rect.width, rect.height);
+
+        paintBlockBorder(g);
     }
 
     @Override
@@ -102,11 +129,13 @@ public abstract class AbstrInput extends JComponent {
             dim = comp.getPreferredSize();
             comp.setSize(dim);
         }
-        Insets in = getBorderInsets(dim.width, dim.width);
+        Insets in = getBorderInsets(dim.width, dim.height);
         dim.width += in.left + in.right;
         dim.height += in.top + in.bottom;
 
-        comp.setLocation(in.left, in.top);
+        if (comp != null) {
+            comp.setLocation(in.left, in.top);
+        }
         setPreferredSize(dim);
     }
 

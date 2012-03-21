@@ -21,8 +21,8 @@ import java.awt.Stroke;
  */
 public class JCommandBlock extends AbstrBlock {
 
-    private static final int TOP = 8;
-    private static final int LEFT_RIGHT = 3;
+    private static final int TOP = 6;
+    private static final int LEFT_RIGHT = 2;
     private static final int BOTTOM = TOP;
     private static final int ADAPTER_W = 15;
 
@@ -35,7 +35,7 @@ public class JCommandBlock extends AbstrBlock {
      * {@inheritDoc}
      */
     @Override
-    public void paintBorder(Graphics grp) {
+    public void paintBlockBorder(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
 
         Color col = getBackground();
@@ -69,7 +69,7 @@ public class JCommandBlock extends AbstrBlock {
         g.setColor(darkShadow);
         g.drawLine(size.width - 1, 0, size.width - 1, size.height - BOTTOM);
         g.setColor(shadow);
-        g.drawLine(size.width - 2, 0 - 2, size.width - 2, size.height - BOTTOM);
+        g.drawLine(size.width - 2, 2, size.width - 2, size.height - BOTTOM);
 
 
         // draw BOTTOM

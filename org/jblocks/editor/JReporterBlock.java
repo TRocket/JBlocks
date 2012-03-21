@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.geom.RoundRectangle2D;
@@ -22,10 +21,7 @@ public class JReporterBlock extends AbstrBlock {
     }
 
     @Override
-    public void paintBorder(Graphics grp) {
-        if (this instanceof JBooleanBlock) {
-            throw new Error();
-        }
+    public void paintBlockBorder(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -58,7 +54,7 @@ public class JReporterBlock extends AbstrBlock {
         Dimension size = getSize();
         
         RoundRectangle2D.Float rect = new RoundRectangle2D
-            .Float(0, 0, size.width, size.height, size.height / 2, size.height / 2);
+            .Float(0, 0, size.width, size.height, size.height / 4, size.height / 4);
         
         return rect.contains(x, y);
     }

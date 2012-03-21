@@ -50,8 +50,7 @@ public abstract class AbstrBlock extends JComponent {
      * This should be implemented to paint the block's border. <br />
      * @see #getBorderInsets(int, int) 
      */
-    @Override
-    public abstract void paintBorder(Graphics g);
+    public abstract void paintBlockBorder(Graphics g);
 
     /**
      * This should be implemented to return the insets of the block's border <br />
@@ -165,6 +164,6 @@ public abstract class AbstrBlock extends JComponent {
         g.setColor(back);
         g.fillRect(rect.x, rect.y, rect.width, rect.height);
 
-        paintBorder(g);
+        paintBlockBorder(g);
     }
 }
