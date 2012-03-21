@@ -3,6 +3,7 @@ package org.jblocks.editor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
+import java.awt.Point;
 import javax.swing.JComponent;
 
 /**
@@ -34,6 +35,22 @@ public abstract class AbstrInput extends JComponent {
         pane = p;
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract boolean contains(int x, int y);
+
+    /**
+     * 
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean contains(Point p) {
+        return contains(p.x, p.y);
+    }
+    
     /**
      * 
      * @return returns true if the input-field accepts this block as an input.

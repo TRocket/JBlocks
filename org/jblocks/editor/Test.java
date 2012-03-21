@@ -16,26 +16,28 @@ import javax.swing.UIManager;
  */
 public class Test {
 
-	public static void main(String[] args) throws Exception {
-    	
+    public static void main(String[] args) throws Exception {
+
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         JScriptPane pane = new JScriptPane();
-       System.out.println("loading block...");
+        System.out.println("loading block...");
 
-    	   @SuppressWarnings("unchecked")
-		Class<? extends AbstrBlock> cl = (Class<? extends AbstrBlock>) Class.forName("org.jblocks.blocks.whengreenflagpressedjhatblock.WhenGreenFlagPressedJHatBlock");
-       	@SuppressWarnings("rawtypes")
-		Class partype = JScriptPane.class;
-       	@SuppressWarnings("rawtypes")
-		Constructor ct = cl.getConstructor(partype);
-           AbstrBlock blockx = (AbstrBlock) ct.newInstance(pane);
-	
-       
+        @SuppressWarnings("unchecked")
+        Class<? extends AbstrBlock> cl = (Class<? extends AbstrBlock>) Class.forName("org.jblocks.blocks.whengreenflagpressedjhatblock.WhenGreenFlagPressedJHatBlock");
         
+        @SuppressWarnings("rawtypes")
+        Class partype = JScriptPane.class;
+        
+        @SuppressWarnings("rawtypes")
+        Constructor ct = cl.getConstructor(partype);
+        AbstrBlock blockx = (AbstrBlock) ct.newInstance(pane);
+
+
+
         System.out.println("loaded block");
 
-        
-    	JHatBlock block = new JHatBlock(pane);
+
+        JHatBlock block = new JHatBlock(pane);
         block.add(new JLabel("Wenn Taste"));
         block.add(new javax.swing.JComboBox<String>(new String[]{"space", "a", "b", "c"}));
         block.add(new JLabel("gedrückt."));
@@ -47,7 +49,7 @@ public class Test {
         rb2.add(new JLabel("Test Command"));
         rb2.add(new javax.swing.JCheckBox());
         rb.add(rb2);
-        
+
         AbstrBlock rb3 = new JBooleanBlock(pane);
         rb3.add(new JLabel("Test Command"));
         rb3.add(new javax.swing.JCheckBox());
@@ -55,16 +57,12 @@ public class Test {
 
         block.add(rb);
 
-
-        block.setSize(block.getPreferredSize());
-        block.setLocation(50, 50);
-
         pane.add(block);
-        blockx.setSize(block.getPreferredSize());
-        blockx.setLocation(0, 0);
 
         pane.add(blockx);
 
+        pane.cleanup();
+        
         JFrame frm = new JFrame("Script-Pane : Test");
         frm.setSize(500, 400);
         frm.setLocationByPlatform(true);
