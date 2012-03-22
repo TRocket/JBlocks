@@ -7,6 +7,8 @@ import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
 
 /**
@@ -19,7 +21,8 @@ import javax.swing.JComponent;
  */
 public abstract class AbstrBlock extends JComponent {
 
-    private JScriptPane pane;
+    protected JScriptPane pane;
+    protected Point drag;
 
     /**
      * @throws NullPointerException if p is null.
@@ -35,8 +38,12 @@ public abstract class AbstrBlock extends JComponent {
         this.setOpaque(true);
         this.setBackground(new Color(0xD6900A)); // <- TEST
         this.setBorder(null);
+
+        BlockMouseListener listener = new BlockMouseListener();
+        this.addMouseListener(listener);
+        this.addMouseMotionListener(listener);
     }
-    
+
     @Override
     public Dimension getPreferredSize() {
         if (!isValid()) {
@@ -61,14 +68,14 @@ public abstract class AbstrBlock extends JComponent {
      * @return the insets of the border.
      */
     public abstract Insets getBorderInsets(int width, int height);
-    
+
     /**
      * 
      * {@inheritDoc}
      */
     @Override
     public abstract boolean contains(int x, int y);
-    
+
     /**
      * 
      * {@inheritDoc}
@@ -79,7 +86,7 @@ public abstract class AbstrBlock extends JComponent {
     }
 
     /* Settings... */
-    private static final int MAX_BLOCK_WIDTH = 150;
+    private static final int MAX_BLOCK_WIDTH = 300;
     private static final int INPUT_X_PADDING = 7;
     private static final int INPUT_Y_PADDING = 5;
 
@@ -126,8 +133,9 @@ public abstract class AbstrBlock extends JComponent {
             }
             if (idx < components.length) {
                 yoff += INPUT_Y_PADDING + lineH;
-            }else
-            yoff += lineH;
+            } else {
+                yoff += lineH;
+            }
 
         }
         h = yoff + 2;
@@ -165,5 +173,51 @@ public abstract class AbstrBlock extends JComponent {
         g.fillRect(rect.x, rect.y, rect.width, rect.height);
 
         paintBlockBorder(g);
+    }
+
+    public void toFront() {
+        if (getParent() == pane) {
+            pane.remove(this);
+            pane.add(this, 0);
+        }
+    }
+
+    protected void dragEvent(MouseEvent evt) {
+        if (drag == null) {
+            return;
+        }
+        setLocation(evt.getX() + getX() - drag.x, evt.getY() + getY() - drag.y);
+    }
+
+    protected void moveEvent(MouseEvent evt) {
+        drag = evt.getPoint();
+        toFront();
+    }
+
+    protected void pressedEvent(MouseEvent evt) {
+        drag = evt.getPoint();
+        toFront();
+    }
+
+    protected void releasedEvent(MouseEvent evt) {
+        drag = null;
+    }
+
+    private class BlockMouseListener extends MouseAdapter {
+
+        @Override
+        public void mouseDragged(MouseEvent evt) {
+            dragEvent(evt);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent evt) {
+            pressedEvent(evt);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent evt) {
+            releasedEvent(evt);
+        }
     }
 }

@@ -54,7 +54,7 @@ public class JScriptPane extends JPanel {
             y += p.height + CLEANUP_BOTTOM;
         }
     }
-    
+
     /**
      * 
      * {@inheritDoc}
@@ -62,10 +62,12 @@ public class JScriptPane extends JPanel {
     @Override
     public void doLayout() {
         for (Component c : getComponents()) {
-            c.setSize(c.getPreferredSize());
+            if (!c.getSize().equals(c.getPreferredSize())) {
+                c.setSize(c.getPreferredSize());
+            }
         }
     }
-    
+
     @Override
     public Dimension getPreferredSize() {
         int w = 0, h = 0;
@@ -78,7 +80,7 @@ public class JScriptPane extends JPanel {
                 h = p.y;
             }
         }
-        
+
         return new Dimension(w + 100, h + 100);
     }
 

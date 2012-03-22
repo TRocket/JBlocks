@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 
 /**
@@ -52,10 +53,21 @@ public class JReporterBlock extends AbstrBlock {
     @Override
     public boolean contains(int x, int y) {
         Dimension size = getSize();
-        
-        RoundRectangle2D.Float rect = new RoundRectangle2D
-            .Float(0, 0, size.width, size.height, size.height / 4, size.height / 4);
-        
+
+        RoundRectangle2D.Float rect = new RoundRectangle2D.Float(0, 0, size.width, size.height, size.height / 4, size.height / 4);
+
         return rect.contains(x, y);
+    }
+
+    @Override
+    public void dragEvent(MouseEvent evt) {
+    }
+
+    @Override
+    public void pressedEvent(MouseEvent evt) {
+    }
+
+    @Override
+    public void releasedEvent(MouseEvent evt) {
     }
 }

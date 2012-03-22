@@ -9,6 +9,7 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 
 /**
@@ -17,17 +18,21 @@ import java.awt.geom.Ellipse2D;
  * 
  * @author ZeroLuck
  */
-public class JHatBlock extends AbstrBlock implements Adapter {
+public class JHatBlock extends AbstrBlock implements Puzzle {
 
+    // <global>
     private static final float RND_X = 1 / 1.5F;
     private static final int RND_Y = 20;
     private static final int LEFT = 3;
     private static final int RIGHT = 2;
     private static final int BOTTOM = 6;
     private static final int ADAPTER_W = 15;
+    // <member>
+    private PuzzleAdapter underMe;
 
     public JHatBlock(JScriptPane pane) {
         super(pane);
+        underMe = new PuzzleAdapter(this, PuzzleAdapter.TYPE_DOWN);
     }
 
     @Override
@@ -98,10 +103,14 @@ public class JHatBlock extends AbstrBlock implements Adapter {
         return new Insets(RND_Y, LEFT, BOTTOM, RIGHT);
     }
 
+    /**
+     * This method should just be called by the ScriptEditor library. <br />
+     */
     @Override
-    public Rectangle getAdapterBounds() {
-        Dimension size = getSize();
-        return new Rectangle(15, size.height - BOTTOM - 5, ADAPTER_W, BOTTOM + 4);
+    public PuzzleAdapter[] getPuzzleAdapters() {
+        return new PuzzleAdapter[]{
+                    underMe
+                };
     }
 
     @Override
@@ -124,5 +133,48 @@ public class JHatBlock extends AbstrBlock implements Adapter {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 
+     * {@inheritDoc}
+     */
+    @Override
+    public void layoutPuzzle() {
+        if (underMe.neighbour != null) {
+            underMe.neighbour.setLocation(getX(), getY() + getHeight() - BOTTOM);
+            if (underMe.neighbour instanceof Puzzle) {
+                ((Puzzle) underMe.neighbour).layoutPuzzle();
+            }
+        }
+    }
+    
+    @Override
+    public void dragEvent(MouseEvent evt) {
+        super.dragEvent(evt);
+        layoutPuzzle();
+    }
+
+    /**
+     * 
+     * {@inheritDoc}
+     */
+    @Override
+    public void doLayout() {
+        super.doLayout();
+        Dimension size = getSize();
+        underMe.bounds.x = 15;
+        underMe.bounds.y = size.height - BOTTOM;
+        underMe.bounds.width = ADAPTER_W;
+        underMe.bounds.height = BOTTOM;
+        
+        layoutPuzzle();
+    }
+
+    @Override
+    public void removeFromPuzzle(AbstrBlock b) {
+        if (underMe.neighbour == b) {
+            underMe.neighbour = null;
+        }
     }
 }
