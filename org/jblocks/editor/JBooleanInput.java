@@ -93,6 +93,7 @@ public class JBooleanInput extends AbstrInput {
 
     @Override
     public void reset() {
+        setBorderEnabled(true);
         setInput(null);
     }
 }

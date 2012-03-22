@@ -1,7 +1,6 @@
 package org.jblocks.editor;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.lang.reflect.Constructor;
 
 import javax.swing.JFrame;
@@ -45,7 +44,7 @@ public class Test {
 
         JReporterBlock rb = new JReporterBlock(pane);
         rb.add(new JLabel("Hallo Welt"));
-        
+
         JReporterBlock rb2 = new JReporterBlock(pane);
         rb2.add(new JLabel("Test Command"));
         rb2.add(new javax.swing.JCheckBox());
@@ -57,21 +56,22 @@ public class Test {
         rb.add(rb3);
 
         block.add(rb);
-        
-        JCommandBlock block3 = new JCommandBlock(pane);
-        block3.add(new JLabel("Say "));
-        JReporterInput inp1 = new JReporterInput(pane);
-        inp1.reset();
-        block3.add(inp1);
-        
-        pane.add(block3);
+        for (int i = 0; i < 3; i++) {
+            JCommandBlock block3 = new JCommandBlock(pane);
+            block3.add(new JLabel("Say "));
+            JReporterInput inp1 = new JReporterInput(pane);
+            inp1.reset();
+            block3.add(inp1);
+
+            pane.add(block3);
+        }
+
         pane.add(block);
 
         pane.add(blockx);
 
-        pane.cleanup();
-
         JFrame frm = new JFrame("Script-Pane : Test");
+        frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frm.setSize(500, 400);
         frm.setLocationByPlatform(true);
 
@@ -79,5 +79,7 @@ public class Test {
         frm.add(pane);
 
         frm.setVisible(true);
+        
+        pane.cleanup();
     }
 }

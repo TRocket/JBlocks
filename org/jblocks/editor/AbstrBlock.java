@@ -203,6 +203,14 @@ public abstract class AbstrBlock extends JComponent {
         drag = null;
     }
 
+    /**
+     * 
+     * Layouts the whole HatBlock. <br />
+     */
+    protected void layoutRoot() {
+        pane.validate();  // not a very clean implementation. (fixme)
+    }
+
     private class BlockMouseListener extends MouseAdapter {
 
         @Override

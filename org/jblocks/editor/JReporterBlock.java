@@ -2,10 +2,13 @@ package org.jblocks.editor;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
@@ -61,13 +64,37 @@ public class JReporterBlock extends AbstrBlock {
 
     @Override
     public void dragEvent(MouseEvent evt) {
+        super.dragEvent(evt);
     }
 
     @Override
     public void pressedEvent(MouseEvent evt) {
+        Container parent = getParent();
+        if (parent != pane) {
+            if (parent instanceof AbstrInput) {
+                ((AbstrInput) parent).reset();
+            }
+            parent.remove(this);
+            
+            setLocation(JScriptPane.getLocationOnScriptPane(this));
+            pane.add(this);
+            layoutRoot();
+        }
+
+        super.pressedEvent(evt);
     }
 
     @Override
     public void releasedEvent(MouseEvent evt) {
+        AbstrInput inp = AbstrInput.findInput(pane,
+                new Rectangle(JScriptPane.getLocationOnScriptPane(this),
+                getSize()), this);
+
+        if (inp != null) {
+            getParent().remove(this);
+            inp.setInput(this);
+            inp.setBorderEnabled(false);
+            layoutRoot();
+        }
     }
 }

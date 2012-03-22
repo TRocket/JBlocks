@@ -82,6 +82,7 @@ public class JReporterInput extends AbstrInput {
 
     @Override
     public void reset() {
+        setBorderEnabled(true);
         setInput(new JReporterInput.TextInput());
     }
 

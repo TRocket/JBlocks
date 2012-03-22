@@ -179,7 +179,10 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
             for (PuzzleAdapter a : adapters) {
                 Rectangle clone = new Rectangle(a.bounds.x, a.bounds.y,
                         a.bounds.width, a.bounds.height);
-                clone.add(b.getLocation());
+                
+                clone.x += b.getX();
+                clone.y += b.getY();
+                
                 if (clone.intersects(r) && a.neighbour == null
                         && a.type == PuzzleAdapter.TYPE_DOWN) {
                     return a;
@@ -191,7 +194,6 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
 
     private void findAdapter() {
         if (overMe.neighbour != null) {
-            // FIXME: Unknown bug, this doesn't work yet :/
             if (overMe.neighbour instanceof Puzzle) {
                 ((Puzzle) overMe.neighbour).removeFromPuzzle(this);
 
@@ -203,7 +205,8 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
         Component[] hats = pane.getComponents();
         Rectangle r = new Rectangle(overMe.bounds.x, overMe.bounds.y,
                 overMe.bounds.width, overMe.bounds.height);
-        r.add(getLocation());
+        r.x += getX();
+        r.y += getY();
 
         for (Component c : hats) {
             if (c instanceof AbstrBlock && c != this) {

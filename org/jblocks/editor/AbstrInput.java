@@ -1,6 +1,7 @@
 package org.jblocks.editor;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -25,6 +26,7 @@ public abstract class AbstrInput extends JComponent {
 
     private JComponent comp;
     private JScriptPane pane;
+    private boolean borderEnabled = true;
 
     /**
      * @throws NullPointerException if p is null.
@@ -102,6 +104,10 @@ public abstract class AbstrInput extends JComponent {
         pane.validate();  // not a very clean implementation. (fixme)
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
     @Override
     public void paintComponent(Graphics g) {
         Insets border = getBorderInsets(getWidth(), getHeight());
@@ -120,6 +126,17 @@ public abstract class AbstrInput extends JComponent {
         paintBlockBorder(g);
     }
 
+    /**
+     * 
+     * enables/disables the input's border. <br />
+     */
+    public void setBorderEnabled(boolean b) {
+        if (borderEnabled != b) {
+            borderEnabled = b;
+            validate();
+        }
+    }
+
     @Override
     public void doLayout() {
         Dimension dim;
@@ -129,13 +146,19 @@ public abstract class AbstrInput extends JComponent {
             dim = comp.getPreferredSize();
             comp.setSize(dim);
         }
-        Insets in = getBorderInsets(dim.width, dim.height);
-        dim.width += in.left + in.right;
-        dim.height += in.top + in.bottom;
-
-        if (comp != null) {
-            comp.setLocation(in.left, in.top);
+        if (borderEnabled) {
+            Insets in = getBorderInsets(dim.width, dim.height);
+            dim.width += in.left + in.right;
+            dim.height += in.top + in.bottom;
+            if (comp != null) {
+                comp.setLocation(in.left, in.top);
+            }
+        } else {
+            if (comp != null) {
+                comp.setLocation(0, 0);
+            }
         }
+
         setPreferredSize(dim);
     }
 
@@ -161,5 +184,34 @@ public abstract class AbstrInput extends JComponent {
      */
     public JComponent getInput() {
         return comp;
+    }
+    
+    /**
+     * 
+     * Finds a possible input for a Rectangle <br />
+     * 
+     * @see JScriptPane#getLocationOnScriptPane(javax.swing.JComponent)
+     * @param cont the component to search.
+     * @param r the rectangle on the JScriptPane.
+     * @return null or an input.
+     */
+    public static AbstrInput findInput(JComponent cont, Rectangle r, AbstrBlock b) {
+        for (Component comp : cont.getComponents()) {
+            if (comp instanceof AbstrInput) {
+                AbstrInput inp = (AbstrInput) comp;
+                Point p = JScriptPane.getLocationOnScriptPane(inp);
+                Rectangle rect = new Rectangle(p, inp.getSize());
+                if (rect.intersects(r) && inp.accepts(b)) {
+                    return inp;
+                }
+            }
+            if (comp instanceof JComponent) {
+                AbstrInput inp = findInput((JComponent) comp, r, b);
+                if (inp != null) {
+                    return inp;
+                }
+            }
+        }
+        return null;
     }
 }
