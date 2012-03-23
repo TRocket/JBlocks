@@ -148,7 +148,15 @@ public class JHatBlock extends AbstrBlock implements Puzzle {
             }
         }
     }
-    
+
+    @Override
+    public void pressedEvent(MouseEvent evt) {
+        super.pressedEvent(evt);
+        if (underMe.neighbour != null) {
+            AbstrBlock.puzzleToFront(this);
+        }
+    }
+
     @Override
     public void dragEvent(MouseEvent evt) {
         super.dragEvent(evt);
@@ -167,7 +175,7 @@ public class JHatBlock extends AbstrBlock implements Puzzle {
         underMe.bounds.y = size.height - BOTTOM;
         underMe.bounds.width = ADAPTER_W;
         underMe.bounds.height = BOTTOM;
-        
+
         layoutPuzzle();
     }
 

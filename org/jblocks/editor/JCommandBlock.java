@@ -27,7 +27,7 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
     // <member>
     private PuzzleAdapter overMe;
     private PuzzleAdapter underMe;
-
+    
     public JCommandBlock(JScriptPane pane) {
         super(pane);
         underMe = new PuzzleAdapter(this, PuzzleAdapter.TYPE_DOWN);
@@ -64,7 +64,7 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
         overMe.bounds.y = 0;
         overMe.bounds.width = ADAPTER_W;
         overMe.bounds.height = TOP;
-
+        
         layoutPuzzle();
     }
 
@@ -75,18 +75,18 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
     @Override
     public void paintBlockBorder(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
-
+        
         Color col = getBackground();
         Rectangle clip = g.getClipBounds();
         Dimension size = getSize();
         Stroke basic = g.getStroke();
-
+        
         Color shadow = col.darker();
         Color darkShadow = shadow.darker();
-
+        
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-
+        
         g.setStroke(new java.awt.BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
 
         // TOP
@@ -101,8 +101,8 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
         // draw LEFT and RIGHT
         g.setColor(shadow);
         g.drawLine(0, 0, 0, size.height - BOTTOM);
-
-
+        
+        
         g.setStroke(basic);
         g.setColor(darkShadow);
         g.drawLine(size.width - 1, 0, size.width - 1, size.height - BOTTOM);
@@ -112,17 +112,17 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
 
         // draw BOTTOM
         g.setClip(0, size.height - BOTTOM, size.width, BOTTOM);
-
+        
         g.setColor(shadow);
         g.drawLine(0, size.height - BOTTOM, size.width, size.height - BOTTOM);
         g.setColor(darkShadow);
         g.drawLine(1, size.height - BOTTOM + 1, size.width - 1, size.height - BOTTOM + 1);
-
+        
         g.setColor(col);
         g.fillRoundRect(15, size.height - BOTTOM - 5, ADAPTER_W, BOTTOM + 5, 5, 5);
         g.setColor(darkShadow);
         g.drawRoundRect(15, size.height - BOTTOM - 5, ADAPTER_W, BOTTOM + 4, 5, 5);
-
+        
         g.setClip(clip);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -171,84 +171,33 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
                     underMe
                 };
     }
-
-    private PuzzleAdapter findAdapter0(AbstrBlock b, Rectangle r) {
-        if (b instanceof Puzzle) {
-            Puzzle p = (Puzzle) b;
-            PuzzleAdapter[] adapters = p.getPuzzleAdapters();
-            for (PuzzleAdapter a : adapters) {
-                Rectangle clone = new Rectangle(a.bounds.x, a.bounds.y,
-                        a.bounds.width, a.bounds.height);
-                
-                clone.x += b.getX();
-                clone.y += b.getY();
-                
-                if (clone.intersects(r) && a.neighbour == null
-                        && a.type == PuzzleAdapter.TYPE_DOWN) {
-                    return a;
-                }
-            }
-        }
-        return null;
-    }
-
-    private void findAdapter() {
-        if (overMe.neighbour != null) {
-            if (overMe.neighbour instanceof Puzzle) {
-                ((Puzzle) overMe.neighbour).removeFromPuzzle(this);
-
-                overMe.neighbour = null;
-            } else {
-                return;
-            }
-        }
-        Component[] hats = pane.getComponents();
-        Rectangle r = new Rectangle(overMe.bounds.x, overMe.bounds.y,
-                overMe.bounds.width, overMe.bounds.height);
-        r.x += getX();
-        r.y += getY();
-
-        for (Component c : hats) {
-            if (c instanceof AbstrBlock && c != this) {
-                PuzzleAdapter p = findAdapter0((AbstrBlock) c, r);
-                if (p != null) {
-                    overMe.neighbour = (AbstrBlock) c;
-                    p.neighbour = this;
-                    ((Puzzle) p.block).layoutPuzzle();
-                    return;
-                }
-            }
-        }
-    }
-
+    
     @Override
-    public void pressedEvent(MouseEvent evt) {
-        if (overMe.neighbour != null) {
-            if (overMe.neighbour instanceof Puzzle) {
-                ((Puzzle) overMe.neighbour).removeFromPuzzle(this);
-                overMe.neighbour = null;
-            } else {
-                return;
-            }
+    protected void pressedEvent(MouseEvent evt) {
+        AbstrBlock.removeFromPuzzle(this, overMe);
+        if (underMe.neighbour != null) {
+            AbstrBlock.puzzleToFront(this);
         }
+        
         super.pressedEvent(evt);
     }
-
+    
     @Override
-    public void dragEvent(MouseEvent evt) {
+    protected void dragEvent(MouseEvent evt) {
         if (overMe.neighbour != null) {
-            return;
+            AbstrBlock.removeFromPuzzle(this, overMe);
         }
+        
         super.dragEvent(evt);
         layoutPuzzle();
     }
-
+    
     @Override
     protected void releasedEvent(MouseEvent evt) {
         super.releasedEvent(evt);
-        findAdapter();
+        AbstrBlock.concatWithPuzzle(this, overMe);
     }
-
+    
     @Override
     public void removeFromPuzzle(AbstrBlock b) {
         if (underMe.neighbour == b) {

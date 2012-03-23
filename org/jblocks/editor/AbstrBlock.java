@@ -210,6 +210,77 @@ public abstract class AbstrBlock extends JComponent {
     protected void layoutRoot() {
         pane.validate();  // not a very clean implementation. (fixme)
     }
+    
+
+    private static PuzzleAdapter findAdapter0(AbstrBlock b, Rectangle r, int t) {
+        if (b instanceof Puzzle) {
+            Puzzle p = (Puzzle) b;
+            PuzzleAdapter[] adapters = p.getPuzzleAdapters();
+            for (PuzzleAdapter a : adapters) {
+                Rectangle clone = new Rectangle(a.bounds.x, a.bounds.y,
+                        a.bounds.width, a.bounds.height);
+                
+                clone.x += b.getX();
+                clone.y += b.getY();
+                
+                if (clone.intersects(r) && a.neighbour == null
+                        && a.type == t) {
+                    return a;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static PuzzleAdapter findAdapter(AbstrBlock b, PuzzleAdapter p, int t) {
+        Component[] hats = b.pane.getComponents();
+        Rectangle r = new Rectangle(p.bounds.x, p.bounds.y,
+                p.bounds.width, p.bounds.height);
+        r.x += b.getX();
+        r.y += b.getY();
+
+        for (Component c : hats) {
+            if (c instanceof AbstrBlock && c != b) {
+                PuzzleAdapter adp = findAdapter0((AbstrBlock) c, r, t);
+                if (p != null) {
+                    return adp;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static void removeFromPuzzle(AbstrBlock b, PuzzleAdapter adp) {
+         if (adp.neighbour != null) {
+            if (adp.neighbour instanceof Puzzle) {
+                ((Puzzle) adp.neighbour).removeFromPuzzle(b);
+                adp.neighbour = null;
+            }
+        }
+    }
+    
+    public static void concatWithPuzzle(AbstrBlock b, PuzzleAdapter adp) {
+        PuzzleAdapter a = findAdapter(b, adp, PuzzleAdapter.TYPE_DOWN);
+        if (a != null) {
+            removeFromPuzzle(b, adp);
+            adp.neighbour = a.block;
+            a.neighbour = b;
+            ((Puzzle) a.block).layoutPuzzle();
+        }
+    }
+    
+    public static void puzzleToFront(AbstrBlock blck) {
+        if (!(blck instanceof Puzzle)) {
+            throw new IllegalArgumentException("the block isn't a puzzle.");
+        }
+        blck.toFront();
+        Puzzle hat = (Puzzle) blck;
+        for (PuzzleAdapter p : hat.getPuzzleAdapters()) {
+            if (p.neighbour instanceof Puzzle && p.type == PuzzleAdapter.TYPE_DOWN) {
+                puzzleToFront(p.neighbour);
+            }
+        }
+    }   
 
     private class BlockMouseListener extends MouseAdapter {
 

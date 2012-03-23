@@ -16,59 +16,16 @@ import javax.swing.UIManager;
 public class Test {
 
     public static void main(String[] args) throws Exception {
-
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         JScriptPane pane = new JScriptPane();
-        System.out.println("loading block...");
-
-        @SuppressWarnings("unchecked")
-        Class<? extends AbstrBlock> cl = (Class<? extends AbstrBlock>) Class.forName("org.jblocks.blocks.whengreenflagpressedjhatblock.WhenGreenFlagPressedJHatBlock");
-
-        @SuppressWarnings("rawtypes")
-        Class partype = JScriptPane.class;
-
-        @SuppressWarnings("rawtypes")
-        Constructor ct = cl.getConstructor(partype);
-        AbstrBlock blockx = (AbstrBlock) ct.newInstance(pane);
-
-
-
-        System.out.println("loaded block");
-
-
-        JHatBlock block = new JHatBlock(pane);
-        block.add(new JLabel("Wenn Taste"));
-        block.add(new javax.swing.JComboBox<String>(new String[]{"space", "a", "b", "c"}));
-        block.add(new JLabel("gedrückt."));
-
-
-        JReporterBlock rb = new JReporterBlock(pane);
-        rb.add(new JLabel("Hallo Welt"));
-
-        JReporterBlock rb2 = new JReporterBlock(pane);
-        rb2.add(new JLabel("Test Command"));
-        rb2.add(new javax.swing.JCheckBox());
-        rb.add(rb2);
-
-        AbstrBlock rb3 = new JBooleanBlock(pane);
-        rb3.add(new JLabel("Test Command"));
-        rb3.add(new javax.swing.JCheckBox());
-        rb.add(rb3);
-
-        block.add(rb);
-        for (int i = 0; i < 3; i++) {
-            JCommandBlock block3 = new JCommandBlock(pane);
-            block3.add(new JLabel("Say "));
-            JReporterInput inp1 = new JReporterInput(pane);
-            inp1.reset();
-            block3.add(inp1);
-
-            pane.add(block3);
-        }
-
-        pane.add(block);
-
-        pane.add(blockx);
+        
+        pane.add(pane.createBlock("hat", "when %{gf} clicked"));
+        pane.add(pane.createBlock("command", "say %{r}"));
+        pane.add(pane.createBlock("reporter", "test-1"));
+        pane.add(pane.createBlock("reporter", "test-2"));
+        pane.add(pane.createBlock("boolean", "test-3"));
+        pane.add(pane.createBlock("command", "test %{b} , %{r}"));
+        pane.add(pane.createBlock("hat", "when %{combo;space;a;b;c;d;} key pressed"));
 
         JFrame frm = new JFrame("Script-Pane : Test");
         frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -79,7 +36,6 @@ public class Test {
         frm.add(pane);
 
         frm.setVisible(true);
-        
         pane.cleanup();
     }
 }

@@ -129,6 +129,7 @@ public abstract class AbstrInput extends JComponent {
     /**
      * 
      * enables/disables the input's border. <br />
+     * @see #setBorderEnabled(boolean) 
      */
     public void setBorderEnabled(boolean b) {
         if (borderEnabled != b) {
@@ -136,7 +137,16 @@ public abstract class AbstrInput extends JComponent {
             validate();
         }
     }
-
+    
+    /**
+     * 
+     * returns true if the border is enabled. <br />
+     * @see #setBorderEnabled(boolean)  
+     */
+    public boolean isBorderEnabled() {
+        return borderEnabled;
+    }
+    
     @Override
     public void doLayout() {
         Dimension dim;

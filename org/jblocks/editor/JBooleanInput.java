@@ -46,6 +46,9 @@ public class JBooleanInput extends AbstrInput {
 
     @Override
     public boolean accepts(AbstrBlock block) {
+        if (!isBorderEnabled()) {
+            return false;
+        }
         return block instanceof JBooleanBlock;
     }
 
