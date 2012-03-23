@@ -1,2 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<block xmlns="http://jblocks.org/block" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jblocks.org/block ../../blockloader/block.xsd " type="command" class="org.jblocks.blocks.sayjcommandblock.SayJCommandBlock"></block>
+<block xmlns="http://jblocks.org/block" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jblocks.org/block ../../blockloader/block.xsd " type="command" class="org.jblocks.blocks.sayjcommandblock.SayJCommandBlock">
+<dependencies>
+<dependency class="org.jblocks.editor.JCommandBlock" name="command block" />
+</dependencies>
+</block>

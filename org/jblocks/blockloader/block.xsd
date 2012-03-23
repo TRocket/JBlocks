@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://jblocks.org/block" xmlns:tns="http://www.example.org/block" elementFormDefault="qualified">
-<element name="block">
-<complexType>
-<attribute name="type" type="string"></attribute>
-<attribute name="class" type="string"></attribute>
-</complexType>
-</element>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://jblocks.org/block"
+	xmlns:tns="http://www.example.org/block" elementFormDefault="qualified">
+	<element name="block">
+		<complexType>
+			<sequence>
+				<element name="dependencies">
+					<complexType>
+						<sequence>
+							<element maxOccurs="unbounded" minOccurs="0" name="dependency">
+								<complexType>
+									<attribute name="class" type="string"></attribute>
+									<attribute name="name" type="string"></attribute>
+								</complexType>
+
+							</element>
+						</sequence>
+					</complexType>
+				</element>
+			</sequence>
+			<attribute name="type" type="string"></attribute>
+			<attribute name="class" type="string"></attribute>
+		</complexType>
+	</element>
 </schema>

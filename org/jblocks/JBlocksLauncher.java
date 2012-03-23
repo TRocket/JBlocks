@@ -1,6 +1,7 @@
 package org.jblocks;
 
 import org.jblocks.blockloader.BlockLoader;
+import org.jblocks.blocks.sayjcommandblock.SayJCommandBlock;
 import org.jblocks.blocks.whengreenflagpressedjhatblock.WhenGreenFlagPressedJHatBlock;
 
 /**
@@ -21,7 +22,7 @@ public class JBlocksLauncher {
         JBlocks jb = new JBlocks();
         jb.init();
         BlockLoader bl = new BlockLoader();
-        bl.load(WhenGreenFlagPressedJHatBlock.class.getResourceAsStream("block.xml"));
+        bl.load(SayJCommandBlock.class.getResourceAsStream("block.xml"));
 
     }
 }

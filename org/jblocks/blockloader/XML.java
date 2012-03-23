@@ -7,6 +7,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * a class which reads block.xml files
@@ -18,6 +19,7 @@ private String docRootName;
 private String type;
 private Node block;
 private String classname;
+private Dependency[] dependicies;
 /**
  * 
  * @param file
@@ -36,6 +38,16 @@ private String classname;
 	        block = doc.getElementsByTagName("block").item(0);
 	        type = block.getAttributes().getNamedItem("type").getNodeValue();
 	        classname = block.getAttributes().getNamedItem("class").getNodeValue();
+	        try{
+	        NodeList dependenciesNodes = doc.getElementsByTagName("dependencies").item(0).getChildNodes();
+	        this.dependicies = new Dependency[dependenciesNodes.getLength()];
+	        for (int i = 0; i < dependenciesNodes.getLength(); i++) {
+	        	Node dependencyNode = dependenciesNodes.item(i);
+				this.dependicies[i] = new Dependency(dependencyNode.getAttributes().getNamedItem("class").getNodeValue(), dependencyNode.getAttributes().getNamedItem("name").getNodeValue());
+			}
+	        }catch (Exception e) {
+				// do nothing
+			}
 
 
 
@@ -72,6 +84,13 @@ private String classname;
 	 */
 	public String getClassname() {
 		return classname;
+	}
+
+	/**
+	 * @return the dependicies
+	 */
+	public Dependency[] getDependicies() {
+		return dependicies;
 	}
 
 

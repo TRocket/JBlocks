@@ -24,6 +24,11 @@ public Constructor load(InputStream file){
 	System.out.println(xml.getDocRootName());
 	System.out.println(xml.getType());
 	System.out.println(xml.getBlock());
+	System.out.println(xml.getDependicies());
+	xml.getDependicies()[0].isAvailable();
+	for (int i = 0; i < xml.getDependicies().length; i++) {
+		xml.getDependicies()[i].isAvailable();
+	}
 	Class<? extends AbstrBlock> cl = null;
 	try {
 		cl = (Class<? extends AbstrBlock>) Class.forName(xml.getClassname());
