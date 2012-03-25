@@ -20,8 +20,8 @@ import javax.swing.JComponent;
  * @author ZeroLuck
  */
 public abstract class AbstrBlock extends JComponent {
-
-    private JScriptPane pane;
+//just for now...
+    protected JScriptPane pane;
     protected Point drag;
 
     /**
