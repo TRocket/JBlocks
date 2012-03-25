@@ -21,7 +21,7 @@ import javax.swing.JComponent;
  */
 public abstract class AbstrBlock extends JComponent {
 
-    protected JScriptPane pane;
+    private JScriptPane pane;
     protected Point drag;
 
     /**
@@ -43,6 +43,14 @@ public abstract class AbstrBlock extends JComponent {
         this.addMouseListener(listener);
         this.addMouseMotionListener(listener);
     }
+    
+    /**
+     * 
+     * @return the block's script pane.
+     */
+    protected JScriptPane getScriptPane() {
+        return pane;
+    }
 
     @Override
     public Dimension getPreferredSize() {
@@ -57,7 +65,7 @@ public abstract class AbstrBlock extends JComponent {
      * This should be implemented to paint the block's border. <br />
      * @see #getBorderInsets(int, int) 
      */
-    public abstract void paintBlockBorder(Graphics g);
+    protected abstract void paintBlockBorder(Graphics g);
 
     /**
      * This should be implemented to return the insets of the block's border <br />
@@ -67,7 +75,7 @@ public abstract class AbstrBlock extends JComponent {
      * @param height the block's height
      * @return the insets of the border.
      */
-    public abstract Insets getBorderInsets(int width, int height);
+    protected abstract Insets getBorderInsets(int width, int height);
 
     /**
      * 
@@ -175,7 +183,7 @@ public abstract class AbstrBlock extends JComponent {
         paintBlockBorder(g);
     }
 
-    public void toFront() {
+    protected void toFront() {
         if (getParent() == pane) {
             pane.remove(this);
             pane.add(this, 0);
@@ -220,12 +228,8 @@ public abstract class AbstrBlock extends JComponent {
                 Rectangle clone = new Rectangle(a.bounds.x, a.bounds.y,
                         a.bounds.width, a.bounds.height);
                 
-                clone.x += b.getX();
-                clone.y += b.getY();
-                r.x -= 10;
-                r.y -= 10;
-                r.width += 10;
-                r.height += 10;
+                clone.x += a.block.getX();
+                clone.y += a.block.getY();
                 
                 if (clone.intersects(r) && a.neighbour == null
                         && a.type == t) {
@@ -236,7 +240,7 @@ public abstract class AbstrBlock extends JComponent {
         return null;
     }
 
-    public static PuzzleAdapter findAdapter(AbstrBlock b, PuzzleAdapter p, int t) {
+    static PuzzleAdapter findAdapter(AbstrBlock b, PuzzleAdapter p, int t) {
         Component[] hats = b.pane.getComponents();
         Rectangle r = new Rectangle(p.bounds.x, p.bounds.y,
                 p.bounds.width, p.bounds.height);
@@ -254,7 +258,7 @@ public abstract class AbstrBlock extends JComponent {
         return null;
     }
 
-    public static void removeFromPuzzle(AbstrBlock b, PuzzleAdapter adp) {
+    static void removeFromPuzzle(AbstrBlock b, PuzzleAdapter adp) {
          if (adp.neighbour != null) {
             if (adp.neighbour instanceof Puzzle) {
                 ((Puzzle) adp.neighbour).removeFromPuzzle(b);
@@ -263,7 +267,7 @@ public abstract class AbstrBlock extends JComponent {
         }
     }
     
-    public static void concatWithPuzzle(AbstrBlock b, PuzzleAdapter adp) {
+    static void concatWithPuzzle(AbstrBlock b, PuzzleAdapter adp) {
         PuzzleAdapter a = findAdapter(b, adp, PuzzleAdapter.TYPE_DOWN);
         if (a != null) {
             removeFromPuzzle(b, adp);
@@ -273,7 +277,7 @@ public abstract class AbstrBlock extends JComponent {
         }
     }
     
-    public static void puzzleToFront(AbstrBlock blck) {
+    protected static void puzzleToFront(AbstrBlock blck) {
         if (!(blck instanceof Puzzle)) {
             throw new IllegalArgumentException("the block isn't a puzzle.");
         }

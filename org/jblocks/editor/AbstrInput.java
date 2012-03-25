@@ -67,7 +67,7 @@ public abstract class AbstrInput extends JComponent {
      * @param size the size of the component
      * @see #paintBorder(java.awt.Graphics) 
      */
-    public abstract Insets getBorderInsets(int width, int height);
+    protected abstract Insets getBorderInsets(int width, int height);
 
     /**
      * Draws the input's border. <br />
@@ -75,7 +75,7 @@ public abstract class AbstrInput extends JComponent {
      * @param g the graphics object on which to draw.
      * @see #getBorderInsets(int, int) 
      */
-    public abstract void paintBlockBorder(Graphics g);
+    protected abstract void paintBlockBorder(Graphics g);
 
     /**
      * @return returns the size which is used when this input-field has no input.
@@ -205,7 +205,7 @@ public abstract class AbstrInput extends JComponent {
      * @param r the rectangle on the JScriptPane.
      * @return null or an input.
      */
-    public static AbstrInput findInput(JComponent cont, Rectangle r, AbstrBlock b) {
+     static AbstrInput findInput(JComponent cont, Rectangle r, AbstrBlock b) {
         for (Component comp : cont.getComponents()) {
             if (comp instanceof AbstrInput) {
                 AbstrInput inp = (AbstrInput) comp;

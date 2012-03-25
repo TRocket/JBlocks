@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
@@ -25,7 +24,7 @@ public class JReporterBlock extends AbstrBlock {
     }
 
     @Override
-    public void paintBlockBorder(Graphics grp) {
+    protected void paintBlockBorder(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -49,7 +48,7 @@ public class JReporterBlock extends AbstrBlock {
     }
 
     @Override
-    public Insets getBorderInsets(int width, int height) {
+    protected Insets getBorderInsets(int width, int height) {
         return new Insets(2, height / 4, 2, height / 4);
     }
 
@@ -63,13 +62,14 @@ public class JReporterBlock extends AbstrBlock {
     }
 
     @Override
-    public void dragEvent(MouseEvent evt) {
+    protected void dragEvent(MouseEvent evt) {
         super.dragEvent(evt);
     }
 
     @Override
-    public void pressedEvent(MouseEvent evt) {
+    protected void pressedEvent(MouseEvent evt) {
         Container parent = getParent();
+        JScriptPane pane = getScriptPane();
         if (parent != pane) {
             if (parent instanceof AbstrInput) {
                 ((AbstrInput) parent).reset();
@@ -85,8 +85,8 @@ public class JReporterBlock extends AbstrBlock {
     }
 
     @Override
-    public void releasedEvent(MouseEvent evt) {
-        AbstrInput inp = AbstrInput.findInput(pane,
+    protected void releasedEvent(MouseEvent evt) {
+        AbstrInput inp = AbstrInput.findInput(getScriptPane(),
                 new Rectangle(JScriptPane.getLocationOnScriptPane(this),
                 getSize()), this);
 

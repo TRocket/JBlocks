@@ -33,7 +33,7 @@ public class JReporterInput extends AbstrInput {
     }
 
     @Override
-    public void paintBlockBorder(Graphics grp) {
+    protected void paintBlockBorder(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -57,7 +57,7 @@ public class JReporterInput extends AbstrInput {
     }
 
     @Override
-    public Insets getBorderInsets(int width, int height) {
+    protected Insets getBorderInsets(int width, int height) {
         return new Insets(2, height / 4, 2, height / 4);
     }
 

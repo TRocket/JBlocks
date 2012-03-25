@@ -36,7 +36,7 @@ public class JHatBlock extends AbstrBlock implements Puzzle {
     }
 
     @Override
-    public void paintBlockBorder(Graphics grp) {
+    protected void paintBlockBorder(Graphics grp) {
         Color col = new Color(0xD6900A); //getBackground();
         Color dark = Color.BLACK;
         Color shadow = col.darker();
@@ -99,7 +99,7 @@ public class JHatBlock extends AbstrBlock implements Puzzle {
     }
 
     @Override
-    public Insets getBorderInsets(int width, int height) {
+    protected Insets getBorderInsets(int width, int height) {
         return new Insets(RND_Y, LEFT, BOTTOM, RIGHT);
     }
 
@@ -150,7 +150,7 @@ public class JHatBlock extends AbstrBlock implements Puzzle {
     }
 
     @Override
-    public void pressedEvent(MouseEvent evt) {
+    protected void pressedEvent(MouseEvent evt) {
         super.pressedEvent(evt);
         if (underMe.neighbour != null) {
             AbstrBlock.puzzleToFront(this);
@@ -158,7 +158,7 @@ public class JHatBlock extends AbstrBlock implements Puzzle {
     }
 
     @Override
-    public void dragEvent(MouseEvent evt) {
+    protected void dragEvent(MouseEvent evt) {
         super.dragEvent(evt);
         layoutPuzzle();
     }

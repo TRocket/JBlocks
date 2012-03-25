@@ -68,13 +68,14 @@ public class JScriptPane extends JPanel {
         if (s.length < 1) {
             throw new IllegalArgumentException("parse error in bs.");
         }
+        JScriptPane pane = block.getScriptPane();
         if (s[0].equals("r")) {
-            JReporterInput inp = new JReporterInput(block.pane);
+            JReporterInput inp = new JReporterInput(pane);
             inp.setBackground(block.getBackground());
             inp.reset();
             block.add(inp);
         } else if (s[0].equals("b")) {
-            JBooleanInput inp = new JBooleanInput(block.pane);
+            JBooleanInput inp = new JBooleanInput(pane);
             inp.setBackground(block.getBackground());
             inp.reset();
             block.add(inp);
