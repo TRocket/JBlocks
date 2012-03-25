@@ -195,7 +195,7 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
         	concatWithPuzzle(this, overMe);
         	pane.setDrawBlockInsertLine(true);
         	pane.setBlockInsertLineX(this.overMe.block.getX());
-        	pane.setBlockInsertLineY(this.overMe.block.getY()  + this.overMe.block.getHeight()/3);
+        	pane.setBlockInsertLineY(this.overMe.block.getY() + 5);
         	pane.setBlockInsertLineW(this.overMe.block.getHeight());
         	removeFromPuzzle(this, overMe);
         	this.setLocation(oldx, oldy);

@@ -275,6 +275,7 @@ public abstract class AbstrBlock extends JComponent {
             a.neighbour = b;
             ((Puzzle) a.block).layoutPuzzle();
         }
+        b.pane.setDrawBlockInsertLine(false);
     }
     static boolean findPuzzle(AbstrBlock b, PuzzleAdapter adp) {
         PuzzleAdapter a = findAdapter(b, adp, PuzzleAdapter.TYPE_DOWN);
