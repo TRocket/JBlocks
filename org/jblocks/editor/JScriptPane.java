@@ -27,11 +27,16 @@ import org.jblocks.JBlocks;
  * 
  * @version 0.1
  * @author ZeroLuck
+ * TRocket
  */
 public class JScriptPane extends JPanel {
 
     private static BufferedImage scriptpane;
     private static BufferedImage greenflag;
+    private int blockInsertLineX;
+    private int blockInsertLineY;
+    private boolean drawBlockInsertLine = false;
+    private int blockInsertLineW;
 
     static {
         try {
@@ -210,6 +215,12 @@ public class JScriptPane extends JPanel {
                 g.drawImage(back, x, y, this);
             }
         }
+        if (drawBlockInsertLine) {
+        	g.setColor(Color.WHITE);
+            g.fillRect(blockInsertLineX, blockInsertLineY, blockInsertLineW, 5);
+          // System.out.println("drw");
+		}
+        
     }
     
     /**
@@ -230,4 +241,34 @@ public class JScriptPane extends JPanel {
         }
         return p;
     }
+
+	/**
+	 * @param blockInsertLineX the blockInsertLineX to set
+	 */
+	public void setBlockInsertLineX(int blockInsertLineX) {
+		this.blockInsertLineX = blockInsertLineX;
+	}
+
+	/**
+	 * @param blockInsertLineY the blockInsertLineY to set
+	 */
+	public void setBlockInsertLineY(int blockInsertLineY) {
+		this.blockInsertLineY = blockInsertLineY;
+	}
+
+	/**
+	 * @param drawBlockInsertLine the drawBlockInsertLine to set
+	 */
+	public void setDrawBlockInsertLine(boolean drawBlockInsertLine) {
+		this.drawBlockInsertLine = drawBlockInsertLine;
+	}
+
+	/**
+	 * @param blockInsertLineH the blockInsertLineH to set
+	 */
+	public void setBlockInsertLineW(int blockInsertLineW) {
+		this.blockInsertLineW = blockInsertLineW;
+	}
+
+
 }

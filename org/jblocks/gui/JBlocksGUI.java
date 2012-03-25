@@ -17,6 +17,7 @@ public static final int JBLOCKS = 0;
 public static final int CLASSICSCRATCH = 1;
 public static final int SCRATCHTWO = 2;
 public int layoutstyle;
+
     /**
      * @throws HeadlessException
      */

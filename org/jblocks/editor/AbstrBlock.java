@@ -276,7 +276,17 @@ public abstract class AbstrBlock extends JComponent {
             ((Puzzle) a.block).layoutPuzzle();
         }
     }
-    
+    static boolean findPuzzle(AbstrBlock b, PuzzleAdapter adp) {
+        PuzzleAdapter a = findAdapter(b, adp, PuzzleAdapter.TYPE_DOWN);
+        if (a != null) {
+            //removeFromPuzzle(b, adp);
+            //adp.neighbour = a.block;
+           // a.neighbour = b;
+           // ((Puzzle) a.block).layoutPuzzle();
+        	return true;
+        }
+		return false;
+    }
     protected static void puzzleToFront(AbstrBlock blck) {
         if (!(blck instanceof Puzzle)) {
             throw new IllegalArgumentException("the block isn't a puzzle.");
