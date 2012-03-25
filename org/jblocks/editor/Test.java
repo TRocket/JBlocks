@@ -1,10 +1,8 @@
 package org.jblocks.editor;
 
 import java.awt.BorderLayout;
-import java.lang.reflect.Constructor;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.UIManager;
 
 /**
@@ -25,6 +23,7 @@ public class Test {
         pane.add(pane.createBlock("reporter", "test-2"));
         pane.add(pane.createBlock("boolean", "test-3"));
         pane.add(pane.createBlock("command", "test %{b} , %{r}"));
+        pane.add(pane.createBlock("command", "hello world"));
         pane.add(pane.createBlock("hat", "when %{combo;space;a;b;c;d;} key pressed"));
 
         JFrame frm = new JFrame("Script-Pane : Test");

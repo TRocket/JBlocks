@@ -89,7 +89,7 @@ public class JReporterInput extends AbstrInput {
         setBorderEnabled(true);
         setInput(new JReporterInput.TextInput());
     }
-
+    
     private class TextInput extends JTextField {
 
         public TextInput() {

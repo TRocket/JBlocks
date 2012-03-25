@@ -87,7 +87,6 @@ public class JScriptPane extends JPanel {
             }
             block.add(box);
         }
-        System.out.println(fmt);
     }
     
     /**

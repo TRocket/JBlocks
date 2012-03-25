@@ -222,6 +222,10 @@ public abstract class AbstrBlock extends JComponent {
                 
                 clone.x += b.getX();
                 clone.y += b.getY();
+                r.x -= 10;
+                r.y -= 10;
+                r.width += 10;
+                r.height += 10;
                 
                 if (clone.intersects(r) && a.neighbour == null
                         && a.type == t) {
@@ -238,11 +242,11 @@ public abstract class AbstrBlock extends JComponent {
                 p.bounds.width, p.bounds.height);
         r.x += b.getX();
         r.y += b.getY();
-
+        
         for (Component c : hats) {
             if (c instanceof AbstrBlock && c != b) {
                 PuzzleAdapter adp = findAdapter0((AbstrBlock) c, r, t);
-                if (p != null) {
+                if (adp != null) {
                     return adp;
                 }
             }
