@@ -18,7 +18,8 @@ public class Test {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         JScriptPane pane = new JScriptPane();
 
-        for (int i = 0; i < 5; i++) {
+        pane.add(pane.createBlock("command", "Hello Stack%{br}Yoo %{s}"));
+        
             pane.add(pane.createBlock("hat", "when %{gf} clicked"));
             pane.add(pane.createBlock("command", "say %{r}"));
             pane.add(pane.createBlock("reporter", "test-1"));
@@ -27,7 +28,7 @@ public class Test {
             pane.add(pane.createBlock("command", "test %{b} , %{r}"));
             pane.add(pane.createBlock("command", "hello world"));
             pane.add(pane.createBlock("hat", "when %{combo;space;a;b;c;d;} key pressed"));
-        }
+        
 
         JFrame frm = new JFrame("Script-Pane : Test");
         frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

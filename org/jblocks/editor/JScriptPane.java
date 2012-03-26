@@ -25,7 +25,7 @@ import org.jblocks.JBlocks;
  *
  * A ScriptPane for the BlockEditor. <br />
  * 
- * @version 0.1
+ * @version 0.2
  * @author ZeroLuck
  * TRocket
  */
@@ -88,6 +88,11 @@ public class JScriptPane extends JPanel {
                 box.addItem(s[i]);
             }
             block.add(box);
+        } else if (s[0].equals("s")) {
+            JBlockSequence seq = new JBlockSequence(pane);
+            block.add(seq);
+        } else if (s[0].equals("br")) {
+            block.add(new NewLineComponent());
         }
     }
 
@@ -97,8 +102,8 @@ public class JScriptPane extends JPanel {
      * Format: <br />
      *  - %{r}    : a reporter/boolean/text input. <br />
      *  - %{b}                  : a boolean input. <br />
-     *  - %{s}                  : a sequence. (not working yet) <br />
-     *  - %{br}                 : a new line. (not working yet) <br />
+     *  - %{s}                  : a sequence.
+     *  - %{br}                 : a new line.
      *  - %{gf}                 : a green flag icon. <br />
      *  - %{combo;ITEM_1}       : a combo box. <br />
      * <br />

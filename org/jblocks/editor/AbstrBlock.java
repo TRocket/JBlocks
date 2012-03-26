@@ -117,6 +117,9 @@ public abstract class AbstrBlock extends JComponent {
 
             while (i < components.length && xoff < MAX_BLOCK_WIDTH) {
                 Component comp = components[i++];
+                if (comp instanceof NewLineComponent) {
+                    break;
+                }
                 Dimension size = comp.getPreferredSize();
                 if (size.height > lineH) {
                     lineH = size.height;
@@ -128,6 +131,9 @@ public abstract class AbstrBlock extends JComponent {
 
             while (idx < components.length && xoff < MAX_BLOCK_WIDTH) {
                 Component comp = components[idx++];
+                if (comp instanceof NewLineComponent) {
+                    break;
+                }
                 Dimension size = comp.getPreferredSize();
                 comp.setSize(size);
 
