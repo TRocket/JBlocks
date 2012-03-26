@@ -2,10 +2,10 @@ package org.jblocks.editor;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
@@ -18,7 +18,6 @@ import javax.swing.JComponent;
 public class JBlockSequence extends JComponent {
 
     // <global>
-    private static final int ADAPTER_A_Y = 0;
     private static final int ADAPTER_W = 15;
     private static final int ADAPTER_X = 15;
     private static final int ADAPTER_H = 6;
@@ -31,10 +30,42 @@ public class JBlockSequence extends JComponent {
         }
         pane = p;
     }
-    
+
+    @Override
+    public void doLayout() {
+        Component[] comp = getComponents();
+        Dimension dim;
+        if (comp.length > 0) {
+            int xmax = 0;
+            int ymax = 0;
+            for (Component c : comp) {
+                Dimension p = c.getPreferredSize();
+                c.setLocation(0, ymax);
+                c.setSize(p);
+                if (p.width > xmax) {
+                    xmax = p.width;
+                }
+                ymax += p.height;
+            }
+            ymax += 1;
+            dim = new Dimension(Math.max(75, xmax + 10), ymax);
+        } else {
+            dim = new Dimension(75, 35);
+        }
+        setPreferredSize(dim);
+    }
+
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(150, 75);
+        if (!isValid()) {
+            validate();
+        }
+        return super.getPreferredSize();
+    }
+
+    public void setStack(AbstrBlock hat) {
+        removeAll();
+        add(hat);
     }
 
     @Override
@@ -54,10 +85,10 @@ public class JBlockSequence extends JComponent {
         // BACKGROUND
         g.setColor(gray);
         g.fillRect(0, 0, size.width, size.height);
-        
+
         // TOP
         g.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
-        
+
         g.setColor(col);
         g.fillRoundRect(ADAPTER_X, 0 - 5, ADAPTER_W, ADAPTER_H + 5, 5, 5);
         g.setColor(shadow);
@@ -67,16 +98,16 @@ public class JBlockSequence extends JComponent {
         g.setColor(shadow);
         g.drawLine(0, 0, ADAPTER_X, 0);
         g.drawLine(ADAPTER_X + ADAPTER_W, 0, size.width, 0);
-        
+
         // LEFT + RIGHT
-        
+
         g.setColor(col);
         g.fillRect(0, 0, 0, size.height);
         g.fillRect(size.width, 0, 0, size.height);
         g.setColor(shadow);
         g.drawLine(0, 0, 0, size.height - ADAPTER_H);
         g.drawLine(size.width - 1, 0, size.width - 1, size.height - ADAPTER_H);
-        
+
         // BOTTOM
         g.setColor(col);
         g.fillRect(0, size.height - ADAPTER_H, ADAPTER_X + 2, ADAPTER_H);
@@ -84,12 +115,12 @@ public class JBlockSequence extends JComponent {
         g.setColor(shadow);
         g.drawLine(0, size.height - ADAPTER_H, ADAPTER_X, size.height - ADAPTER_H);
         g.drawLine(ADAPTER_X + ADAPTER_W, size.height - ADAPTER_H, size.width, size.height - ADAPTER_H);
-        
+
         g.setClip(ADAPTER_X, size.height - ADAPTER_H, ADAPTER_W, ADAPTER_H);
         g.drawRoundRect(ADAPTER_X, size.height - ADAPTER_H - 5, ADAPTER_W - 1, ADAPTER_H + 4, 5, 5);
-        
+
         g.setClip(clip);
-        
+
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_OFF);
 
