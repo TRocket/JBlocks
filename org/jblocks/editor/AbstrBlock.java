@@ -1,5 +1,5 @@
 package org.jblocks.editor;
-
+ 
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -20,8 +20,8 @@ import javax.swing.JComponent;
  * @author ZeroLuck
  */
 public abstract class AbstrBlock extends JComponent {
-//just for now...
-    protected JScriptPane pane;
+
+    private JScriptPane pane;
     protected Point drag;
 
     /**
@@ -275,19 +275,18 @@ public abstract class AbstrBlock extends JComponent {
             a.neighbour = b;
             ((Puzzle) a.block).layoutPuzzle();
         }
-        b.pane.setDrawBlockInsertLine(false);
     }
-    static boolean findPuzzle(AbstrBlock b, PuzzleAdapter adp) {
+    
+    /*static void findPuzzle(AbstrBlock b, PuzzleAdapter adp) {
         PuzzleAdapter a = findAdapter(b, adp, PuzzleAdapter.TYPE_DOWN);
         if (a != null) {
-            //removeFromPuzzle(b, adp);
-            //adp.neighbour = a.block;
-           // a.neighbour = b;
-           // ((Puzzle) a.block).layoutPuzzle();
-        	return true;
+            removeFromPuzzle(b, adp);
+            adp.neighbour = a.block;
+            a.neighbour = b;
+            ((Puzzle) a.block).layoutPuzzle();
         }
-		return false;
-    }
+    }*/
+    
     protected static void puzzleToFront(AbstrBlock blck) {
         if (!(blck instanceof Puzzle)) {
             throw new IllegalArgumentException("the block isn't a puzzle.");

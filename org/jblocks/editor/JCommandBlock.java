@@ -26,7 +26,7 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
     // <member>
     private PuzzleAdapter overMe;
     private PuzzleAdapter underMe;
-    
+
     public JCommandBlock(JScriptPane pane) {
         super(pane);
         underMe = new PuzzleAdapter(this, PuzzleAdapter.TYPE_DOWN);
@@ -63,7 +63,7 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
         overMe.bounds.y = 0;
         overMe.bounds.width = ADAPTER_W;
         overMe.bounds.height = TOP;
-        
+
         layoutPuzzle();
     }
 
@@ -74,18 +74,18 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
     @Override
     public void paintBlockBorder(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
-        
+
         Color col = getBackground();
         Rectangle clip = g.getClipBounds();
         Dimension size = getSize();
         Stroke basic = g.getStroke();
-        
+
         Color shadow = col.darker();
         Color darkShadow = shadow.darker();
-        
+
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-        
+
         g.setStroke(new java.awt.BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
 
         // TOP
@@ -100,8 +100,8 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
         // draw LEFT and RIGHT
         g.setColor(shadow);
         g.drawLine(0, 0, 0, size.height - BOTTOM);
-        
-        
+
+
         g.setStroke(basic);
         g.setColor(darkShadow);
         g.drawLine(size.width - 1, 0, size.width - 1, size.height - BOTTOM);
@@ -111,17 +111,17 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
 
         // draw BOTTOM
         g.setClip(0, size.height - BOTTOM, size.width, BOTTOM);
-        
+
         g.setColor(shadow);
         g.drawLine(0, size.height - BOTTOM, size.width, size.height - BOTTOM);
         g.setColor(darkShadow);
         g.drawLine(1, size.height - BOTTOM + 1, size.width - 1, size.height - BOTTOM + 1);
-        
+
         g.setColor(col);
         g.fillRoundRect(15, size.height - BOTTOM - 5, ADAPTER_W, BOTTOM + 5, 5, 5);
         g.setColor(darkShadow);
         g.drawRoundRect(15, size.height - BOTTOM - 5, ADAPTER_W, BOTTOM + 4, 5, 5);
-        
+
         g.setClip(clip);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -170,17 +170,17 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
                     underMe
                 };
     }
-    
+
     @Override
     protected void pressedEvent(MouseEvent evt) {
         AbstrBlock.removeFromPuzzle(this, overMe);
         if (underMe.neighbour != null) {
             AbstrBlock.puzzleToFront(this);
         }
-        
+
         super.pressedEvent(evt);
     }
-    
+
     @Override
     protected void dragEvent(MouseEvent evt) {
         if (overMe.neighbour != null) {
@@ -188,32 +188,14 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
         }
         super.dragEvent(evt);
         layoutPuzzle();
-        
-        if (AbstrBlock.findPuzzle(this, overMe)) {
-        	int oldx = this.getX();
-        	int oldy = this.getY();
-        	concatWithPuzzle(this, overMe);
-        	pane.setDrawBlockInsertLine(true);
-        	pane.setBlockInsertLineX(this.overMe.block.getX());
-        	pane.setBlockInsertLineY(this.overMe.block.getY() + 5);
-        	pane.setBlockInsertLineW(this.overMe.block.getHeight());
-        	removeFromPuzzle(this, overMe);
-        	this.setLocation(oldx, oldy);
-        	pane.repaint();
-		}else{
-	        pane.setDrawBlockInsertLine(false);
-	        pane.repaint();
-		}
-        //	System.out.println(AbstrBlock.findPuzzle(this, overMe));
-
     }
-    
+
     @Override
     protected void releasedEvent(MouseEvent evt) {
         super.releasedEvent(evt);
         AbstrBlock.concatWithPuzzle(this, overMe);
     }
-    
+
     @Override
     public void removeFromPuzzle(AbstrBlock b) {
         if (underMe.neighbour == b) {
