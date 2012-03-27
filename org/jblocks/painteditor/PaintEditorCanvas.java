@@ -1,17 +1,11 @@
 package org.jblocks.painteditor;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
@@ -20,6 +14,9 @@ public class PaintEditorCanvas extends JPanel implements MouseListener, MouseMot
 	private BufferedImage canvas;
 	private Graphics2D g;
 	private int lastX, lastY;
+	private int w;
+	private int h;
+	private Color color;
 	/**
 	 * the paintbrush tool
 	 */
@@ -36,10 +33,12 @@ public class PaintEditorCanvas extends JPanel implements MouseListener, MouseMot
 	private int currentTool;
 
 	public PaintEditorCanvas(int h, int w){
+		this.h = h;
+		this.w = w;
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
-		canvas = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-		g = canvas.createGraphics();
+		clear();
+		
 		
 	}
 	@Override
@@ -93,6 +92,7 @@ public class PaintEditorCanvas extends JPanel implements MouseListener, MouseMot
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		// TODO Auto-generated method stub
+		g.setColor(color);
 		g.drawLine(this.lastX, this.lastY, e.getX(), e.getY());
 		
 		this.repaint();
@@ -105,5 +105,47 @@ public class PaintEditorCanvas extends JPanel implements MouseListener, MouseMot
 	public void mouseMoved(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void clear() {
+		canvas = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		g = canvas.createGraphics();
+		this.repaint();
+	}
+	/**
+	 * @return the w
+	 */
+	public int getW() {
+		return w;
+	}
+	/**
+	 * @param w the w to set
+	 */
+	public void setW(int w) {
+		this.w = w;
+	}
+	/**
+	 * @return the h
+	 */
+	public int getH() {
+		return h;
+	}
+	/**
+	 * @param h the h to set
+	 */
+	public void setH(int h) {
+		this.h = h;
+	}
+	/**
+	 * @return the color
+	 */
+	public Color getColor() {
+		return color;
+	}
+	/**
+	 * @param color the color to set
+	 */
+	public void setColor(Color color) {
+		this.color = color;
 	}
 }

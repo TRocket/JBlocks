@@ -16,6 +16,7 @@ pE.setVisible(true);
 jf.add(pE);
 jf.setVisible(true);
 jf.pack();
+
 	}
 
 }
