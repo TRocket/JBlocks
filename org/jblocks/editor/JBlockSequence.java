@@ -69,10 +69,12 @@ public class JBlockSequence extends JComponent {
                 }
                 ymax += p.height;
                 if (c instanceof Puzzle) {
-                    Rectangle r = getAdapterFor((Puzzle) c, PuzzleAdapter.TYPE_DOWN).bounds;
-                    if (r != null) {
-                        lastp = r.height;
-                        ymax -= r.height;
+                    PuzzleAdapter pa = getAdapterFor((Puzzle) c, PuzzleAdapter.TYPE_DOWN);
+                    if (pa != null) {
+                        lastp = pa.bounds.height;
+                        ymax -= pa.bounds.height;
+                    } else {
+                        lastp = 0;
                     }
                 }
             }
@@ -286,15 +288,21 @@ public class JBlockSequence extends JComponent {
         PuzzleAdapter[] adps = p.getPuzzleAdapters();
         while (adps != null && adps.length > 0) {
             list.add(adps[0].block);
+            boolean brk = false;
             for (PuzzleAdapter a : adps) {
                 if (a.type == t) {
                     if (a.neighbour instanceof Puzzle) {
                         adps = ((Puzzle) a.neighbour).getPuzzleAdapters();
+                        brk = true;
                         break;
                     }
                     adps = null;
+                    brk = true;
                     break;
                 }
+            }
+            if (!brk) {
+                adps = null;
             }
         }
         return list.toArray(new AbstrBlock[0]);

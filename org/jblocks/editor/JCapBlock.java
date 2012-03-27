@@ -21,8 +21,8 @@ import java.awt.event.MouseEvent;
  *
  * @author ZeroLuck
  */
-public class JCapBlock extends AbstrBlock {
-    
+public class JCapBlock extends AbstrBlock implements Puzzle {
+
     // <global>
     private static final int TOP = 6;
     private static final int LEFT_RIGHT = 2;
@@ -165,4 +165,20 @@ public class JCapBlock extends AbstrBlock {
         }
     }
 
+    @Override
+    public void layoutPuzzle() {
+        // do nothing: there isn't a "underMe"
+    }
+
+    @Override
+    public void removeFromPuzzle(AbstrBlock b) {
+        // do nothing: there isn't a "underMe"
+    }
+
+    @Override
+    public PuzzleAdapter[] getPuzzleAdapters() {
+        return new PuzzleAdapter[]{
+                    overMe
+                };
+    }
 }

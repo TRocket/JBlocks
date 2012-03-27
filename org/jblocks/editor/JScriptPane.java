@@ -162,15 +162,14 @@ public class JScriptPane extends JPanel {
         return block;
     }
 
-
-    // has bugs...
+    // Fixme: replace the "-6"s.
     private static int doPuzzleH(Puzzle p, int y, Set<Component> set) {
         int h = 0;
         AbstrBlock[] up = JBlockSequence.getPuzzlePieces(p, PuzzleAdapter.TYPE_TOP);
         AbstrBlock[] down = JBlockSequence.getPuzzlePieces(p, PuzzleAdapter.TYPE_DOWN);
 
         up[up.length - 1].setLocation(CLEANUP_LEFT, y);
-
+        ((Puzzle) up[up.length - 1]).layoutPuzzle();
         for (AbstrBlock b : up) {
             set.add(b);
             h += b.getHeight() - 6;
@@ -199,15 +198,16 @@ public class JScriptPane extends JPanel {
         int y = CLEANUP_TOP;
 
         for (Component c : getComponents()) {
-            //   if (c instanceof AbstrBlock && !set.contains(c)) {
-            //       if (c instanceof Puzzle) {
-            //           y += doPuzzleH((Puzzle) c, y, set) + CLEANUP_BOTTOM;
-            //     } else {
-            Dimension size = c.getSize();
-            c.setLocation(CLEANUP_LEFT, y);
-            y += size.height + CLEANUP_BOTTOM;
-            //   }
-            //  }
+            if (c instanceof AbstrBlock && !set.contains(c)) {
+                if (c instanceof Puzzle) {
+                    y += doPuzzleH((Puzzle) c, y, set) + CLEANUP_BOTTOM;
+                } else {
+                    set.add(c);
+                    Dimension size = c.getSize();
+                    c.setLocation(CLEANUP_LEFT, y);
+                    y += size.height + CLEANUP_BOTTOM;
+                }
+            }
         }
     }
 
