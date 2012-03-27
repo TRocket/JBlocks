@@ -22,7 +22,7 @@ public class Test {
         pane.add(pane.createBlock("command", "Hello Stack%{br}Yoo %{s}"));
 
         pane.add(pane.createBlock("hat", "when %{gf} clicked"));
-        pane.add(pane.createBlock("command", "say %{r}"));
+        pane.add(pane.createBlock("cap", "<HTML><b>return</b></HTML> %{r}"));
         pane.add(pane.createBlock("reporter", "test-1 %{r}"));
         pane.add(pane.createBlock("reporter", "test-2"));
         pane.add(pane.createBlock("boolean", "test-3"));

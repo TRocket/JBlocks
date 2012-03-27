@@ -109,7 +109,7 @@ public class JScriptPane extends JPanel {
      *  - %{combo;ITEM_1}       : a combo box. <br />
      * <br />
      * 
-     * @param type "control", "reporter", "boolean" or "hat"
+     * @param type "control", "cap", "reporter", "boolean" or "hat"
      * @param bs the format for the block label
      * @return the created block
      */
@@ -123,6 +123,8 @@ public class JScriptPane extends JPanel {
             block = new JBooleanBlock(this);
         } else if (type.equals("reporter")) {
             block = new JReporterBlock(this);
+        } else if (type.equals("cap")) {
+            block = new JCapBlock(this);
         }
         if (block == null) {
             throw new IllegalArgumentException("\"" + type + "\" isn't a correct block type.");
