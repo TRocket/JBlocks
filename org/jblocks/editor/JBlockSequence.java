@@ -6,9 +6,12 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.util.ArrayList;
 import javax.swing.JComponent;
 
 /**
@@ -23,6 +26,7 @@ public class JBlockSequence extends JComponent {
     private static final int ADAPTER_H = 6;
     // <member>
     private JScriptPane pane;
+    private AbstrBlock stack;
 
     public JBlockSequence(JScriptPane p) {
         if (p == null) {
@@ -31,13 +35,31 @@ public class JBlockSequence extends JComponent {
         pane = p;
     }
 
+    /**
+     *  Returns the bounds of the adapter with the type t of the puzzle.
+     *  (or null)
+     */
+    private static PuzzleAdapter getAdapterFor(Puzzle p, int t) {
+        PuzzleAdapter[] adps = p.getPuzzleAdapters();
+        for (PuzzleAdapter a : adps) {
+            if (a.type == t) {
+                return a;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doLayout() {
-        Component[] comp = getComponents();
+        AbstrBlock[] comp = getPuzzlePieces((Puzzle) stack, PuzzleAdapter.TYPE_DOWN);
         Dimension dim;
         if (comp.length > 0) {
             int xmax = 0;
             int ymax = 0;
+            int lastp = 0;
             for (Component c : comp) {
                 Dimension p = c.getPreferredSize();
                 c.setLocation(0, ymax);
@@ -46,8 +68,15 @@ public class JBlockSequence extends JComponent {
                     xmax = p.width;
                 }
                 ymax += p.height;
+                if (c instanceof Puzzle) {
+                    Rectangle r = getAdapterFor((Puzzle) c, PuzzleAdapter.TYPE_DOWN).bounds;
+                    if (r != null) {
+                        lastp = r.height;
+                        ymax -= r.height;
+                    }
+                }
             }
-            ymax += 1;
+            ymax += 1 + lastp;
             dim = new Dimension(Math.max(75, xmax + 10), ymax);
         } else {
             dim = new Dimension(75, 35);
@@ -55,6 +84,10 @@ public class JBlockSequence extends JComponent {
         setPreferredSize(dim);
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
     @Override
     public Dimension getPreferredSize() {
         if (!isValid()) {
@@ -63,11 +96,41 @@ public class JBlockSequence extends JComponent {
         return super.getPreferredSize();
     }
 
-    public void setStack(AbstrBlock hat) {
-        removeAll();
-        add(hat);
+    /**
+     * 
+     * @return the block sequence's stack.
+     * @see #setStack(AbstrBlock)
+     */
+    public AbstrBlock getStack() {
+        return stack;
     }
 
+    /**
+     * 
+     * @see #getStack() 
+     * @param hat the new hat of the stack
+     */
+    public void setStack(AbstrBlock hat) {
+        if (hat == null) {
+            stack = null;
+            removeAll();
+            return;
+        }
+        if (hat instanceof Puzzle) {
+            stack = hat;
+            removeAll();
+            AbstrBlock[] seq = getPuzzlePieces((Puzzle) hat, PuzzleAdapter.TYPE_DOWN);
+            for (AbstrBlock b : seq) {
+                add(b);
+            }
+        } else {
+            throw new IllegalArgumentException("hat is not a instanceof Puzzle.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void paintComponent(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
@@ -125,5 +188,115 @@ public class JBlockSequence extends JComponent {
                 RenderingHints.VALUE_ANTIALIAS_OFF);
 
         g.setStroke(basic);
+    }
+
+    /**
+     * 
+     * finds a possible sequence for the block b. <br />
+     * 
+     * @param cont - cont = b
+     * @param b - the block
+     * @param r - the bounds of the block b.
+     */
+    static JBlockSequence findSequence(JComponent cont, Rectangle r, AbstrBlock b) {
+        for (Component comp : cont.getComponents()) {
+            if (comp == b) {
+                continue;
+            }
+            if (comp instanceof JBlockSequence) {
+                JBlockSequence inp = (JBlockSequence) comp;
+                if (inp.getStack() != null) {
+                    JBlockSequence inp2 = findSequence((JComponent) comp, r, b);
+                    if (inp2 != null) {
+                        return inp2;
+                    }
+                    continue;
+                }
+                Point p = JScriptPane.getLocationOnScriptPane(inp);
+                Rectangle rect = new Rectangle(p, inp.getSize());
+                if (rect.intersects(r)) {
+                    return inp;
+                }
+            }
+            if (comp instanceof JComponent) {
+                JBlockSequence inp = findSequence((JComponent) comp, r, b);
+                if (inp != null) {
+                    return inp;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * removes a block-puzzle from a sequence. <br />
+     * 
+     * @throws ClassCastException, NullPointerException
+     * @param b - the hat of the block-puzzle 
+     */
+    static void removeFromSequence(AbstrBlock b) {
+        JScriptPane pane = b.getScriptPane();
+        JBlockSequence seq = (JBlockSequence) b.getParent();
+        if (seq.getStack() == b) {
+            seq.setStack(null);
+        } else {
+            AbstrBlock[] blcks = getPuzzlePieces((Puzzle) b, PuzzleAdapter.TYPE_TOP);
+            if (blcks.length > 0) {
+                seq.setStack(blcks[1]);
+            } else {
+                seq.setStack(null);
+            }
+            AbstrBlock.removeFromPuzzle(b, getAdapterFor((Puzzle) b, PuzzleAdapter.TYPE_TOP));
+        }
+
+        AbstrBlock[] blcks = getPuzzlePieces((Puzzle) b, PuzzleAdapter.TYPE_DOWN);
+        for (AbstrBlock item : blcks) {
+            Point p = JScriptPane.getLocationOnScriptPane(b);
+            b.setLocation(p);
+            pane.add(item);
+        }
+
+
+        b.layoutRoot();
+    }
+
+    /**
+     * 
+     * @param b - the block.
+     * @return true if a sequence was found.
+     */
+    static boolean concatWithSequence(AbstrBlock b) {
+        JScriptPane pane = b.getScriptPane();
+        JBlockSequence seq = findSequence(pane,
+                new Rectangle(JScriptPane.getLocationOnScriptPane(b), b.getSize()), b);
+        if (seq != null) {
+            b.getParent().remove(b);
+            seq.setStack(b);
+            pane.validate();
+            return true;
+        }
+        return false;
+    }
+
+    static AbstrBlock[] getPuzzlePieces(Puzzle p, int t) {
+        if (p == null) {
+            return new AbstrBlock[0];
+        }
+        ArrayList<AbstrBlock> list = new ArrayList<AbstrBlock>();
+        PuzzleAdapter[] adps = p.getPuzzleAdapters();
+        while (adps != null && adps.length > 0) {
+            list.add(adps[0].block);
+            for (PuzzleAdapter a : adps) {
+                if (a.type == t) {
+                    if (a.neighbour instanceof Puzzle) {
+                        adps = ((Puzzle) a.neighbour).getPuzzleAdapters();
+                        break;
+                    }
+                    adps = null;
+                    break;
+                }
+            }
+        }
+        return list.toArray(new AbstrBlock[0]);
     }
 }

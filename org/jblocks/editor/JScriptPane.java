@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -25,9 +27,8 @@ import org.jblocks.JBlocks;
  *
  * A ScriptPane for the BlockEditor. <br />
  * 
- * @version 0.2
+ * @version 0.3
  * @author ZeroLuck
- * TRocket
  */
 public class JScriptPane extends JPanel {
 
@@ -159,19 +160,52 @@ public class JScriptPane extends JPanel {
         return block;
     }
 
+
+    // has bugs...
+    private static int doPuzzleH(Puzzle p, int y, Set<Component> set) {
+        int h = 0;
+        AbstrBlock[] up = JBlockSequence.getPuzzlePieces(p, PuzzleAdapter.TYPE_TOP);
+        AbstrBlock[] down = JBlockSequence.getPuzzlePieces(p, PuzzleAdapter.TYPE_DOWN);
+
+        up[up.length - 1].setLocation(CLEANUP_LEFT, y);
+
+        for (AbstrBlock b : up) {
+            set.add(b);
+            h += b.getHeight() - 6;
+        }
+
+        for (AbstrBlock b : down) {
+            if (!set.contains(b)) {
+                set.add(b);
+                h += b.getHeight() - 6;
+            }
+        }
+        h += 6;
+
+
+        return h;
+    }
+
     /**
      *
-     * Layouts the scripts like in Scratch.
+     * Layouts the scripts like in Scratch. <br />
      */
     public void cleanup() {
         doLayout();
+        HashSet<Component> set = new HashSet<Component>();
+
         int y = CLEANUP_TOP;
 
         for (Component c : getComponents()) {
-            Dimension p = c.getSize();
+            //   if (c instanceof AbstrBlock && !set.contains(c)) {
+            //       if (c instanceof Puzzle) {
+            //           y += doPuzzleH((Puzzle) c, y, set) + CLEANUP_BOTTOM;
+            //     } else {
+            Dimension size = c.getSize();
             c.setLocation(CLEANUP_LEFT, y);
-
-            y += p.height + CLEANUP_BOTTOM;
+            y += size.height + CLEANUP_BOTTOM;
+            //   }
+            //  }
         }
     }
 
@@ -188,6 +222,9 @@ public class JScriptPane extends JPanel {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Dimension getPreferredSize() {
         int w = 0, h = 0;
@@ -204,6 +241,9 @@ public class JScriptPane extends JPanel {
         return new Dimension(w + 100, h + 100);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void paintComponent(Graphics g) {
         BufferedImage back = scriptpane;

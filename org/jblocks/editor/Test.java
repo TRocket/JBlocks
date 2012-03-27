@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
-
+ 
 /**
  *
  * Class for testing the BlockEditor. <br />
@@ -23,7 +23,7 @@ public class Test {
 
         pane.add(pane.createBlock("hat", "when %{gf} clicked"));
         pane.add(pane.createBlock("command", "say %{r}"));
-        pane.add(pane.createBlock("reporter", "test-1"));
+        pane.add(pane.createBlock("reporter", "test-1 %{r}"));
         pane.add(pane.createBlock("reporter", "test-2"));
         pane.add(pane.createBlock("boolean", "test-3"));
         pane.add(pane.createBlock("command", "test %{b} , %{r}"));

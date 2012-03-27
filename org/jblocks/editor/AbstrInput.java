@@ -207,6 +207,9 @@ public abstract class AbstrInput extends JComponent {
      */
      static AbstrInput findInput(JComponent cont, Rectangle r, AbstrBlock b) {
         for (Component comp : cont.getComponents()) {
+            if (comp == b) {
+                continue;
+            }
             if (comp instanceof AbstrInput) {
                 AbstrInput inp = (AbstrInput) comp;
                 Point p = JScriptPane.getLocationOnScriptPane(inp);

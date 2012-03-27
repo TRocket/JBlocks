@@ -2,10 +2,12 @@ package org.jblocks.editor;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -173,10 +175,17 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
 
     @Override
     protected void pressedEvent(MouseEvent evt) {
+        Container parent = getParent();
+        JScriptPane pane = getScriptPane();
+        if (parent != pane) {
+            JBlockSequence.removeFromSequence(this);
+        }
+
         AbstrBlock.removeFromPuzzle(this, overMe);
         if (underMe.neighbour != null) {
             AbstrBlock.puzzleToFront(this);
         }
+
 
         super.pressedEvent(evt);
     }
@@ -193,7 +202,9 @@ public class JCommandBlock extends AbstrBlock implements Puzzle {
     @Override
     protected void releasedEvent(MouseEvent evt) {
         super.releasedEvent(evt);
-        AbstrBlock.concatWithPuzzle(this, overMe);
+        if (!AbstrBlock.concatWithPuzzle(this, overMe)) {
+            JBlockSequence.concatWithSequence(this);
+        }
     }
 
     @Override

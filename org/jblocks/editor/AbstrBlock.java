@@ -273,14 +273,16 @@ public abstract class AbstrBlock extends JComponent {
         }
     }
     
-    static void concatWithPuzzle(AbstrBlock b, PuzzleAdapter adp) {
+    static boolean concatWithPuzzle(AbstrBlock b, PuzzleAdapter adp) {
         PuzzleAdapter a = findAdapter(b, adp, PuzzleAdapter.TYPE_DOWN);
         if (a != null) {
             removeFromPuzzle(b, adp);
             adp.neighbour = a.block;
             a.neighbour = b;
             ((Puzzle) a.block).layoutPuzzle();
+            return true;
         }
+        return false;
     }
     
     /*static void findPuzzle(AbstrBlock b, PuzzleAdapter adp) {
