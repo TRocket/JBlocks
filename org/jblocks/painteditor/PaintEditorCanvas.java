@@ -1,14 +1,22 @@
 package org.jblocks.painteditor;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
+/**
+ * 
+ * @author TRocket
+ *
+ */
 
 public class PaintEditorCanvas extends JPanel implements MouseListener, MouseMotionListener {
 	private BufferedImage canvas;
@@ -17,6 +25,7 @@ public class PaintEditorCanvas extends JPanel implements MouseListener, MouseMot
 	private int w;
 	private int h;
 	private Color color;
+	private int linewidth;
 	/**
 	 * the paintbrush tool
 	 */
@@ -92,6 +101,7 @@ public class PaintEditorCanvas extends JPanel implements MouseListener, MouseMot
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		// TODO Auto-generated method stub
+		g.setStroke(new BasicStroke(this.linewidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		g.setColor(color);
 		g.drawLine(this.lastX, this.lastY, e.getX(), e.getY());
 		
@@ -147,5 +157,17 @@ public class PaintEditorCanvas extends JPanel implements MouseListener, MouseMot
 	 */
 	public void setColor(Color color) {
 		this.color = color;
+	}
+	/**
+	 * @return the linewidth
+	 */
+	public int getLinewidth() {
+		return linewidth;
+	}
+	/**
+	 * @param linewidth the linewidth to set
+	 */
+	public void setLinewidth(int linewidth) {
+		this.linewidth = linewidth;
 	}
 }

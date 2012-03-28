@@ -13,7 +13,11 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.InternalFrameListener;
-
+/**
+ * 
+ * @author TRocket
+ *
+ */
 public class PaintEditor extends JInternalFrame implements ToolChanged, ActionListener, ChangeListener{
 public static int CANVAS_DEAFAULT_HEIGHT = 300;
 public static int CANVAS_DEAFAULT_WIDTH = 300;
@@ -23,6 +27,7 @@ ToolSelector ts = new ToolSelector(this);
 JButton clear = new JButton("clear");
 JColorChooser jcc = new JColorChooser();
 
+ 
 	public PaintEditor(){
 		this.setTitle("Paint Editor");
 		//set the canvas to the deafault height and width
@@ -56,7 +61,16 @@ JColorChooser jcc = new JColorChooser();
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		// TODO Auto-generated method stub
-		pEC.setColor(jcc.getColor());
+		
+			pEC.setColor(jcc.getColor());
+		
+		
+	}
+
+	@Override
+	public void lineThicknessChanged(int line) {
+		// TODO Auto-generated method stub
+		pEC.setLinewidth(line);
 	}
 	
 	

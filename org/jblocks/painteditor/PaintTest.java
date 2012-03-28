@@ -1,7 +1,11 @@
 package org.jblocks.painteditor;
 
 import javax.swing.JFrame;
-
+/**
+ * 
+ * @author TRocket
+ *
+ */
 public class PaintTest {
 
 	/**
