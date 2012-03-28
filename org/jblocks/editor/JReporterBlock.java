@@ -17,7 +17,7 @@ import java.awt.geom.RoundRectangle2D;
  *
  * @author ZeroLuck
  */
-public class JReporterBlock extends AbstrBlock {
+class JReporterBlock extends AbstrBlock {
 
     public JReporterBlock(JScriptPane pane) {
         super(pane);

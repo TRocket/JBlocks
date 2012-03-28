@@ -20,7 +20,7 @@ import javax.swing.event.DocumentListener;
  * 
  * @author ZeroLuck
  */
-public class JReporterInput extends AbstrInput {
+class JReporterInput extends AbstrInput {
 
     public JReporterInput(JScriptPane p) {
         super(p);

@@ -18,7 +18,7 @@ import javax.swing.JComponent;
  *
  * @author ZeroLuck
  */
-public class JBlockSequence extends JComponent {
+class JBlockSequence extends JComponent {
 
     // <global>
     private static final int ADAPTER_W = 15;

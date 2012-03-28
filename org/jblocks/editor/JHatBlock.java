@@ -18,7 +18,7 @@ import java.awt.geom.Ellipse2D;
  * 
  * @author ZeroLuck
  */
-public class JHatBlock extends AbstrBlock implements Puzzle {
+class JHatBlock extends AbstrBlock implements Puzzle {
 
     // <global>
     private static final float RND_X = 1 / 1.5F;

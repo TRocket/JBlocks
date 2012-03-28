@@ -20,7 +20,7 @@ import java.awt.Stroke;
  * 
  * @author ZeroLuck
  */
-public class JBooleanInput extends AbstrInput {
+class JBooleanInput extends AbstrInput {
 
     public JBooleanInput(JScriptPane p) {
         super(p);

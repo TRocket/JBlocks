@@ -14,7 +14,7 @@ import java.awt.Stroke;
  *
  * @author ZeroLuck
  */
-public class JBooleanBlock extends JReporterBlock {
+class JBooleanBlock extends JReporterBlock {
 
     public JBooleanBlock(JScriptPane p) {
         super(p);

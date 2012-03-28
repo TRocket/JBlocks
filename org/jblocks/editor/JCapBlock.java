@@ -21,7 +21,7 @@ import java.awt.event.MouseEvent;
  *
  * @author ZeroLuck
  */
-public class JCapBlock extends AbstrBlock implements Puzzle {
+class JCapBlock extends AbstrBlock implements Puzzle {
 
     // <global>
     private static final int TOP = 6;
