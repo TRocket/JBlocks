@@ -16,10 +16,6 @@ import java.awt.Stroke;
  */
 class JBooleanBlock extends JReporterBlock {
 
-    public JBooleanBlock(JScriptPane p) {
-        super(p);
-    }
-
     private static Polygon getPlg(Dimension size) {
         Polygon plg = new Polygon();
 

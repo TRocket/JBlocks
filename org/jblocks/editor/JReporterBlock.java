@@ -19,10 +19,6 @@ import java.awt.geom.RoundRectangle2D;
  */
 class JReporterBlock extends AbstrBlock {
 
-    public JReporterBlock(JScriptPane pane) {
-        super(pane);
-    }
-
     @Override
     protected void paintBlockBorder(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
@@ -69,7 +65,7 @@ class JReporterBlock extends AbstrBlock {
     @Override
     protected void pressedEvent(MouseEvent evt) {
         Container parent = getParent();
-        JScriptPane pane = getScriptPane();
+        Container pane = getRootPane();
         if (parent != pane) {
             if (parent instanceof AbstrInput) {
                 ((AbstrInput) parent).reset();
@@ -86,7 +82,7 @@ class JReporterBlock extends AbstrBlock {
 
     @Override
     protected void releasedEvent(MouseEvent evt) {
-        AbstrInput inp = AbstrInput.findInput(getScriptPane(),
+        AbstrInput inp = AbstrInput.findInput(getRootPane(),
                 new Rectangle(JScriptPane.getLocationOnScriptPane(this),
                 getSize()), this);
 

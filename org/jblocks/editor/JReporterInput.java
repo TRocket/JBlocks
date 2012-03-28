@@ -22,10 +22,6 @@ import javax.swing.event.DocumentListener;
  */
 class JReporterInput extends AbstrInput {
 
-    public JReporterInput(JScriptPane p) {
-        super(p);
-    }
-
     private static Color bright(Color c, float f) {
         return new Color(Math.min((int) (c.getRed() * f), 255),
                 Math.min((int) (c.getGreen() * f), 255),

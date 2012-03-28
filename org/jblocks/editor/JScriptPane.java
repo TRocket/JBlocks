@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRootPane;
 import org.jblocks.JBlocks;
 
 /**
@@ -30,7 +31,7 @@ import org.jblocks.JBlocks;
  * @version 0.3
  * @author ZeroLuck
  */
-public class JScriptPane extends JPanel {
+public class JScriptPane extends JRootPane {
 
     private static BufferedImage scriptpane;
     private static BufferedImage greenflag;
@@ -65,19 +66,18 @@ public class JScriptPane extends JPanel {
         this.setComponentPopupMenu(menu);
     }
 
-    private void addFmt0(AbstrBlock block, String fmt) {
+    private static void addFmt0(AbstrBlock block, String fmt) {
         String[] s = fmt.split(";");
         if (s.length < 1) {
             throw new IllegalArgumentException("parse error in bs.");
         }
-        JScriptPane pane = block.getScriptPane();
         if (s[0].equals("r")) {
-            JReporterInput inp = new JReporterInput(pane);
+            JReporterInput inp = new JReporterInput();
             inp.setBackground(block.getBackground());
             inp.reset();
             block.add(inp);
         } else if (s[0].equals("b")) {
-            JBooleanInput inp = new JBooleanInput(pane);
+            JBooleanInput inp = new JBooleanInput();
             inp.setBackground(block.getBackground());
             inp.reset();
             block.add(inp);
@@ -90,7 +90,7 @@ public class JScriptPane extends JPanel {
             }
             block.add(box);
         } else if (s[0].equals("s")) {
-            JBlockSequence seq = new JBlockSequence(pane);
+            JBlockSequence seq = new JBlockSequence();
             block.add(seq);
         } else if (s[0].equals("br")) {
             block.add(new NewLineComponent());
@@ -113,18 +113,18 @@ public class JScriptPane extends JPanel {
      * @param bs the format for the block label
      * @return the created block
      */
-    public AbstrBlock createBlock(String type, String bs) {
+    public static AbstrBlock createBlock(String type, String bs) {
         AbstrBlock block = null;
         if (type.equals("hat")) {
-            block = new JHatBlock(this);
+            block = new JHatBlock();
         } else if (type.equals("command")) {
-            block = new JCommandBlock(this);
+            block = new JCommandBlock();
         } else if (type.equals("boolean")) {
-            block = new JBooleanBlock(this);
+            block = new JBooleanBlock();
         } else if (type.equals("reporter")) {
-            block = new JReporterBlock(this);
+            block = new JReporterBlock();
         } else if (type.equals("cap")) {
-            block = new JCapBlock(this);
+            block = new JCapBlock();
         }
         if (block == null) {
             throw new IllegalArgumentException("\"" + type + "\" isn't a correct block type.");

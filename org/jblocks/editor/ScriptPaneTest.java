@@ -6,36 +6,36 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
- 
+
 /**
  *
  * Class for testing the BlockEditor. <br />
  * 
  * @author ZeroLuck
  */
-class Test {
+class ScriptPaneTest {
 
     public static void main(String[] args) throws Exception {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         JScriptPane pane = new JScriptPane();
 
-        pane.add(pane.createBlock("command", "Hello Stack%{br}Yoo %{s}"));
+        pane.add(JScriptPane.createBlock("command", "Hello Stack%{br}Yoo %{s}"));
 
-        pane.add(pane.createBlock("hat", "when %{gf} clicked"));
-        pane.add(pane.createBlock("cap", "<HTML><b>return</b></HTML> %{r}"));
-        pane.add(pane.createBlock("reporter", "test-1 %{r}"));
-        pane.add(pane.createBlock("reporter", "test-2"));
-        pane.add(pane.createBlock("boolean", "test-3"));
-        pane.add(pane.createBlock("command", "test %{b} , %{r}"));
-        pane.add(pane.createBlock("command", "hello world"));
-        pane.add(pane.createBlock("hat", "when %{combo;space;a;b;c;d;} key pressed"));
+        pane.add(JScriptPane.createBlock("hat", "when %{gf} clicked"));
+        pane.add(JScriptPane.createBlock("cap", "<HTML><b>return</b></HTML> %{r}"));
+        pane.add(JScriptPane.createBlock("reporter", "test-1 %{r}"));
+        pane.add(JScriptPane.createBlock("reporter", "test-2"));
+        pane.add(JScriptPane.createBlock("boolean", "test-3"));
+        pane.add(JScriptPane.createBlock("command", "test %{b} , %{r}"));
+        pane.add(JScriptPane.createBlock("command", "hello world"));
+        pane.add(JScriptPane.createBlock("hat", "when %{combo;space;a;b;c;d;} key pressed"));
         
-        JCommandBlock block = new JCommandBlock(pane);
+        JCommandBlock block = new JCommandBlock();
         block.add(new JLabel("<HTML><b>Hello</b></HTML>"));
-        JBlockSequence seq = new JBlockSequence(pane);
-        
-        seq.setStack(pane.createBlock("command", "Hallo Welt %{s}"));
-        
+        JBlockSequence seq = new JBlockSequence();
+
+        seq.setStack(JScriptPane.createBlock("command", "Hallo Welt %{s}"));
+
         block.add(seq);
         pane.add(block);
 

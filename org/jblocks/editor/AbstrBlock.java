@@ -2,6 +2,7 @@ package org.jblocks.editor;
  
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -21,19 +22,10 @@ import javax.swing.JComponent;
  */
 public abstract class AbstrBlock extends JComponent {
 
-    private JScriptPane pane;
     protected Point drag;
 
-    /**
-     * @throws NullPointerException if p is null.
-     * @param p the script pane for this block.
-     */
-    public AbstrBlock(JScriptPane p) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
-        this.pane = p;
 
+    public AbstrBlock() {
         this.setLayout(null);
         this.setOpaque(true);
         this.setBackground(new Color(0xD6900A)); // <- TEST
@@ -44,14 +36,6 @@ public abstract class AbstrBlock extends JComponent {
         this.addMouseMotionListener(listener);
     }
     
-    /**
-     * 
-     * @return the block's script pane.
-     */
-    protected JScriptPane getScriptPane() {
-        return pane;
-    }
-
     @Override
     public Dimension getPreferredSize() {
         if (!isValid()) {
@@ -190,9 +174,10 @@ public abstract class AbstrBlock extends JComponent {
     }
 
     protected void toFront() {
-        if (getParent() == pane) {
-            pane.remove(this);
-            pane.add(this, 0);
+        Container root = getRootPane();
+        if (getParent() == root) {
+            root.remove(this);
+            root.add(this, 0);
         }
     }
 
@@ -219,10 +204,10 @@ public abstract class AbstrBlock extends JComponent {
 
     /**
      * 
-     * Layouts the whole HatBlock. <br />
+     * Layouts the whole ScriptPane. <br />
      */
     protected void layoutRoot() {
-        pane.validate();  // not a very clean implementation. (fixme)
+        getRootPane().validate();
     }
     
 
@@ -247,7 +232,7 @@ public abstract class AbstrBlock extends JComponent {
     }
 
     static PuzzleAdapter findAdapter(AbstrBlock b, PuzzleAdapter p, int t) {
-        Component[] hats = b.pane.getComponents();
+        Component[] hats = b.getRootPane().getComponents();
         Rectangle r = new Rectangle(p.bounds.x, p.bounds.y,
                 p.bounds.width, p.bounds.height);
         r.x += b.getX();

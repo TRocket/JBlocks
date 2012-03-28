@@ -31,8 +31,7 @@ class JCapBlock extends AbstrBlock implements Puzzle {
     // <member>
     private PuzzleAdapter overMe;
 
-    public JCapBlock(JScriptPane pane) {
-        super(pane);
+    public JCapBlock() {
         overMe = new PuzzleAdapter(this, PuzzleAdapter.TYPE_TOP);
     }
 
@@ -139,7 +138,7 @@ class JCapBlock extends AbstrBlock implements Puzzle {
     @Override
     protected void pressedEvent(MouseEvent evt) {
         Container parent = getParent();
-        JScriptPane pane = getScriptPane();
+        Container pane = getRootPane();
         if (parent != pane) {
             JBlockSequence.removeFromSequence(this);
         }

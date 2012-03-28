@@ -3,6 +3,7 @@ package org.jblocks.editor;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -25,14 +26,10 @@ class JBlockSequence extends JComponent {
     private static final int ADAPTER_X = 15;
     private static final int ADAPTER_H = 6;
     // <member>
-    private JScriptPane pane;
     private AbstrBlock stack;
 
-    public JBlockSequence(JScriptPane p) {
-        if (p == null) {
-            throw new IllegalArgumentException("p is null!");
-        }
-        pane = p;
+    public JBlockSequence() {
+        // nothing...
     }
 
     /**
@@ -200,7 +197,7 @@ class JBlockSequence extends JComponent {
      * @param b - the block
      * @param r - the bounds of the block b.
      */
-    static JBlockSequence findSequence(JComponent cont, Rectangle r, AbstrBlock b) {
+    static JBlockSequence findSequence(Container cont, Rectangle r, AbstrBlock b) {
         for (Component comp : cont.getComponents()) {
             if (comp == b) {
                 continue;
@@ -237,7 +234,7 @@ class JBlockSequence extends JComponent {
      * @param b - the hat of the block-puzzle 
      */
     static void removeFromSequence(AbstrBlock b) {
-        JScriptPane pane = b.getScriptPane();
+        Container pane = b.getRootPane();
         JBlockSequence seq = (JBlockSequence) b.getParent();
         if (seq.getStack() == b) {
             seq.setStack(null);
@@ -268,7 +265,7 @@ class JBlockSequence extends JComponent {
      * @return true if a sequence was found.
      */
     static boolean concatWithSequence(AbstrBlock b) {
-        JScriptPane pane = b.getScriptPane();
+        Container pane = b.getRootPane();
         JBlockSequence seq = findSequence(pane,
                 new Rectangle(JScriptPane.getLocationOnScriptPane(b), b.getSize()), b);
         if (seq != null) {

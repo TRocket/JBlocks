@@ -29,8 +29,7 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
     private PuzzleAdapter overMe;
     private PuzzleAdapter underMe;
 
-    public JCommandBlock(JScriptPane pane) {
-        super(pane);
+    public JCommandBlock() {
         underMe = new PuzzleAdapter(this, PuzzleAdapter.TYPE_DOWN);
         overMe = new PuzzleAdapter(this, PuzzleAdapter.TYPE_TOP);
     }
@@ -176,7 +175,7 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
     @Override
     protected void pressedEvent(MouseEvent evt) {
         Container parent = getParent();
-        JScriptPane pane = getScriptPane();
+        Container pane = getRootPane();
         if (parent != pane) {
             JBlockSequence.removeFromSequence(this);
         }

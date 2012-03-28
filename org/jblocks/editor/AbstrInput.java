@@ -25,18 +25,10 @@ import javax.swing.JComponent;
 public abstract class AbstrInput extends JComponent {
 
     private JComponent comp;
-    private JScriptPane pane;
     private boolean borderEnabled = true;
 
-    /**
-     * @throws NullPointerException if p is null.
-     * @param p the script pane for this block-input.
-     */
-    public AbstrInput(JScriptPane p) {
-        if (p == null) {
-            throw new NullPointerException();
-        }
-        pane = p;
+    public AbstrInput() {
+        // do nothing
     }
 
     /**
@@ -98,10 +90,10 @@ public abstract class AbstrInput extends JComponent {
 
     /**
      * 
-     * Layouts the whole HatBlock. <br />
+     * Layouts the whole ScriptPane. <br />
      */
     protected void layoutRoot() {
-        pane.validate();  // not a very clean implementation. (fixme)
+        getRootPane().validate();
     }
 
     /**

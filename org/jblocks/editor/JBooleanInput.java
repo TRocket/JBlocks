@@ -22,10 +22,6 @@ import java.awt.Stroke;
  */
 class JBooleanInput extends AbstrInput {
 
-    public JBooleanInput(JScriptPane p) {
-        super(p);
-    }
-
     private static Polygon getPlg(Dimension size) {
         Polygon plg = new Polygon();
 

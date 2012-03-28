@@ -30,8 +30,7 @@ class JHatBlock extends AbstrBlock implements Puzzle {
     // <member>
     private PuzzleAdapter underMe;
 
-    public JHatBlock(JScriptPane pane) {
-        super(pane);
+    public JHatBlock() {
         underMe = new PuzzleAdapter(this, PuzzleAdapter.TYPE_DOWN);
     }
 
