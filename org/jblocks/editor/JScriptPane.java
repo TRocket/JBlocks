@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -21,7 +22,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JRootPane;
 import org.jblocks.JBlocks;
 
 /**
@@ -31,7 +31,7 @@ import org.jblocks.JBlocks;
  * @version 0.3
  * @author ZeroLuck
  */
-public class JScriptPane extends JRootPane {
+public class JScriptPane extends JPanel {
 
     private static BufferedImage scriptpane;
     private static BufferedImage greenflag;
@@ -47,6 +47,8 @@ public class JScriptPane extends JRootPane {
     private static final int CLEANUP_LEFT = 5;
     private static final int CLEANUP_BOTTOM = 5;
     private static final int CLEANUP_TOP = 5;
+    // <member>
+    private Image scrp = scriptpane;
 
     public JScriptPane() {
         setBackground(Color.WHITE);
@@ -64,6 +66,17 @@ public class JScriptPane extends JRootPane {
         menu.add(item);
         add(menu);
         this.setComponentPopupMenu(menu);
+    }
+    
+    public Image getScriptPaneImage() {
+        return scrp;
+    }
+    
+    public void setScriptPaneImage(Image img) {
+        if (img == null) {
+            throw new IllegalArgumentException("img is null!");
+        }
+        scrp = img;
     }
 
     private static void addFmt0(AbstrBlock block, String fmt) {
@@ -210,6 +223,14 @@ public class JScriptPane extends JRootPane {
             }
         }
     }
+    
+    public boolean isDragEnabled() {
+        return true;
+    }
+    
+    public boolean isModEnabled() {
+        return true;
+    }
 
     /**
      * 
@@ -248,10 +269,10 @@ public class JScriptPane extends JRootPane {
      */
     @Override
     public void paintComponent(Graphics g) {
-        BufferedImage back = scriptpane;
+        Image back = scrp;
         Rectangle clip = g.getClipBounds();
-        int w = back.getWidth();
-        int h = back.getHeight();
+        int w = back.getWidth(null);
+        int h = back.getHeight(null);
 
         for (int x = clip.x - (clip.x % w); x < (clip.x + clip.width); x += w) {
             for (int y = clip.y - (clip.y % h); y < (clip.y + clip.height); y += h) {

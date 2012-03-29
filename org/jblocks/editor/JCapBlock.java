@@ -138,7 +138,7 @@ class JCapBlock extends AbstrBlock implements Puzzle {
     @Override
     protected void pressedEvent(MouseEvent evt) {
         Container parent = getParent();
-        Container pane = getRootPane();
+        Container pane = getScriptPane();
         if (parent != pane) {
             JBlockSequence.removeFromSequence(this);
         }

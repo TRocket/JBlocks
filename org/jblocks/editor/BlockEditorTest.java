@@ -1,8 +1,8 @@
 package org.jblocks.editor;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import javax.swing.JFrame;
-import javax.swing.JRootPane;
 
 /**
  *
@@ -10,18 +10,32 @@ import javax.swing.JRootPane;
  */
 class BlockEditorTest {
     
-    public static void main(String[] args) {
-        
-        
+    public static void main(String[] args) {    
         JFrame frm = new JFrame("Block-Editor : Test");
         frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frm.setLocationByPlatform(true);
 
         frm.setLayout(new BorderLayout());
-        JRootPane root = new JRootPane();
-        root.setLayout(new BorderLayout());
-        root.add(JScriptPane.createBlock("command", "Hello %{r} World"));
-        frm.add(root);
+        JBlockEditor ch = new JBlockEditor();
+        
+        ch.addCategory("Motion", Color.BLUE); 
+        ch.addCategory("Operators", Color.GREEN);
+        ch.addCategory("Lists", Color.RED);
+        ch.addCategory("Control", Color.ORANGE);
+        
+        ch.addCategory("Touching", Color.CYAN);
+        ch.addCategory("Pen", Color.GREEN.darker());
+        ch.addCategory("Sound", Color.MAGENTA);
+        ch.addCategory("Looking", Color.MAGENTA.darker());
+        
+        JScriptPane pane = new JScriptPane();
+        pane.add(JScriptPane.createBlock("hat", "When %{gf} clicked"));
+        pane.cleanup();
+                
+        ch.setScriptPane(pane);
+        
+        
+        frm.add(ch);
         frm.pack();
 
         

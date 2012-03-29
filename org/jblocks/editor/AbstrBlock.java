@@ -61,6 +61,17 @@ public abstract class AbstrBlock extends JComponent {
      */
     protected abstract Insets getBorderInsets(int width, int height);
 
+    
+    public JScriptPane getScriptPane() {
+        Container cont = this;
+        while ((cont = cont.getParent()) != null) {
+            if (cont instanceof JScriptPane) {
+                return (JScriptPane) cont;
+            }
+        }
+        return null;
+    }
+    
     /**
      * 
      * {@inheritDoc}
@@ -174,7 +185,7 @@ public abstract class AbstrBlock extends JComponent {
     }
 
     protected void toFront() {
-        Container root = getRootPane();
+        Container root = getScriptPane();
         if (getParent() == root) {
             root.remove(this);
             root.add(this, 0);
@@ -207,7 +218,7 @@ public abstract class AbstrBlock extends JComponent {
      * Layouts the whole ScriptPane. <br />
      */
     protected void layoutRoot() {
-        getRootPane().validate();
+        getScriptPane().validate();
     }
     
 
@@ -232,7 +243,7 @@ public abstract class AbstrBlock extends JComponent {
     }
 
     static PuzzleAdapter findAdapter(AbstrBlock b, PuzzleAdapter p, int t) {
-        Component[] hats = b.getRootPane().getComponents();
+        Component[] hats = b.getScriptPane().getComponents();
         Rectangle r = new Rectangle(p.bounds.x, p.bounds.y,
                 p.bounds.width, p.bounds.height);
         r.x += b.getX();

@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -111,7 +110,7 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
 
 
         // draw BOTTOM
-        g.setClip(0, size.height - BOTTOM, size.width, BOTTOM);
+        g.setClip(clip.intersection(new Rectangle(0, size.height - BOTTOM, size.width, BOTTOM)));
 
         g.setColor(shadow);
         g.drawLine(0, size.height - BOTTOM, size.width, size.height - BOTTOM);
@@ -175,7 +174,7 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
     @Override
     protected void pressedEvent(MouseEvent evt) {
         Container parent = getParent();
-        Container pane = getRootPane();
+        Container pane = getScriptPane();
         if (parent != pane) {
             JBlockSequence.removeFromSequence(this);
         }

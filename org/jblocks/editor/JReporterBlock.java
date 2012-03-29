@@ -65,7 +65,7 @@ class JReporterBlock extends AbstrBlock {
     @Override
     protected void pressedEvent(MouseEvent evt) {
         Container parent = getParent();
-        Container pane = getRootPane();
+        Container pane = getScriptPane();
         if (parent != pane) {
             if (parent instanceof AbstrInput) {
                 ((AbstrInput) parent).reset();
@@ -82,7 +82,7 @@ class JReporterBlock extends AbstrBlock {
 
     @Override
     protected void releasedEvent(MouseEvent evt) {
-        AbstrInput inp = AbstrInput.findInput(getRootPane(),
+        AbstrInput inp = AbstrInput.findInput(getScriptPane(),
                 new Rectangle(JScriptPane.getLocationOnScriptPane(this),
                 getSize()), this);
 

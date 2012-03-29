@@ -234,7 +234,7 @@ class JBlockSequence extends JComponent {
      * @param b - the hat of the block-puzzle 
      */
     static void removeFromSequence(AbstrBlock b) {
-        Container pane = b.getRootPane();
+        Container pane = b.getScriptPane();
         JBlockSequence seq = (JBlockSequence) b.getParent();
         if (seq.getStack() == b) {
             seq.setStack(null);
@@ -265,7 +265,7 @@ class JBlockSequence extends JComponent {
      * @return true if a sequence was found.
      */
     static boolean concatWithSequence(AbstrBlock b) {
-        Container pane = b.getRootPane();
+        Container pane = b.getScriptPane();
         JBlockSequence seq = findSequence(pane,
                 new Rectangle(JScriptPane.getLocationOnScriptPane(b), b.getSize()), b);
         if (seq != null) {

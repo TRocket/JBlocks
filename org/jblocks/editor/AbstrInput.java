@@ -2,6 +2,7 @@ package org.jblocks.editor;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -87,13 +88,23 @@ public abstract class AbstrInput extends JComponent {
         }
         return super.getPreferredSize();
     }
-
+    
+    public JScriptPane getScriptPane() {
+        Container cont = this;
+        while ((cont = cont.getParent()) != null) {
+            if (cont instanceof JScriptPane) {
+                return (JScriptPane) cont;
+            }
+        }
+        return null;
+    }
+    
     /**
      * 
      * Layouts the whole ScriptPane. <br />
      */
     protected void layoutRoot() {
-        getRootPane().validate();
+        getScriptPane().validate();
     }
 
     /**
