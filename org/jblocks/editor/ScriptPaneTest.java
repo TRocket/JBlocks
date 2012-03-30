@@ -9,7 +9,7 @@ import javax.swing.UIManager;
 
 /**
  *
- * Class for testing the BlockEditor. <br />
+ * this class will be removed later... <br />
  * 
  * @author ZeroLuck
  */

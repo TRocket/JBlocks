@@ -1,8 +1,13 @@
 package org.jblocks;
 
+import java.awt.BorderLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import org.jblocks.gui.JBlocksPane;
+
 /**
  * 
- * Main-Class for Desktop-Application.
+ * Main class for the JBlocks desktop-application. <br />
  * 
  * @author TRocket
  * @author ZeroLuck
@@ -15,8 +20,19 @@ public class JBlocksLauncher {
      */
     public static void main(String[] args) {
         // TODO run JBlocks
-        JBlocks jb = new JBlocks();
-        jb.init();
+
+        JBlocksPane.setLaF();
+        
+        JBlocksPane p = new JBlocksPane();
+        JFrame frm = new JFrame("JBlocks 0.4");
+        frm.setIconImage(new ImageIcon(JBlocks.class.getResource("res/jblocks-icon.png")).getImage());
+        frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frm.setLocationByPlatform(true);
+        frm.setSize(600, 400);
+        frm.setLayout(new BorderLayout());
+        frm.add(p, BorderLayout.CENTER);
+
+        frm.setVisible(true);
 
     }
 }

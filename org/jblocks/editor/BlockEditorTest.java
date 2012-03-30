@@ -7,21 +7,13 @@ import javax.swing.UIManager;
 
 /**
  *
+ * this class will be removed later... <br />
+ * 
  * @author ZeroLuck
  */
-class BlockEditorTest {
+public class BlockEditorTest {
 
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Throwable t) {
-            t.printStackTrace(System.err);
-        }
-        JFrame frm = new JFrame("Block-Editor : Test");
-        frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frm.setLocationByPlatform(true);
-
-        frm.setLayout(new BorderLayout());
+    public static JBlockEditor createTestEditor() {
         JBlockEditor ch = new JBlockEditor();
 
         ch.addCategory("Control", Color.ORANGE);
@@ -47,9 +39,24 @@ class BlockEditorTest {
         ch.addBlock("Control", JScriptPane.createBlock("command", "when %{b}%{br}%{s}"));
 
         AbstrBlock b = JScriptPane.createBlock("reporter", "xpos");
-        b.setBackground(new Color(0x3030FF));
+        b.setBackground(new Color(32, 64, 189));
         ch.addBlock("Motion", b);
 
+        return ch;
+    }
+    
+    public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Throwable t) {
+            t.printStackTrace(System.err);
+        }
+        JFrame frm = new JFrame("Block-Editor : Test");
+        frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frm.setLocationByPlatform(true);
+
+        frm.setLayout(new BorderLayout());
+        JBlockEditor ch = createTestEditor();
 
         frm.add(ch);
         frm.pack();

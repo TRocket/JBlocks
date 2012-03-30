@@ -133,7 +133,7 @@ public class JBlockEditor extends JRootPane {
      * @param b - the block
      */
     public void addBlock(String name, final AbstrBlock b) {
-        JScriptPane p = ctgs.get(name);
+        final JScriptPane p = ctgs.get(name);
         if (p != null) {
             b.addMouseListener(new MouseAdapter() {
 
@@ -142,13 +142,17 @@ public class JBlockEditor extends JRootPane {
                     String syntax = b.getBlockSyntax();
                     String type = b.getBlockType();
                     if (syntax != null) {
-                        AbstrBlock block = JScriptPane.createBlock(type, syntax);
-                        block.setBackground(b.getBackground());
-                        
-                        pane.add(block);
-                        
-                        paneScroll.invalidate();
-                        paneScroll.validate();
+                        try {
+                            AbstrBlock block = JScriptPane.createBlock(type, syntax);
+                            block.setBackground(b.getBackground());
+
+                            pane.add(block);
+
+                            paneScroll.invalidate();
+                            paneScroll.validate();
+                        } catch (RuntimeException ex) {
+                            ex.printStackTrace(System.err);
+                        }
                     }
                 }
             });
