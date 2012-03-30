@@ -51,27 +51,33 @@ public class JScriptPane extends JPanel {
     private Image scrp = scriptpane;
 
     public JScriptPane() {
+        this(true);
+    }
+    
+    public JScriptPane(boolean clean) {
         setBackground(Color.WHITE);
         setLayout(null);
 
-        JPopupMenu menu = new JPopupMenu();
-        JMenuItem item = new JMenuItem("cleanup");
-        item.addActionListener(new ActionListener() {
+        if (clean) {
+            JPopupMenu menu = new JPopupMenu();
+            JMenuItem item = new JMenuItem("cleanup");
+            item.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                cleanup();
-            }
-        });
-        menu.add(item);
-        add(menu);
-        this.setComponentPopupMenu(menu);
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    cleanup();
+                }
+            });
+            menu.add(item);
+            add(menu);
+            this.setComponentPopupMenu(menu);
+        }
     }
-    
+
     public Image getScriptPaneImage() {
         return scrp;
     }
-    
+
     public void setScriptPaneImage(Image img) {
         if (img == null) {
             throw new IllegalArgumentException("img is null!");
@@ -172,6 +178,8 @@ public class JScriptPane extends JPanel {
             block.add(new JLabel(str));
         }
 
+        block.setBlockType(type);
+        block.setBlockSyntax(bs);
         return block;
     }
 
@@ -223,13 +231,24 @@ public class JScriptPane extends JPanel {
             }
         }
     }
-    
-    public boolean isDragEnabled() {
-        return true;
+    // <member>
+    private boolean editable = true;
+    private boolean drag = true;
+
+    public void setTextEditable(boolean b) {
+        editable = b;
     }
-    
-    public boolean isModEnabled() {
-        return true;
+
+    public void setDragEnabled(boolean b) {
+        drag = b;
+    }
+
+    public boolean isDragEnabled() {
+        return drag;
+    }
+
+    public boolean isTextEditable() {
+        return editable;
     }
 
     /**

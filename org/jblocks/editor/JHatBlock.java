@@ -51,7 +51,7 @@ class JHatBlock extends AbstrBlock implements Puzzle {
         Stroke basic = g.getStroke();
 
         // Draw TOP
-        g.setClip(0, 0, size.width, RND_Y);
+        g.setClip(new Rectangle(0, 0, size.width, RND_Y).intersection(clip));
 
         final int rndx = (int) (size.width * RND_X);
         final int rndy = RND_Y * 2;

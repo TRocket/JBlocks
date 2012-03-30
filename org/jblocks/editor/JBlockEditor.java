@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import org.jblocks.JBlocks;
 
@@ -23,7 +24,7 @@ import org.jblocks.JBlocks;
  * @version 0.1
  * @author ZeroLuck
  */
-public class JBlockEditor extends JPanel {
+public class JBlockEditor extends JRootPane {
 
     // <global>
     private static BufferedImage scriptpane;
@@ -38,7 +39,9 @@ public class JBlockEditor extends JPanel {
     // <member>
     private JPanel ctgPanel;
     private JScriptPane pane;
-    private JScriptPane ctgScriptPane;
+    private JScrollPane paneScroll;
+    private JScriptPane curr;
+    private JScrollPane currScroll;
     private JCategoryChooser chooser;
     private HashMap<String, JScriptPane> ctgs = new HashMap<String, JScriptPane>();
 
@@ -66,24 +69,27 @@ public class JBlockEditor extends JPanel {
      * @param p - the new script pane to display.
      */
     public void setScriptPane(JScriptPane p) {
-        if (pane != null) {
-            remove(pane);
+        if (paneScroll != null) {
+            remove(paneScroll);
         }
         pane = p;
-        if (pane != null) {
-            add(pane, BorderLayout.CENTER);
+        paneScroll = null;
+        if (p != null) {
+            paneScroll = new JScrollPane(pane);
+            add(paneScroll, BorderLayout.CENTER);
         }
     }
 
     public void switchCategory(String name) {
-        System.out.println(name);
-        JScriptPane bck = ctgScriptPane;
-        ctgScriptPane = ctgs.get(name);
-        if (ctgScriptPane != null) {
+        JScriptPane bck = curr;
+        curr = ctgs.get(name);
+        if (curr != null) {
             if (bck != null) {
-                ctgPanel.remove(bck.getParent());
+                ctgPanel.remove(currScroll);
             }
-            ctgPanel.add(new JScrollPane(ctgScriptPane), BorderLayout.CENTER);
+            currScroll = new JScrollPane(curr);
+            ctgPanel.add(currScroll, BorderLayout.CENTER);
+            ctgPanel.invalidate();
             ctgPanel.validate();
         }
     }
@@ -104,11 +110,12 @@ public class JBlockEditor extends JPanel {
         comp.addMouseListener(new MouseAdapter() {
 
             @Override
-            public void mouseClicked(MouseEvent evt) {
+            public void mousePressed(MouseEvent evt) {
                 switchCategory(name);
             }
         });
-        JScriptPane p = new JScriptPane();
+        JScriptPane p = new JScriptPane(false);
+        p.setDragEnabled(false);
         p.setScriptPaneImage(scriptpane);
         ctgs.put(name, p);
 
@@ -125,9 +132,26 @@ public class JBlockEditor extends JPanel {
      * @param name - the name of the category
      * @param b - the block
      */
-    public void addBlock(String name, AbstrBlock b) {
+    public void addBlock(String name, final AbstrBlock b) {
         JScriptPane p = ctgs.get(name);
         if (p != null) {
+            b.addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mousePressed(MouseEvent evt) {
+                    String syntax = b.getBlockSyntax();
+                    String type = b.getBlockType();
+                    if (syntax != null) {
+                        AbstrBlock block = JScriptPane.createBlock(type, syntax);
+                        block.setBackground(b.getBackground());
+                        
+                        pane.add(block);
+                        
+                        paneScroll.invalidate();
+                        paneScroll.validate();
+                    }
+                }
+            });
             p.add(b);
             p.cleanup();
         }

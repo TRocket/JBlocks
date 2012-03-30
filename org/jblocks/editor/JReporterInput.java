@@ -71,7 +71,7 @@ class JReporterInput extends AbstrInput {
         if (!isBorderEnabled()) {
             return false;
         }
-        
+
         return block instanceof JReporterBlock;
     }
 
@@ -86,7 +86,7 @@ class JReporterInput extends AbstrInput {
         TextInput txt = new TextInput();
         setInput(txt);
     }
-    
+
     private class TextInput extends JTextField {
 
         public TextInput() {
@@ -112,6 +112,10 @@ class JReporterInput extends AbstrInput {
                     update();
                 }
             });
+            JScriptPane pne = getScriptPane();
+            if (pne != null) {
+                this.setEditable(pne.isTextEditable());
+            }
         }
 
         @Override

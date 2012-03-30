@@ -1,5 +1,5 @@
 package org.jblocks.editor;
- 
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -24,7 +24,6 @@ public abstract class AbstrBlock extends JComponent {
 
     protected Point drag;
 
-
     public AbstrBlock() {
         this.setLayout(null);
         this.setOpaque(true);
@@ -35,7 +34,7 @@ public abstract class AbstrBlock extends JComponent {
         this.addMouseListener(listener);
         this.addMouseMotionListener(listener);
     }
-    
+
     @Override
     public Dimension getPreferredSize() {
         if (!isValid()) {
@@ -61,7 +60,6 @@ public abstract class AbstrBlock extends JComponent {
      */
     protected abstract Insets getBorderInsets(int width, int height);
 
-    
     public JScriptPane getScriptPane() {
         Container cont = this;
         while ((cont = cont.getParent()) != null) {
@@ -71,7 +69,7 @@ public abstract class AbstrBlock extends JComponent {
         }
         return null;
     }
-    
+
     /**
      * 
      * {@inheritDoc}
@@ -193,10 +191,19 @@ public abstract class AbstrBlock extends JComponent {
     }
 
     protected void dragEvent(MouseEvent evt) {
-        if (drag == null) {
+        if (drag == null) { // shouldn't happen...
             return;
         }
-        setLocation(evt.getX() + getX() - drag.x, evt.getY() + getY() - drag.y);
+        int newX = evt.getX() + getX() - drag.x;
+        int newY = evt.getY() + getY() - drag.y;
+        if (newX < 0) {
+            newX = 0;
+        }
+        if (newY < 0) {
+            newY = 0;
+        }
+        setLocation(newX, newY);
+
     }
 
     protected void moveEvent(MouseEvent evt) {
@@ -220,7 +227,6 @@ public abstract class AbstrBlock extends JComponent {
     protected void layoutRoot() {
         getScriptPane().validate();
     }
-    
 
     private static PuzzleAdapter findAdapter0(AbstrBlock b, Rectangle r, int t) {
         if (b instanceof Puzzle) {
@@ -229,10 +235,10 @@ public abstract class AbstrBlock extends JComponent {
             for (PuzzleAdapter a : adapters) {
                 Rectangle clone = new Rectangle(a.bounds.x, a.bounds.y,
                         a.bounds.width, a.bounds.height);
-                
+
                 clone.x += a.block.getX();
                 clone.y += a.block.getY();
-                
+
                 if (clone.intersects(r) && a.neighbour == null
                         && a.type == t) {
                     return a;
@@ -248,7 +254,7 @@ public abstract class AbstrBlock extends JComponent {
                 p.bounds.width, p.bounds.height);
         r.x += b.getX();
         r.y += b.getY();
-        
+
         for (Component c : hats) {
             if (c instanceof AbstrBlock && c != b) {
                 PuzzleAdapter adp = findAdapter0((AbstrBlock) c, r, t);
@@ -261,14 +267,14 @@ public abstract class AbstrBlock extends JComponent {
     }
 
     static void removeFromPuzzle(AbstrBlock b, PuzzleAdapter adp) {
-         if (adp.neighbour != null) {
+        if (adp.neighbour != null) {
             if (adp.neighbour instanceof Puzzle) {
                 ((Puzzle) adp.neighbour).removeFromPuzzle(b);
                 adp.neighbour = null;
             }
         }
     }
-    
+
     static boolean concatWithPuzzle(AbstrBlock b, PuzzleAdapter adp) {
         PuzzleAdapter a = findAdapter(b, adp, PuzzleAdapter.TYPE_DOWN);
         if (a != null) {
@@ -280,17 +286,16 @@ public abstract class AbstrBlock extends JComponent {
         }
         return false;
     }
-    
+
     /*static void findPuzzle(AbstrBlock b, PuzzleAdapter adp) {
-        PuzzleAdapter a = findAdapter(b, adp, PuzzleAdapter.TYPE_DOWN);
-        if (a != null) {
-            removeFromPuzzle(b, adp);
-            adp.neighbour = a.block;
-            a.neighbour = b;
-            ((Puzzle) a.block).layoutPuzzle();
-        }
+    PuzzleAdapter a = findAdapter(b, adp, PuzzleAdapter.TYPE_DOWN);
+    if (a != null) {
+    removeFromPuzzle(b, adp);
+    adp.neighbour = a.block;
+    a.neighbour = b;
+    ((Puzzle) a.block).layoutPuzzle();
+    }
     }*/
-    
     protected static void puzzleToFront(AbstrBlock blck) {
         if (!(blck instanceof Puzzle)) {
             throw new IllegalArgumentException("the block isn't a puzzle.");
@@ -302,23 +307,57 @@ public abstract class AbstrBlock extends JComponent {
                 puzzleToFront(p.neighbour);
             }
         }
-    }   
-
+    }
+    
+    // <member>
+    private String bspec;
+    private String type;
+    
+    protected void setBlockType(String t) {
+        type = t;
+    }
+    
+    protected String getBlockType() {
+        return type;
+    }
+    
+    protected void setBlockSyntax(String s) {
+        bspec = s;
+    }
+    
+    protected String getBlockSyntax() {
+        return bspec;
+    }
+            
     private class BlockMouseListener extends MouseAdapter {
+
+        private boolean veto() {
+            JScriptPane pne = getScriptPane();
+            if (pne == null || !pne.isDragEnabled()) {
+                return true;
+            }
+            return false;
+        }
 
         @Override
         public void mouseDragged(MouseEvent evt) {
-            dragEvent(evt);
+            if (!veto()) {
+                dragEvent(evt);
+            }
         }
 
         @Override
         public void mousePressed(MouseEvent evt) {
-            pressedEvent(evt);
+            if (!veto()) {
+                pressedEvent(evt);
+            }
         }
 
         @Override
         public void mouseReleased(MouseEvent evt) {
-            releasedEvent(evt);
+            if (!veto()) {
+                releasedEvent(evt);
+            }
         }
     }
 }
