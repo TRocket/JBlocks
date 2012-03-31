@@ -2,14 +2,16 @@ package org.jblocks.painteditor;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
+import java.util.Date;
 
 import javax.swing.JPanel;
 /**
@@ -26,6 +28,7 @@ public class PaintEditorCanvas extends JPanel implements MouseListener, MouseMot
 	private int h;
 	private Color color;
 	private int linewidth;
+	private BufferedImage rectangleOldImage;
 	/**
 	 * the paintbrush tool
 	 */
@@ -96,20 +99,38 @@ public class PaintEditorCanvas extends JPanel implements MouseListener, MouseMot
 	}
 	
 	public void paintComponent(Graphics g){
+		
+		
 		g.drawImage(this.canvas, 0, 0, null);
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		// TODO Auto-generated method stub
-		g.setStroke(new BasicStroke(this.linewidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-		g.setColor(color);
-		g.drawLine(this.lastX, this.lastY, e.getX(), e.getY());
-		
-		this.repaint();
-		if (currentTool != 3) {
-			this.lastX = e.getX();
-			this.lastY = e.getY();
+		if (currentTool == 2) {
+			rectangleOldImage = deepCopy(canvas);
+			g = canvas.createGraphics();
+			g.setColor(color);
+			g.fillRect(lastX, lastY, e.getX() - lastX, e.getY() - lastY);
+			System.out.println("rectangle :" + lastX + " " + lastY + " " + (e.getX() - lastX) + " " + (e.getY() - lastY));
+			this.repaint();
+			
+			canvas = deepCopy(rectangleOldImage);
+			g = canvas.createGraphics();
+			
+			//g = canvas.createGraphics();
+		} else {
+			
+			g.setStroke(new BasicStroke(this.linewidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			g.setColor(color);
+			g.drawLine(this.lastX, this.lastY, e.getX(), e.getY());
+			
+			this.repaint();
+			if (currentTool != 3) {
+				this.lastX = e.getX();
+				this.lastY = e.getY();
+			}
 		}
+		
 	}
 	@Override
 	public void mouseMoved(MouseEvent e) {
@@ -170,4 +191,10 @@ public class PaintEditorCanvas extends JPanel implements MouseListener, MouseMot
 	public void setLinewidth(int linewidth) {
 		this.linewidth = linewidth;
 	}
+	static BufferedImage deepCopy(BufferedImage bi) {
+		 ColorModel cm = bi.getColorModel();
+		 boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+		 WritableRaster raster = bi.copyData(null);
+		 return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+		}
 }

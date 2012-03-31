@@ -20,7 +20,7 @@ import javax.swing.event.InternalFrameListener;
  */
 public class PaintEditor extends JInternalFrame implements ToolChanged, ActionListener, ChangeListener{
 public static int CANVAS_DEAFAULT_HEIGHT = 300;
-public static int CANVAS_DEAFAULT_WIDTH = 300;
+public static int CANVAS_DEAFAULT_WIDTH =  300;
 PaintEditorCanvas pEC = new PaintEditorCanvas(CANVAS_DEAFAULT_HEIGHT, CANVAS_DEAFAULT_WIDTH);
 JPanel panel = new JPanel();
 ToolSelector ts = new ToolSelector(this);
