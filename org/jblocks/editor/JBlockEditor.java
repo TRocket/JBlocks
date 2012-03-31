@@ -77,6 +77,9 @@ public class JBlockEditor extends JRootPane {
         if (p != null) {
             paneScroll = new JScrollPane(pane);
             add(paneScroll, BorderLayout.CENTER);
+            invalidate();
+            validate();
+            repaint();
         }
     }
 
@@ -146,6 +149,7 @@ public class JBlockEditor extends JRootPane {
                             AbstrBlock block = JScriptPane.createBlock(type, syntax);
                             block.setBackground(b.getBackground());
 
+                            block.setLocation(50,50);
                             pane.add(block);
 
                             paneScroll.invalidate();

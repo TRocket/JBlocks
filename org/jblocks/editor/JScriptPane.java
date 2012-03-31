@@ -69,8 +69,7 @@ public class JScriptPane extends JPanel {
                 }
             });
             menu.add(item);
-            add(menu);
-            this.setComponentPopupMenu(menu);
+            setComponentPopupMenu(menu);
         }
     }
 

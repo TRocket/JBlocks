@@ -27,8 +27,8 @@ public class JBlocksLauncher {
         JFrame frm = new JFrame("JBlocks 0.4");
         frm.setIconImage(new ImageIcon(JBlocks.class.getResource("res/jblocks-icon.png")).getImage());
         frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frm.setSize(1000, 600);
         frm.setLocationByPlatform(true);
-        frm.setSize(600, 400);
         frm.setLayout(new BorderLayout());
         frm.add(p, BorderLayout.CENTER);
 

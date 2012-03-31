@@ -3,20 +3,26 @@ package org.jblocks.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.WindowConstants;
 import org.jblocks.JBlocks;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.painteditor.PaintEditor;
 
 /**
  *
+ * The main GUI class for JBlocks. <br />
+ * 
  * @author ZeroLuck
  */
 public class JBlocksPane extends JDesktopPane {
@@ -62,11 +68,12 @@ public class JBlocksPane extends JDesktopPane {
 
                 int w = 500;
                 int h = 400;
-                
+
                 edt.setResizable(true);
                 edt.setClosable(true);
+                edt.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
                 edt.setLocation(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2);
-                
+
                 edt.setSize(w, h);
                 edt.setVisible(true);
                 add(edt, 0);
@@ -78,8 +85,13 @@ public class JBlocksPane extends JDesktopPane {
         // add components to 'app'
         app.setLayout(new BorderLayout());
         app.add(tools, BorderLayout.NORTH);
-        app.add(editor, BorderLayout.CENTER);
 
+        JScrollPane chScroll = new JScrollPane(SpriteChooserTest.createTestSpriteChooser2(editor));
+        chScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        
+        app.add(editor, BorderLayout.CENTER);
+        app.add(chScroll, BorderLayout.EAST);
+        
         // add app to the desktop-pane
         add(app);
     }
