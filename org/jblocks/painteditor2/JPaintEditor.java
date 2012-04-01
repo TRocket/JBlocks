@@ -40,6 +40,8 @@ public final class JPaintEditor extends JPanel {
     private JSmallColorChooser colorChooser;
     private JCheckBox fill;
     private Color col = Color.BLACK;
+    private BufferedImage backImg;
+    private int actionsBackImgOffset = 0;
 
     public JPaintEditor() {
         tools = new JToolBar();
@@ -92,19 +94,19 @@ public final class JPaintEditor extends JPanel {
         });
         tools.add(undo);
         tools.add(redo);
-        
-        
+
+
         tools.add(new JSeparator(JSeparator.VERTICAL));
-        
+
         // <tools>
         ImageIcon pipetteIcon = new ImageIcon(JBlocks.class.getResource("res/pipette.png"));
         addTool(new PipetteTool(this, pipetteIcon.getImage()), pipetteIcon, "pipette");
         addTool(new StampTool(this), new ImageIcon(JBlocks.class.getResource("res/stamp.png")), "stamp");
-        
+
         ImageIcon fillIcon = new ImageIcon(JBlocks.class.getResource("res/fill.png"));
         addTool(new FillTool(this, fillIcon.getImage()), fillIcon, "flood-fill : can be very slow!");
         // </tools>
-        
+
         tools.add(new JSeparator(JSeparator.VERTICAL));
 
         // <tools>
@@ -164,9 +166,57 @@ public final class JPaintEditor extends JPanel {
      */
     void addAction(PaintAction a) {
         actions = actions.subList(0, actionsOffset);
-        
+
         actions.add(a);
         actionsOffset = actions.size();
+    }
+
+    private void paintUpdateOn(BufferedImage img, int off, boolean pre, boolean back) {
+        Graphics2D g = img.createGraphics();
+
+        g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+
+        Composite c = g.getComposite();
+        g.setComposite(
+                AlphaComposite.getInstance(AlphaComposite.CLEAR, 0.0f));
+        g.fillRect(0, 0, img.getWidth(), img.getHeight());
+        g.setComposite(c);
+
+        if (back && backImg != null) {
+            g.drawImage(backImg, 0, 0, this);
+        }
+
+        for (int i = off; i < actionsOffset; i++) {
+            actions.get(i).draw(img, g);
+        }
+        if (pre) {
+            if (preview != null) {
+                preview.draw(img, g);
+            }
+        }
+    }
+
+    private BufferedImage deepSubimage(BufferedImage img, int x, int y, int w, int h) {
+        BufferedImage n = new BufferedImage(w, h, img.getType());
+        for (int i = x; i < x + w; i++) {
+            for (int j = y; j < y + h; j++) {
+                n.setRGB(i - x, j - y, img.getRGB(i, j));
+            }
+        }
+        return n;
+    }
+
+    private void removeBackImage() {
+        actionsBackImgOffset = 0;
+        backImg = null;
+    }
+
+    private void createBackImage() {
+        BufferedImage img = paint.getImage();
+        backImg = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+        paintUpdateOn(backImg, 0, false, false);
+        actionsBackImgOffset = actionsOffset;
     }
 
     /**
@@ -176,23 +226,11 @@ public final class JPaintEditor extends JPanel {
      * @see #preview
      */
     void paintUpdate() {
-        BufferedImage img = paint.getImage();
-        Graphics2D g = img.createGraphics();
+        paintUpdateOn(paint.getImage(), actionsBackImgOffset, true, true);
 
-        g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, 
-                java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
-        
-        Composite c = g.getComposite();
-        g.setComposite(
-                AlphaComposite.getInstance(AlphaComposite.CLEAR, 0.0f));
-        g.fillRect(0, 0, img.getWidth(), img.getHeight());
-        g.setComposite(c);
-
-        for (int i = 0; i < actionsOffset; i++) {
-            actions.get(i).draw(img, g);
-        }
-        if (preview != null) {
-            preview.draw(img, g);
+        // to slow? create a back-buffer.
+        if (actionsOffset - actionsBackImgOffset > 3) {
+            createBackImage();
         }
 
         paint.updateImage();
@@ -204,6 +242,9 @@ public final class JPaintEditor extends JPanel {
     void undo() {
         if (actionsOffset > 0) {
             actionsOffset--;
+            if (actionsOffset < actionsBackImgOffset) {
+                removeBackImage();
+            }
 
             paintUpdate();
         }
@@ -226,6 +267,7 @@ public final class JPaintEditor extends JPanel {
     void clear() {
         actionsOffset = 0;
         actions.clear();
+        removeBackImage();
         paintUpdate();
     }
 
@@ -275,7 +317,7 @@ public final class JPaintEditor extends JPanel {
         }
         paintUpdate();
     }
-    
+
     PaintAction[] getActions() {
         return actions.toArray(new PaintAction[]{});
     }
@@ -291,14 +333,14 @@ public final class JPaintEditor extends JPanel {
     Color getColorA() {
         return col;
     }
-    
+
     void setColorA(Color c) {
         if (c == null) {
             throw new IllegalArgumentException("'c' is null");
         }
         col = c;
     }
-    
+
     JPaintCanvas getCanvas() {
         return paint;
     }
