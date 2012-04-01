@@ -1,31 +1,33 @@
 
 package org.jblocks.painteditor;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentListener;
 
 import javax.swing.JButton;
-import javax.swing.JColorChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.InternalFrameListener;
+
+import org.jblocks.gui.JSmallColorChooser;
+import org.jblocks.gui.JSmallColorChooser.ColorChangedListener;
+import org.jblocks.gui.JZoomChooser;
 /**
  * 
  * @author TRocket
  *
  */
-public class PaintEditor extends JInternalFrame implements ToolChanged, ActionListener, ChangeListener{
+public class PaintEditor extends JInternalFrame implements ToolChanged, ActionListener,  ColorChangedListener{
 public static int CANVAS_DEAFAULT_HEIGHT = 300;
 public static int CANVAS_DEAFAULT_WIDTH =  300;
 PaintEditorCanvas pEC = new PaintEditorCanvas(CANVAS_DEAFAULT_HEIGHT, CANVAS_DEAFAULT_WIDTH);
 JPanel panel = new JPanel();
 ToolSelector ts = new ToolSelector(this);
 JButton clear = new JButton("clear");
-JColorChooser jcc = new JColorChooser();
+JSmallColorChooser jcc = new JSmallColorChooser();
+JZoomChooser jzc = new JZoomChooser();
+
 
  
 	public PaintEditor(){
@@ -34,10 +36,11 @@ JColorChooser jcc = new JColorChooser();
 		pEC.setPreferredSize(new Dimension(CANVAS_DEAFAULT_WIDTH, CANVAS_DEAFAULT_HEIGHT));
 		panel.add(clear);
 		panel.add(ts);
-		panel.add(pEC);
 		panel.add(jcc);
+		panel.add(pEC);
+		panel.add(jzc);
 		clear.addActionListener(this);
-		jcc.getSelectionModel().addChangeListener(this);
+		jcc.addColorChangedListener(this);
 		
 		//add the panel
 		this.add(panel);
@@ -58,19 +61,18 @@ JColorChooser jcc = new JColorChooser();
 		pEC.clear();
 	}
 
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		// TODO Auto-generated method stub
-		
-			pEC.setColor(jcc.getColor());
-		
-		
-	}
+	
 
 	@Override
 	public void lineThicknessChanged(int line) {
 		// TODO Auto-generated method stub
 		pEC.setLinewidth(line);
+	}
+
+	@Override
+	public void colorChanged(JSmallColorChooser ch, Color c) {
+		// TODO Auto-generated method stub
+		pEC.setColor(c);
 	}
 	
 	
