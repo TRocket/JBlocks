@@ -36,7 +36,30 @@ JZoomChooser jzc = new JZoomChooser();
 		pEC.setPreferredSize(new Dimension(CANVAS_DEAFAULT_WIDTH, CANVAS_DEAFAULT_HEIGHT));
 		panel.add(clear);
 		panel.add(ts);
-		panel.add(jcc);
+                // <ZeroLuck>
+		// TRocket: panel.add(jcc);
+                JPanel jccp = new JPanel();
+                jccp.setLayout(new java.awt.FlowLayout());
+                jccp.add(jcc);
+                JButton jccswitch = new JButton("Switch");
+                jccswitch.addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        int style = jcc.getStyle();
+                        if (style == JSmallColorChooser.GRADIENT) {
+                            jcc.setStyle(JSmallColorChooser.RECTANGULAR);
+                        } else {
+                            jcc.setStyle(JSmallColorChooser.GRADIENT);
+                        }
+                    }
+                    
+                });
+                jccp.add(jccswitch);
+
+                panel.add(jccp);
+                
+                // </ZeroLuck>
 		panel.add(pEC);
 		panel.add(jzc);
 		clear.addActionListener(this);

@@ -66,6 +66,7 @@ public class JSmallColorChooser extends JComponent {
     // <member>
     private int style = RECTANGULAR;
     private Point gsel = new Point(0, 0);
+    private Point sel = new Point(0, 0);
     private ArrayList<ColorChangedListener> clist = new ArrayList<ColorChangedListener>();
 
     static {
@@ -99,7 +100,7 @@ public class JSmallColorChooser extends JComponent {
                         p.y = RH * Y_CNT - 1;
                     }
 
-                    gsel = p;
+                    sel = p;
                     int col = gradient.getRGB(
                             (int) ((double) p.x / ((double) (RW * X_CNT) / gradient.getWidth())),
                             (int) ((double) p.y / ((double) (RH * Y_CNT) / gradient.getHeight())));
@@ -136,6 +137,16 @@ public class JSmallColorChooser extends JComponent {
                 int y = evt.getY() / RH;
                 Color col = bright(colors[x], ((double) 1 / Y_CNT) * y);
                 colorChanged(col);
+                sel.x = x;
+                sel.y = y;
+                repaint();
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent evt) {
+                gsel.x = -1;
+                gsel.y = -1;
+                repaint();
             }
         });
 
@@ -229,6 +240,8 @@ public class JSmallColorChooser extends JComponent {
             }
             g.setColor(Color.LIGHT_GRAY);
             g.drawRect(gsel.x * RW, gsel.y * RH, RW, RH);
+            g.setColor(Color.WHITE);
+            g.drawRect(sel.x * RW, sel.y * RH, RW, RH);
         } else if (style == GRADIENT) {
             Object obj = g.getRenderingHint(RenderingHints.KEY_INTERPOLATION);
 
@@ -236,8 +249,8 @@ public class JSmallColorChooser extends JComponent {
             g.drawImage(gradient, 0, 0, RW * X_CNT, RH * Y_CNT, null);
 
             g.setColor(Color.LIGHT_GRAY);
-            g.drawLine(gsel.x - 5, gsel.y, gsel.x + 5, gsel.y);
-            g.drawLine(gsel.x, gsel.y - 5, gsel.x, gsel.y + 5);
+            g.drawLine(sel.x - 5, sel.y, sel.x + 5, sel.y);
+            g.drawLine(sel.x, sel.y - 5, sel.x, sel.y + 5);
 
             if (obj != null) {
                 g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, obj);
