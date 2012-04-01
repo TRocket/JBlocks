@@ -126,11 +126,13 @@ public class JZoomChooser extends JComponent {
                 if (insideZoomIn(evt.getPoint())) {
                     if (value + 1 < cnt) {
                         value++;
+                        fireZoomChangedEvent();
                         repaint();
                     }
                 } else if (insideZoomOut(evt.getPoint())) {
                     if (value - 1 >= 0) {
                         value--;
+                        fireZoomChangedEvent();
                         repaint();
                     }
                 }
@@ -174,5 +176,11 @@ public class JZoomChooser extends JComponent {
 
         g.setClip(clip);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+    }
+    
+    private void fireZoomChangedEvent() {
+        for (ZoomChangedListener list : clist) {
+            list.zoomChanged(this, value);
+        }
     }
 }

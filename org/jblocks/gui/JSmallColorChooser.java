@@ -130,18 +130,25 @@ public class JSmallColorChooser extends JComponent {
 
             @Override
             public void mousePressed(MouseEvent evt) {
-                if (style != RECTANGULAR) {
-                    return;
+                if (style == RECTANGULAR) {
+                    int x = evt.getX() / RW;
+                    int y = evt.getY() / RH;
+                    Color col = bright(colors[x], ((double) 1 / Y_CNT) * y);
+                    colorChanged(col);
+                    sel.x = x;
+                    sel.y = y;
+                    repaint();
+                } else {
+                    Point p = evt.getPoint();
+                    sel = p;
+                    int col = gradient.getRGB(
+                            (int) ((double) p.x / ((double) (RW * X_CNT) / gradient.getWidth())),
+                            (int) ((double) p.y / ((double) (RH * Y_CNT) / gradient.getHeight())));
+                    colorChanged(new Color(col));
+                    repaint();
                 }
-                int x = evt.getX() / RW;
-                int y = evt.getY() / RH;
-                Color col = bright(colors[x], ((double) 1 / Y_CNT) * y);
-                colorChanged(col);
-                sel.x = x;
-                sel.y = y;
-                repaint();
             }
-            
+
             @Override
             public void mouseExited(MouseEvent evt) {
                 gsel.x = -1;
