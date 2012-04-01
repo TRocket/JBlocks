@@ -47,8 +47,8 @@ public class JZoomChooser extends JComponent {
 
     static {
         try {
-            zoomIn = ImageIO.read(JZoomChooser.class.getResource("res/zoom-in.png"));
-            zoomOut = ImageIO.read(JZoomChooser.class.getResource("res/zoom-out.png"));
+            zoomIn = ImageIO.read(JZoomChooser.class.getResource("../res/zoom-in.png"));
+            zoomOut = ImageIO.read(JZoomChooser.class.getResource("../res/zoom-out.png"));
         } catch (IOException io) {
             throw new ExceptionInInitializerError(io);
         }

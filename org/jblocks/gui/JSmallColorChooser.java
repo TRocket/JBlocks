@@ -70,7 +70,7 @@ public class JSmallColorChooser extends JComponent {
 
     static {
         try {
-            gradient = ImageIO.read(JSmallColorChooser.class.getResourceAsStream("res/gradient.png"));
+            gradient = ImageIO.read(JSmallColorChooser.class.getResourceAsStream("../res/gradient.png"));
         } catch (IOException ex) {
             throw new ExceptionInInitializerError(ex);
         }
