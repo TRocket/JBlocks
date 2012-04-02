@@ -5,27 +5,35 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Composite;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
+import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import org.jblocks.JBlocks;
 import org.jblocks.gui.JSmallColorChooser;
 import org.jblocks.gui.JZoomChooser;
 
 /**
- * A vector-graphics paint editor. <br />
+ * A "vector"-graphics paint editor. <br />
+ * Use the JPaintEditor.PaintEditorListener to reveive <br />
+ * finish and cancel events. <br />
  * 
  * @author ZeroLuck
  */
@@ -34,34 +42,53 @@ public final class JPaintEditor extends JPanel {
     private JToolBar tools;
     private JPaintCanvas paint;
     private List<PaintAction> actions;
+    private List<PaintEditorListener> peListeners;
     private int actionsOffset = 0;
     private PaintAction preview;
     private PaintTool tool;
     private JSmallColorChooser colorChooser;
     private JCheckBox fill;
-    private Color col = Color.BLACK;
+    private JCheckBox antialising;
     private BufferedImage backImg;
+    private JColorSwitcher colorSwitcher;
     private int actionsBackImgOffset = 0;
+    private float alpha = 1F;
+
+    public static interface PaintEditorListener {
+
+        public void cancelSelected(BufferedImage img);
+
+        public void finishSelected(BufferedImage img);
+    }
 
     public JPaintEditor() {
         tools = new JToolBar();
         tools.setFloatable(false);
         colorChooser = new JSmallColorChooser();
+        colorSwitcher = new JColorSwitcher();
         colorChooser.addColorChangedListener(new JSmallColorChooser.ColorChangedListener() {
 
             @Override
             public void colorChanged(JSmallColorChooser ch, Color c) {
-                col = c;
+                colorSwitcher.setColorA(c);
             }
         });
         fill = new JCheckBox("Fill");
         colorChooser.setStyle(JSmallColorChooser.GRADIENT);
         paint = new JPaintCanvas(new BufferedImage(480, 360, BufferedImage.TYPE_INT_ARGB));
         actions = new ArrayList<PaintAction>();
+        peListeners = new ArrayList<PaintEditorListener>();
 
         setLayout(new BorderLayout());
-        tools.add(new JButton(new ImageIcon(JBlocks.class.getResource("res/open.png"))));
-        tools.add(new JButton(new ImageIcon(JBlocks.class.getResource("res/save.png"))));
+        JButton open = new JButton(new ImageIcon(JBlocks.class.getResource("res/open.png")));
+        open.setToolTipText("open");
+        open.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+            }
+        });
+        tools.add(open);
 
         JButton clear = new JButton(new ImageIcon(JBlocks.class.getResource("res/clear.png")));
         clear.setToolTipText("clear");
@@ -104,12 +131,13 @@ public final class JPaintEditor extends JPanel {
         addTool(new StampTool(this), new ImageIcon(JBlocks.class.getResource("res/stamp.png")), "stamp");
 
         ImageIcon fillIcon = new ImageIcon(JBlocks.class.getResource("res/fill.png"));
-        addTool(new FillTool(this, fillIcon.getImage()), fillIcon, "flood-fill : can be very slow!");
+        addTool(new FillTool(this, fillIcon.getImage()), fillIcon, "flood-fill");
         // </tools>
 
         tools.add(new JSeparator(JSeparator.VERTICAL));
 
         // <tools>
+        addTool(new EraserTool(this), new ImageIcon(JBlocks.class.getResource("res/eraser.png")), "eraser");
         addTool(new BrushTool(this), new ImageIcon(JBlocks.class.getResource("res/brush.png")), "brush");
         addTool(new LineTool(this), new ImageIcon(JBlocks.class.getResource("res/line.png")), "line");
         addTool(new RectTool(this), new ImageIcon(JBlocks.class.getResource("res/rect.png")), "rect");
@@ -121,11 +149,59 @@ public final class JPaintEditor extends JPanel {
         JPanel left = new JPanel();
         left.setLayout(new BorderLayout());
         JPanel leftSouth = new JPanel();
-        leftSouth.setLayout(new GridLayout(0, 1));
-        leftSouth.add(fill);
+        leftSouth.setLayout(new BorderLayout());
+
+        final ImageIcon mini_gradient =
+                new ImageIcon(JBlocks.class.getResource("res/mini-gradient-color-chooser.png"));
+        final ImageIcon mini_rect =
+                new ImageIcon(JBlocks.class.getResource("res/mini-rect-cc.png"));
+        final JToggleButton ccstyle = new JToggleButton();
+        ccstyle.setIcon(mini_rect);
+
+        ccstyle.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                if (ccstyle.isSelected()) {
+                    ccstyle.setIcon(mini_gradient);
+                    colorChooser.setStyle(JSmallColorChooser.RECTANGULAR);
+                } else {
+                    ccstyle.setIcon(mini_rect);
+                    colorChooser.setStyle(JSmallColorChooser.GRADIENT);
+                }
+            }
+        });
+
+
+        JPanel leftCenter = new JPanel();
+        leftCenter.setLayout(new BorderLayout());
+        JPanel leftCenterNorth = new JPanel();
+        leftCenterNorth.add(ccstyle);
+        leftCenterNorth.add(colorSwitcher);
+
+        JPanel leftCenterCenter = new JPanel();
+        leftCenterCenter.setLayout(new BoxLayout(leftCenterCenter, BoxLayout.PAGE_AXIS));
+
+        JPanel othersPanel = new JPanel();
+        othersPanel.setBorder(BorderFactory.createTitledBorder("Settings"));
+        
+        othersPanel.add(fill);
+        antialising = new JCheckBox("Antialising");
+        antialising.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                removeBackImage();
+                paintUpdate();
+            }
+        });
+        othersPanel.add(antialising);
+        leftCenterCenter.add(othersPanel);
+        leftCenter.add(leftCenterNorth, BorderLayout.NORTH);
+        leftCenter.add(leftCenterCenter, BorderLayout.CENTER);
 
         left.add(colorChooser, BorderLayout.NORTH);
-        left.add(leftSouth, BorderLayout.CENTER);
+        left.add(leftCenter, BorderLayout.CENTER);
 
 
         add(left, BorderLayout.WEST);
@@ -135,7 +211,7 @@ public final class JPaintEditor extends JPanel {
         JPanel bottom = new JPanel();
         bottom.setLayout(new java.awt.BorderLayout());
 
-        JZoomChooser zoomChg = new JZoomChooser();
+        JZoomChooser zoomChg = new JZoomChooser(0, 10);
         zoomChg.addZoomChangedListener(new JZoomChooser.ZoomChangedListener() {
 
             @Override
@@ -146,8 +222,28 @@ public final class JPaintEditor extends JPanel {
 
         JPanel bottomEast = new JPanel();
         bottomEast.add(zoomChg);
-        bottomEast.add(new JButton("OK"));
-        bottomEast.add(new JButton("Cancel"));
+        JButton OK = new JButton("OK");
+        JButton CANCEL = new JButton("Cancel");
+        OK.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                for (PaintEditorListener list : peListeners) {
+                    list.finishSelected(paint.getImage());
+                }
+            }
+        });
+        CANCEL.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                for (PaintEditorListener list : peListeners) {
+                    list.cancelSelected(paint.getImage());
+                }
+            }
+        });
+        bottomEast.add(OK);
+        bottomEast.add(CANCEL);
         bottom.add(bottomEast, BorderLayout.EAST);
 
         add(bottom, BorderLayout.SOUTH);
@@ -171,11 +267,35 @@ public final class JPaintEditor extends JPanel {
         actionsOffset = actions.size();
     }
 
+    /**
+     * Adds the PaintEditorListener to this JPaintEditor. <br />
+     * 
+     * @see #removePaintEditorListener(org.jblocks.painteditor2.JPaintEditor.PaintEditorListener) 
+     * @throws IllegalArgumentException - if 'list' is null.
+     * @param list - the PaintEditorListener to add.
+     */
+    public void addPaintEditorListener(PaintEditorListener list) {
+        peListeners.add(list);
+    }
+
+    /**
+     * Removes the PaintEditorListener from this JPaintEditor. <br />
+     * 
+     * @param list - the PaintEditorListener to remove.
+     */
+    public void removePaintEditorListener(PaintEditorListener list) {
+        peListeners.remove(list);
+    }
+
     private void paintUpdateOn(BufferedImage img, int off, boolean pre, boolean back) {
         Graphics2D g = img.createGraphics();
 
-        g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
-                java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        if (antialising.isSelected()) {
+            g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                    java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        }
+
+        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         Composite c = g.getComposite();
         g.setComposite(
@@ -326,19 +446,23 @@ public final class JPaintEditor extends JPanel {
         return new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
     }
 
+    int getLineWidthHeight() {
+        return 15;
+    }
+
     Color getColorB() {
-        return Color.YELLOW;
+        return colorSwitcher.getColorB();
     }
 
     Color getColorA() {
-        return col;
+        return colorSwitcher.getColorA();
     }
 
     void setColorA(Color c) {
         if (c == null) {
             throw new IllegalArgumentException("'c' is null");
         }
-        col = c;
+        colorSwitcher.setColorA(c);
     }
 
     JPaintCanvas getCanvas() {

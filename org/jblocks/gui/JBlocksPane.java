@@ -3,6 +3,7 @@ package org.jblocks.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.ImageIcon;
@@ -18,6 +19,7 @@ import javax.swing.WindowConstants;
 import org.jblocks.JBlocks;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.painteditor.PaintEditor;
+import org.jblocks.painteditor2.JPaintEditor;
 
 /**
  *
@@ -37,6 +39,7 @@ public class JBlocksPane extends JDesktopPane {
     private JToolBar tools;
     private JBlockEditor editor;
     private JPanel app;
+    private JSpriteChooser spriteChooser;
 
     static {
         icon_run_build = new ImageIcon(JBlocks.class.getResource("res/run-build.png"));
@@ -63,20 +66,37 @@ public class JBlocksPane extends JDesktopPane {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                PaintEditor edt =
-                        new org.jblocks.painteditor.PaintEditor();
+                final JInternalFrame frm = new JInternalFrame("ZeroLuck's Paint-Editor");
+                frm.setResizable(false);
+                frm.setClosable(true);
+                frm.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+                frm.setLayout(new BorderLayout());
+                
+                JPaintEditor edt = new JPaintEditor();
+                edt.addPaintEditorListener(new JPaintEditor.PaintEditorListener() {
 
-                int w = 500;
-                int h = 400;
+                    @Override
+                    public void cancelSelected(BufferedImage img) {
+                        frm.dispose();
+                    }
 
-                edt.setResizable(true);
-                edt.setClosable(true);
-                edt.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-                edt.setLocation(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2);
+                    @Override
+                    public void finishSelected(BufferedImage img) {
+                        spriteChooser.addSpriteView(null, "Test", img);
+                        frm.dispose();
+                    }
+                });
+                frm.add(edt, BorderLayout.CENTER);
+                frm.setVisible(true);
+                add(frm, 0);
+                
+                frm.pack();
+                
+                int w = frm.getWidth();
+                int h = frm.getHeight();
+                
+                frm.setLocation(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2);
 
-                edt.setSize(w, h);
-                edt.setVisible(true);
-                add(edt, 0);
             }
         });
 
@@ -86,7 +106,8 @@ public class JBlocksPane extends JDesktopPane {
         app.setLayout(new BorderLayout());
         app.add(tools, BorderLayout.NORTH);
 
-        JScrollPane chScroll = new JScrollPane(SpriteChooserTest.createTestSpriteChooser2(editor));
+        spriteChooser = SpriteChooserTest.createTestSpriteChooser2(editor);
+        JScrollPane chScroll = new JScrollPane(spriteChooser);
         chScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         
         app.add(editor, BorderLayout.CENTER);
@@ -114,7 +135,7 @@ public class JBlocksPane extends JDesktopPane {
         } catch (Throwable t) {
             System.err.println("The Nímbus-LaF isn't supported!");
             // we don't want that our application crashs just because of this LaF.
-            // (older Java versions doesn't support the nimbus LaF.)
+            // (older Java versions may not support the nimbus LaF.)
         }
     }
 }

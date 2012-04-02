@@ -264,7 +264,7 @@ public class JSpriteChooser extends JComponent {
             g.setColor(Color.WHITE);
 
             String name = filterLength(text, fm);
-            g.drawString(name, SV_LEFT, SV_TOP + SV_HEIGHT - SV_BOTTOM);
+            g.drawString(name, SV_LEFT + (SV_WIDTH / 2 - fm.stringWidth(name) / 2), SV_TOP + SV_HEIGHT);
 
             if (selected) {
                 g.setColor(lightBlue);
@@ -274,8 +274,8 @@ public class JSpriteChooser extends JComponent {
                 g.setColor(Color.LIGHT_GRAY);
             }
             g.setStroke(new BasicStroke(2, BasicStroke.JOIN_ROUND, BasicStroke.CAP_ROUND));
-            g.drawRoundRect(0, 0, SV_LEFT + SV_WIDTH + SV_RIGHT - 11,
-                    SV_TOP + SV_HEIGHT + SV_BOTTOM - 11, 10, 10);
+            g.drawRoundRect(0, 0, SV_LEFT + SV_WIDTH + SV_RIGHT - 1,
+                    SV_TOP + SV_HEIGHT + SV_BOTTOM -1, 10, 10);
 
 
 
