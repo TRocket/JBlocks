@@ -11,6 +11,8 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
+import javax.swing.JRootPane;
+import org.jblocks.gui.JDragPane;
 
 /**
  * An abstract class for blocks. <br />
@@ -26,7 +28,7 @@ public abstract class AbstrBlock extends JComponent {
 
     public AbstrBlock() {
         this.setLayout(null);
-        this.setOpaque(true);
+        this.setOpaque(false);
         this.setBackground(new Color(0xD6900A)); // <- TEST
         this.setBorder(null);
 
@@ -299,27 +301,26 @@ public abstract class AbstrBlock extends JComponent {
             }
         }
     }
-    
     // <member>
     private String bspec;
     private String type;
-    
+
     protected void setBlockType(String t) {
         type = t;
     }
-    
+
     protected String getBlockType() {
         return type;
     }
-    
+
     protected void setBlockSyntax(String s) {
         bspec = s;
     }
-    
+
     protected String getBlockSyntax() {
         return bspec;
     }
-            
+
     private class BlockMouseListener extends MouseAdapter {
 
         private boolean veto() {

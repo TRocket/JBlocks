@@ -53,7 +53,7 @@ public class JScriptPane extends JPanel {
     public JScriptPane() {
         this(true);
     }
-    
+
     public JScriptPane(boolean clean) {
         setBackground(Color.WHITE);
         setLayout(null);
@@ -218,7 +218,7 @@ public class JScriptPane extends JPanel {
         int y = CLEANUP_TOP;
 
         for (Component c : getComponents()) {
-            if (c instanceof AbstrBlock && !set.contains(c)) {
+            if (!set.contains(c)) {
                 if (c instanceof Puzzle) {
                     y += doPuzzleH((Puzzle) c, y, set) + CLEANUP_BOTTOM;
                 } else {
@@ -257,8 +257,9 @@ public class JScriptPane extends JPanel {
     @Override
     public void doLayout() {
         for (Component c : getComponents()) {
-            if (!c.getSize().equals(c.getPreferredSize())) {
-                c.setSize(c.getPreferredSize());
+            Dimension preferred = c.getPreferredSize();
+            if (!c.getSize().equals(preferred)) {
+                c.setSize(preferred);
             }
         }
     }

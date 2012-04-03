@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import org.jblocks.gui.JBlocksPane;
+import org.jblocks.gui.JDragPane;
 
 /**
  * 
@@ -30,7 +31,8 @@ public class JBlocksLauncher {
         frm.setSize(1000, 600);
         frm.setLocationByPlatform(true);
         frm.setLayout(new BorderLayout());
-        frm.add(p, BorderLayout.CENTER);
+        
+        frm.add(new JDragPane(p), BorderLayout.CENTER);
 
         frm.setVisible(true);
 

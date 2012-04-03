@@ -2,8 +2,11 @@ package org.jblocks.editor;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
@@ -11,9 +14,9 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import org.jblocks.JBlocks;
+import org.jblocks.gui.JDragPane;
 
 /**
  *
@@ -24,7 +27,7 @@ import org.jblocks.JBlocks;
  * @version 0.1
  * @author ZeroLuck
  */
-public class JBlockEditor extends JRootPane {
+public class JBlockEditor extends JPanel {
 
     // <global>
     private static BufferedImage scriptpane;
@@ -148,12 +151,32 @@ public class JBlockEditor extends JRootPane {
                         try {
                             AbstrBlock block = JScriptPane.createBlock(type, syntax);
                             block.setBackground(b.getBackground());
+                            JDragPane.DragFinishedHandler handler = new JDragPane.DragFinishedHandler() {
 
-                            block.setLocation(50,50);
-                            pane.add(block);
+                                @Override
+                                public void dragFinished(JDragPane jdrag, Component c, Point location) {
+                                    Point p = javax.swing.SwingUtilities.
+                                            convertPoint(jdrag, location, pane);
+                                    
+                                    // FIXME: use JScrollPane.visibleRect() (or similar)
+                                    if (p.x < 0 || p.y < 0)
+                                        return;
+                                    
+                                    pane.add(c);
+                                    c.setLocation(p);
+                                    pane.invalidate();
+                                    pane.validate();
+                                    pane.repaint();
 
-                            paneScroll.invalidate();
-                            paneScroll.validate();
+                                    // this can be a problem in future.
+                                    // <bad-code>
+                                    ((AbstrBlock) c).releasedEvent(null);
+                                    // </bad-code>
+                                }
+                            };
+                            JDragPane.getDragPane(JBlockEditor.this).
+                                    setDrag(block, p, b.getLocation(), evt.getPoint(), handler);
+
                         } catch (RuntimeException ex) {
                             ex.printStackTrace(System.err);
                         }
@@ -161,6 +184,20 @@ public class JBlockEditor extends JRootPane {
                 }
             });
             p.add(b);
+            p.cleanup();
+        }
+    }
+
+    /**
+     * Adds a new JComponent to the category 'name'.
+     * 
+     * @param name - the name of the category
+     * @param c - the JComponent
+     */
+    public void addComponent(String name, JComponent c) {
+        final JScriptPane p = ctgs.get(name);
+        if (p != null) {
+            p.add(c);
             p.cleanup();
         }
     }

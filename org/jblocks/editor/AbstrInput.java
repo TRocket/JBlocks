@@ -29,7 +29,7 @@ public abstract class AbstrInput extends JComponent {
     private boolean borderEnabled = true;
 
     public AbstrInput() {
-        // do nothing
+        setOpaque(false);
     }
 
     /**

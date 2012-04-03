@@ -260,7 +260,7 @@ public class JSpriteChooser extends JComponent {
             g.setFont(getFont());
             FontMetrics fm = g.getFontMetrics();
 
-            g.drawImage(img, SV_LEFT, SV_TOP, SV_WIDTH - SV_RIGHT, SV_HEIGHT - fm.getHeight(), this);
+            g.drawImage(img, SV_LEFT, SV_TOP, SV_WIDTH , SV_HEIGHT - fm.getHeight(), this);
             g.setColor(Color.WHITE);
 
             String name = filterLength(text, fm);
