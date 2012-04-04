@@ -23,7 +23,7 @@ class JHatBlock extends AbstrBlock implements Puzzle {
     // <global>
     private static final float RND_X = 1 / 1.5F;
     private static final int RND_Y = 20;
-    private static final int LEFT = 3;
+    private static final int LEFT = 2;
     private static final int RIGHT = 2;
     private static final int BOTTOM = 6;
     private static final int ADAPTER_W = 15;
@@ -64,14 +64,14 @@ class JHatBlock extends AbstrBlock implements Puzzle {
         g.drawOval(0, 1, rndx, rndy - 1);
         g.drawLine(rndx + 1, RND_Y - 2, size.width - 3, RND_Y - 2);
 
-        g.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.setStroke(new BasicStroke(1));
         g.setClip(clip);
 
         // draw LEFT and RIGHT
         g.setColor(darkShadow);
         g.drawLine(0, RND_Y, 0, size.height - BOTTOM);
         g.setColor(shadow);
-        g.drawLine(1, RND_Y, 2, size.height - BOTTOM);
+        g.drawLine(1, RND_Y, 1, size.height - BOTTOM);
 
         g.setStroke(basic);
         g.setColor(darkShadow);

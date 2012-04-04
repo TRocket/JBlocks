@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
@@ -17,6 +18,8 @@ import javax.swing.JToolBar;
 import org.jblocks.JBlocks;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.painteditor2.JPaintEditor;
+import org.jblocks.soundeditor.JSoundEditor;
+import org.jblocks.soundeditor.JSoundRecorder;
 
 /**
  *
@@ -34,6 +37,7 @@ public class JBlocksPane extends JDesktopPane {
     private static ImageIcon icon_save;
     private static ImageIcon icon_open;
     private static ImageIcon icon_paint_editor;
+    private static ImageIcon icon_sound_editor;
     // <member>
     private JToolBar tools;
     private JBlockEditor editor;
@@ -46,6 +50,7 @@ public class JBlocksPane extends JDesktopPane {
         icon_save = new ImageIcon(JBlocks.class.getResource("res/save.png"));
         icon_open = new ImageIcon(JBlocks.class.getResource("res/open.png"));
         icon_paint_editor = new ImageIcon(JBlocks.class.getResource("res/paint-editor.png"));
+        icon_sound_editor = new ImageIcon(JBlocks.class.getResource("res/speaker.png"));
     }
 
     public JBlocksPane() {
@@ -59,11 +64,10 @@ public class JBlocksPane extends JDesktopPane {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                openFileChooser(JBlocksPane.this, new JFileChooser());
+                //    openFileChooser(JBlocksPane.this, new JFileChooser());
             }
-            
         });
-        
+
         tools.add(new JButton(icon_save));
         tools.add(openButton);
         tools.add(new JButton(icon_run_build));
@@ -111,11 +115,40 @@ public class JBlocksPane extends JDesktopPane {
 
         tools.add(openPaint);
 
+        JButton openSound = new JButton(icon_sound_editor);
+        openSound.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                final JInternalFrame frm = new JInternalFrame("ZeroLuck's Audio-Recorder");
+                frm.setResizable(false);
+                frm.setClosable(true);
+                frm.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+                frm.setLayout(new BorderLayout());
+
+                Container edt = new JSoundRecorder();
+                frm.add(edt, BorderLayout.CENTER);
+                frm.setVisible(true);
+                add(frm, 0);
+
+                frm.pack();
+
+                int w = frm.getWidth();
+                int h = frm.getHeight();
+
+                frm.setLocation(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2);
+
+            }
+        });
+
+        tools.add(openSound);
+
         // add components to 'app'
         app.setLayout(new BorderLayout());
         app.add(tools, BorderLayout.NORTH);
 
         spriteChooser = SpriteChooserTest.createTestSpriteChooser2(editor);
+
         JScrollPane chScroll = new JScrollPane(spriteChooser);
         chScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -126,7 +159,6 @@ public class JBlocksPane extends JDesktopPane {
         add(app);
     }
 
-
     private static JBlocksPane getJBlocksPane(Component c) {
         if (c instanceof JBlocksPane) {
             return (JBlocksPane) c;
@@ -136,15 +168,16 @@ public class JBlocksPane extends JDesktopPane {
             if (cont instanceof JBlocksPane) {
                 return (JBlocksPane) cont;
             }
-            
+
             cont = cont.getParent();
         }
         return null;
     }
 
-    public static void openFileChooser(Component c, JFileChooser ch) {
+    public static void openFileChooserRead(Component c, String text) {
         JBlocksPane jblocks = getJBlocksPane(c);
         JFileChooser chooser = new JFileChooser();
+        java.net.URL a;
         JInternalFrame frm = new JInternalFrame("File Chooser");
         frm.setClosable(true);
         frm.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
@@ -164,16 +197,18 @@ public class JBlocksPane extends JDesktopPane {
     }
 
     public static void setLaF() {
-        /* Set the Nimbus look and feel */
+        /* Sets the Nimbus look and feel */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
+                    return;
                 }
             }
+            javax.swing.UIManager.setLookAndFeel(
+                    javax.swing.UIManager.getSystemLookAndFeelClassName());
         } catch (Throwable t) {
-            System.err.println("The Nímbus-LaF isn't supported!");
+            System.err.println("Exception while setting LaF.");
             // we don't want that our application crashs just because of this LaF.
             // (older Java versions may not support the nimbus LaF.)
         }

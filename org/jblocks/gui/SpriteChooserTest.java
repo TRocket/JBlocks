@@ -29,6 +29,9 @@ public class SpriteChooserTest {
             pane.add(JScriptPane.createBlock("hat", "When %{gf} clicked"));
             pane.cleanup();
 
+            if (i == 0) {
+                edt.setScriptPane(pane);
+            }
 
             comp.addMouseListener(new MouseAdapter() {
 
@@ -60,7 +63,7 @@ public class SpriteChooserTest {
         frm.setSize(500, 400);
 
         JSpriteChooser ch = createTestSpriteChooser();
-
+        
         frm.add(ch, BorderLayout.CENTER);
         frm.setVisible(true);
     }

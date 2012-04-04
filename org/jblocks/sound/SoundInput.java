@@ -107,10 +107,11 @@ public abstract class SoundInput {
             @Override
             public int read(byte[] data, int off, int len) throws IOException {
                 int x = Math.min(len, b.length - offset);
-                if (x == 0) {
+                if (b.length - offset <= 0) {
                     return -1;
                 }
                 System.arraycopy(b, offset, data, off, len);
+                offset += x;
                 return x;
             }
 

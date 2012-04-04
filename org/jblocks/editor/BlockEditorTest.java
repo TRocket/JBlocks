@@ -26,21 +26,19 @@ public class BlockEditorTest {
         ch.addCategory("Sound", Color.MAGENTA);
         ch.addCategory("Looking", Color.MAGENTA.darker());
 
-        JScriptPane pane = new JScriptPane();
-        pane.add(JScriptPane.createBlock("hat", "When %{gf} clicked"));
-        pane.cleanup();
-
-        ch.setScriptPane(pane);
-
         ch.addBlock("Control", JScriptPane.createBlock("hat", "When %{gf} clicked"));
         ch.addBlock("Control", JScriptPane.createBlock("hat", "When key %{combo;space;a;b;c;d;e;f} pressed"));
         ch.addBlock("Control", JScriptPane.createBlock("command", "return %{r}"));
 
         ch.addBlock("Control", JScriptPane.createBlock("command", "when %{b}%{br}%{s}"));
+        ch.addBlock("Control", JScriptPane.createBlock("reporter", "x pos"));
+        ch.addBlock("Control", JScriptPane.createBlock("reporter", "y pos"));
+        ch.addBlock("Control", JScriptPane.createBlock("boolean", "visible"));
+        
+        ch.addBlock("Control", JScriptPane.createBlock("reporter", "test %{b}%{i}"));
+        ch.addBlock("Control", JScriptPane.createBlock("command", "when %{b}%{br}%{s}"));
 
-        AbstrBlock b = JScriptPane.createBlock("reporter", "xpos");
-        b.setBackground(new Color(32, 64, 189));
-        ch.addBlock("Motion", b);
+        ch.cleanup();
 
         return ch;
     }

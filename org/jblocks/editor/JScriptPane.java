@@ -44,9 +44,9 @@ public class JScriptPane extends JPanel {
             throw new java.lang.ExceptionInInitializerError(ex);
         }
     }
-    private static final int CLEANUP_LEFT = 5;
-    private static final int CLEANUP_BOTTOM = 5;
-    private static final int CLEANUP_TOP = 5;
+    private static final int CLEANUP_LEFT = 10;
+    private static final int CLEANUP_SPACE = 5;
+    private static final int CLEANUP_TOP = 10;
     // <member>
     private Image scrp = scriptpane;
 
@@ -182,7 +182,7 @@ public class JScriptPane extends JPanel {
         return block;
     }
 
-    // Fixme: replace the "-6"s.
+    // FIXME: replace the "-6"s.
     private static int doPuzzleH(Puzzle p, int y, Set<Component> set) {
         int h = 0;
         AbstrBlock[] up = JBlockSequence.getPuzzlePieces(p, PuzzleAdapter.TYPE_TOP);
@@ -192,13 +192,19 @@ public class JScriptPane extends JPanel {
         ((Puzzle) up[up.length - 1]).layoutPuzzle();
         for (AbstrBlock b : up) {
             set.add(b);
-            h += b.getHeight() - 6;
+            h += b.getHeight();
+            if (b instanceof JCommandBlock || b instanceof JHatBlock) {
+                h -= 6; 
+            }
         }
 
         for (AbstrBlock b : down) {
             if (!set.contains(b)) {
                 set.add(b);
-                h += b.getHeight() - 6;
+                h += b.getHeight();
+                if (b instanceof JCommandBlock || b instanceof JHatBlock) {
+                    h -= 6; 
+                }
             }
         }
         h += 6;
@@ -213,30 +219,26 @@ public class JScriptPane extends JPanel {
      */
     public void cleanup() {
         doLayout();
-        HashSet<Component> set = new HashSet<Component>();
+        HashSet<Component> set = new HashSet<Component>(25);
 
         int y = CLEANUP_TOP;
 
         for (Component c : getComponents()) {
             if (!set.contains(c)) {
                 if (c instanceof Puzzle) {
-                    y += doPuzzleH((Puzzle) c, y, set) + CLEANUP_BOTTOM;
+                    y += doPuzzleH((Puzzle) c, y, set) + CLEANUP_SPACE;
                 } else {
                     set.add(c);
                     Dimension size = c.getSize();
                     c.setLocation(CLEANUP_LEFT, y);
-                    y += size.height + CLEANUP_BOTTOM;
+                    y += size.height + CLEANUP_SPACE;
                 }
             }
         }
     }
     // <member>
-    private boolean editable = true;
     private boolean drag = true;
 
-    public void setTextEditable(boolean b) {
-        editable = b;
-    }
 
     public void setDragEnabled(boolean b) {
         drag = b;
@@ -244,10 +246,6 @@ public class JScriptPane extends JPanel {
 
     public boolean isDragEnabled() {
         return drag;
-    }
-
-    public boolean isTextEditable() {
-        return editable;
     }
 
     /**
@@ -272,15 +270,16 @@ public class JScriptPane extends JPanel {
         int w = 0, h = 0;
         for (Component c : getComponents()) {
             Point p = c.getLocation();
-            if (p.x > w) {
-                w = p.x;
+            Dimension size = c.getPreferredSize();
+            if (p.x + size.width > w) {
+                w = p.x + size.width;
             }
-            if (p.y > h) {
-                h = p.y;
+            if (p.y + size.height > h) {
+                h = p.y + size.height;
             }
         }
 
-        return new Dimension(w + 100, h + 100);
+        return new Dimension(w + 10 , h + 100);
     }
 
     /**

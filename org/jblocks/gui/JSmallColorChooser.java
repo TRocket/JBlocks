@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
+import org.jblocks.JBlocks;
 
 /**
  *
@@ -71,7 +72,7 @@ public class JSmallColorChooser extends JComponent {
 
     static {
         try {
-            gradient = ImageIO.read(JSmallColorChooser.class.getResourceAsStream("../res/gradient.png"));
+            gradient = ImageIO.read(JBlocks.class.getResourceAsStream("res/gradient.png"));
         } catch (IOException ex) {
             throw new ExceptionInInitializerError(ex);
         }

@@ -79,7 +79,7 @@ public class JSpriteChooser extends JComponent {
             }
         }
     }
-
+    
     /**
      * {@inheritDoc}
      */

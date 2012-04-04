@@ -3,6 +3,7 @@ package org.jblocks.editor;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -55,7 +56,7 @@ public class JBlockEditor extends JPanel {
      * @see #setScriptPane(org.jblocks.editor.JScriptPane) 
      */
     public JBlockEditor() {
-        chooser = new JCategoryChooser();
+        chooser = new JCategoryChooser(2);
         ctgPanel = new JPanel();
         ctgPanel.setLayout(new BorderLayout());
         ctgPanel.setBorder(BorderFactory.createBevelBorder(4, Color.yellow, Color.black));
@@ -65,6 +66,12 @@ public class JBlockEditor extends JPanel {
         ctgPanel.add(chooser, BorderLayout.NORTH);
     }
 
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        cleanup();
+    }
+    
     /**
      * switches between script-panes. <br />
      * 
@@ -93,6 +100,8 @@ public class JBlockEditor extends JPanel {
             if (bck != null) {
                 ctgPanel.remove(currScroll);
             }
+            
+            curr.setMaximumSize(new Dimension(chooser.getPreferredSize().width, Integer.MAX_VALUE));
             currScroll = new JScrollPane(curr);
             ctgPanel.add(currScroll, BorderLayout.CENTER);
             ctgPanel.invalidate();
@@ -198,7 +207,6 @@ public class JBlockEditor extends JPanel {
         final JScriptPane p = ctgs.get(name);
         if (p != null) {
             p.add(c);
-            p.cleanup();
         }
     }
 
@@ -208,5 +216,11 @@ public class JBlockEditor extends JPanel {
      */
     public JScriptPane getScriptPane() {
         return pane;
+    }
+
+    public void cleanup() {
+        for (JScriptPane p : ctgs.values()) {
+            p.cleanup();
+        }
     }
 }

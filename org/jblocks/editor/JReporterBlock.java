@@ -1,6 +1,5 @@
 package org.jblocks.editor;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -9,7 +8,6 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 
@@ -28,19 +26,19 @@ class JReporterBlock extends AbstrBlock {
 
         Dimension size = getSize();
         Color col = getBackground();
-        Stroke basic = g.getStroke();
+      //  Stroke basic = g.getStroke();
 
         g.setColor(col);
         g.fillRoundRect(0, 0, size.width, size.height, size.height / 2, size.height / 2);
 
-        g.setStroke(new java.awt.BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
+      //  g.setStroke(new java.awt.BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
         g.setColor(col.darker());
         g.drawRoundRect(0, 0, size.width - 1, size.height - 1, size.height / 2, size.height / 2);
-
+        
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_OFF);
 
-        g.setStroke(basic);
+      //  g.setStroke(basic);
     }
 
     @Override

@@ -88,7 +88,7 @@ public abstract class AbstrInput extends JComponent {
         }
         return super.getPreferredSize();
     }
-    
+
     public JScriptPane getScriptPane() {
         Container cont = this;
         while ((cont = cont.getParent()) != null) {
@@ -98,7 +98,7 @@ public abstract class AbstrInput extends JComponent {
         }
         return null;
     }
-    
+
     /**
      * 
      * Layouts the whole ScriptPane. <br />
@@ -126,7 +126,9 @@ public abstract class AbstrInput extends JComponent {
         g.setColor(back);
         g.fillRect(rect.x, rect.y, rect.width, rect.height);
 
-        paintBlockBorder(g);
+        if (borderEnabled) {
+            paintBlockBorder(g);
+        }
     }
 
     /**
@@ -140,7 +142,7 @@ public abstract class AbstrInput extends JComponent {
             validate();
         }
     }
-    
+
     /**
      * 
      * returns true if the border is enabled. <br />
@@ -149,7 +151,7 @@ public abstract class AbstrInput extends JComponent {
     public boolean isBorderEnabled() {
         return borderEnabled;
     }
-    
+
     @Override
     public void doLayout() {
         Dimension dim;
@@ -198,7 +200,7 @@ public abstract class AbstrInput extends JComponent {
     public JComponent getInput() {
         return comp;
     }
-    
+
     /**
      * 
      * Finds a possible input for a Rectangle <br />
@@ -208,7 +210,7 @@ public abstract class AbstrInput extends JComponent {
      * @param r the rectangle on the JScriptPane.
      * @return null or an input.
      */
-     static AbstrInput findInput(JComponent cont, Rectangle r, AbstrBlock b) {
+    static AbstrInput findInput(JComponent cont, Rectangle r, AbstrBlock b) {
         for (Component comp : cont.getComponents()) {
             if (comp == b) {
                 continue;

@@ -113,9 +113,6 @@ class JReporterInput extends AbstrInput {
                 }
             });
             JScriptPane pne = getScriptPane();
-            if (pne != null) {
-                this.setEditable(pne.isTextEditable());
-            }
         }
 
         @Override

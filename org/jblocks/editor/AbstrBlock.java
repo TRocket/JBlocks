@@ -3,6 +3,7 @@ package org.jblocks.editor;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -11,8 +12,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
-import javax.swing.JRootPane;
-import org.jblocks.gui.JDragPane;
 
 /**
  * An abstract class for blocks. <br />

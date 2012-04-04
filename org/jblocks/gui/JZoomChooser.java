@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
+import org.jblocks.JBlocks;
 
 /**
  * The JZoomChooser is a swing component for choosing zoom. <br />
@@ -47,8 +48,8 @@ public class JZoomChooser extends JComponent {
 
     static {
         try {
-            zoomIn = ImageIO.read(JZoomChooser.class.getResource("../res/zoom-in.png"));
-            zoomOut = ImageIO.read(JZoomChooser.class.getResource("../res/zoom-out.png"));
+            zoomIn = ImageIO.read(JBlocks.class.getResource("res/zoom-in.png"));
+            zoomOut = ImageIO.read(JBlocks.class.getResource("res/zoom-out.png"));
         } catch (IOException io) {
             throw new ExceptionInInitializerError(io);
         }
