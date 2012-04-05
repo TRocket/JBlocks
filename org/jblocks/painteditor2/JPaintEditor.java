@@ -36,6 +36,22 @@ import org.jblocks.gui.JZoomChooser;
  */
 public final class JPaintEditor extends JPanel {
 
+    // <global>
+    static ImageIcon icon_trash = new ImageIcon(JBlocks.class.getResource("res/trash.png"));
+    static ImageIcon icon_open = new ImageIcon(JBlocks.class.getResource("res/open.png"));
+    static ImageIcon icon_redo = new ImageIcon(JBlocks.class.getResource("res/redo.png"));
+    static ImageIcon icon_undo = new ImageIcon(JBlocks.class.getResource("res/undo.png"));
+    static ImageIcon icon_pipette = new ImageIcon(JBlocks.class.getResource("res/pipette.png"));
+    static ImageIcon icon_stamp = new ImageIcon(JBlocks.class.getResource("res/stamp.png"));
+    static ImageIcon icon_fill = new ImageIcon(JBlocks.class.getResource("res/fill.png"));
+    static ImageIcon icon_eraser = new ImageIcon(JBlocks.class.getResource("res/eraser.png"));
+    static ImageIcon icon_brush = new ImageIcon(JBlocks.class.getResource("res/brush.png"));
+    static ImageIcon icon_line = new ImageIcon(JBlocks.class.getResource("res/line.png"));
+    static ImageIcon icon_rect = new ImageIcon(JBlocks.class.getResource("res/rect.png"));
+    static ImageIcon icon_circle = new ImageIcon(JBlocks.class.getResource("res/circle.png"));
+    static ImageIcon icon_mini_gradient = new ImageIcon(JBlocks.class.getResource("res/mini-gradient-color-chooser.png"));
+    static ImageIcon icon_mini_rect = new ImageIcon(JBlocks.class.getResource("res/mini-rect-cc.png"));
+    // <member>
     private JToolBar tools;
     private JPaintCanvas paint;
     private List<PaintAction> actions;
@@ -77,7 +93,7 @@ public final class JPaintEditor extends JPanel {
         peListeners = new ArrayList<PaintEditorListener>();
 
         setLayout(new BorderLayout());
-        JButton open = new JButton(new ImageIcon(JBlocks.class.getResource("res/open.png")));
+        JButton open = new JButton(icon_open);
         open.setToolTipText("open");
         open.addActionListener(new ActionListener() {
 
@@ -87,7 +103,7 @@ public final class JPaintEditor extends JPanel {
         });
         tools.add(open);
 
-        JButton clear = new JButton(new ImageIcon(JBlocks.class.getResource("res/clear.png")));
+        JButton clear = new JButton(icon_trash);
         clear.setToolTipText("clear");
         clear.addActionListener(new ActionListener() {
 
@@ -98,7 +114,7 @@ public final class JPaintEditor extends JPanel {
         });
         tools.add(clear);
         tools.add(new JSeparator(JSeparator.VERTICAL));
-        JButton redo = new JButton(new ImageIcon(JBlocks.class.getResource("res/redo.png")));
+        JButton redo = new JButton(icon_redo);
         redo.setToolTipText("redo");
         redo.addActionListener(new ActionListener() {
 
@@ -107,7 +123,7 @@ public final class JPaintEditor extends JPanel {
                 redo();
             }
         });
-        JButton undo = new JButton(new ImageIcon(JBlocks.class.getResource("res/undo.png")));
+        JButton undo = new JButton(icon_undo);
         undo.setToolTipText("undo");
         undo.addActionListener(new ActionListener() {
 
@@ -123,22 +139,20 @@ public final class JPaintEditor extends JPanel {
         tools.add(new JSeparator(JSeparator.VERTICAL));
 
         // <tools>
-        ImageIcon pipetteIcon = new ImageIcon(JBlocks.class.getResource("res/pipette.png"));
-        addTool(new PipetteTool(this, pipetteIcon.getImage()), pipetteIcon, "pipette");
-        addTool(new StampTool(this), new ImageIcon(JBlocks.class.getResource("res/stamp.png")), "stamp");
+        addTool(new PipetteTool(this, icon_pipette.getImage()), icon_pipette, "pipette");
+        addTool(new StampTool(this), icon_stamp, "stamp");
 
-        ImageIcon fillIcon = new ImageIcon(JBlocks.class.getResource("res/fill.png"));
-        addTool(new FillTool(this, fillIcon.getImage()), fillIcon, "flood-fill");
+        addTool(new FillTool(this, icon_fill.getImage()), icon_fill, "flood-fill");
         // </tools>
 
         tools.add(new JSeparator(JSeparator.VERTICAL));
 
         // <tools>
-        addTool(new EraserTool(this), new ImageIcon(JBlocks.class.getResource("res/eraser.png")), "eraser");
-        addTool(new BrushTool(this), new ImageIcon(JBlocks.class.getResource("res/brush.png")), "brush");
-        addTool(new LineTool(this), new ImageIcon(JBlocks.class.getResource("res/line.png")), "line");
-        addTool(new RectTool(this), new ImageIcon(JBlocks.class.getResource("res/rect.png")), "rect");
-        addTool(new CircleTool(this), new ImageIcon(JBlocks.class.getResource("res/circle.png")), "circle");
+        addTool(new EraserTool(this), icon_eraser, "eraser");
+        addTool(new BrushTool(this), icon_brush, "brush");
+        addTool(new LineTool(this), icon_line, "line");
+        addTool(new RectTool(this), icon_rect, "rect");
+        addTool(new CircleTool(this), icon_circle, "circle");
         // </tools>
 
         add(tools, BorderLayout.NORTH);
@@ -148,22 +162,18 @@ public final class JPaintEditor extends JPanel {
         JPanel leftSouth = new JPanel();
         leftSouth.setLayout(new BorderLayout());
 
-        final ImageIcon mini_gradient =
-                new ImageIcon(JBlocks.class.getResource("res/mini-gradient-color-chooser.png"));
-        final ImageIcon mini_rect =
-                new ImageIcon(JBlocks.class.getResource("res/mini-rect-cc.png"));
         final JToggleButton ccstyle = new JToggleButton();
-        ccstyle.setIcon(mini_rect);
+        ccstyle.setIcon(icon_mini_rect);
 
         ccstyle.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if (ccstyle.isSelected()) {
-                    ccstyle.setIcon(mini_gradient);
+                    ccstyle.setIcon(icon_mini_gradient);
                     colorChooser.setStyle(JSmallColorChooser.RECTANGULAR);
                 } else {
-                    ccstyle.setIcon(mini_rect);
+                    ccstyle.setIcon(icon_mini_rect);
                     colorChooser.setStyle(JSmallColorChooser.GRADIENT);
                 }
             }
@@ -181,7 +191,7 @@ public final class JPaintEditor extends JPanel {
 
         JPanel othersPanel = new JPanel();
         othersPanel.setBorder(BorderFactory.createTitledBorder("Settings"));
-        
+
         othersPanel.add(fill);
         antialising = new JCheckBox("Antialising");
         antialising.addActionListener(new ActionListener() {

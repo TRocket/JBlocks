@@ -17,15 +17,15 @@ public class Test {
     public static void main(String[] args) {
         JBlocksPane.setLaF();
         
-        JSoundRecorder rec = new JSoundRecorder();
+        JSoundEditor rec = new JSoundEditor();
         
-        JFrame frm = new JFrame("Script-Pane : Test");
+        JFrame frm = new JFrame("Sound-Editor : Test");
         frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frm.setLocationByPlatform(true);
 
         frm.setLayout(new BorderLayout());
         frm.add(rec);
-        frm.pack();
+        frm.setSize(650,400);
 
         frm.setVisible(true);
     }

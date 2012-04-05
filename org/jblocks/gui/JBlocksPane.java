@@ -12,9 +12,12 @@ import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 import org.jblocks.JBlocks;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.painteditor2.JPaintEditor;
@@ -60,6 +63,7 @@ public class JBlocksPane extends JDesktopPane {
         editor = org.jblocks.editor.BlockEditorTest.createTestEditor();
 
         JButton openButton = new JButton(icon_open);
+        openButton.setToolTipText("Open project");
         openButton.addActionListener(new ActionListener() {
 
             @Override
@@ -68,13 +72,21 @@ public class JBlocksPane extends JDesktopPane {
             }
         });
 
-        tools.add(new JButton(icon_save));
+        JButton saveButton = new JButton(icon_save);
+        saveButton.setToolTipText("Save project");
+        tools.add(saveButton);
         tools.add(openButton);
-        tools.add(new JButton(icon_run_build));
-        tools.add(new JButton(icon_download_folder));
+        
+        JButton runButton = new JButton(icon_run_build);
+        runButton.setToolTipText("Run project");
+        tools.add(runButton);
+        tools.add(new JSeparator(JSeparator.VERTICAL));
+        JButton blockstoreButton = new JButton(icon_download_folder);
+        blockstoreButton.setToolTipText("Open Block-Store");
+        tools.add(blockstoreButton);
 
         JButton openPaint = new JButton(icon_paint_editor);
-
+        openPaint.setToolTipText("Open Paint-Editor");
         openPaint.addActionListener(new ActionListener() {
 
             @Override
@@ -116,22 +128,23 @@ public class JBlocksPane extends JDesktopPane {
         tools.add(openPaint);
 
         JButton openSound = new JButton(icon_sound_editor);
+        openSound.setToolTipText("Open Sound-Editor");
         openSound.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
                 final JInternalFrame frm = new JInternalFrame("ZeroLuck's Audio-Recorder");
-                frm.setResizable(false);
+                frm.setResizable(true);
                 frm.setClosable(true);
                 frm.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
                 frm.setLayout(new BorderLayout());
 
-                Container edt = new JSoundRecorder();
+                Container edt = new JSoundEditor();
                 frm.add(edt, BorderLayout.CENTER);
                 frm.setVisible(true);
                 add(frm, 0);
 
-                frm.pack();
+                frm.setSize((int) (getWidth() / 1.3), (int) (getHeight() / 1.3));
 
                 int w = frm.getWidth();
                 int h = frm.getHeight();
@@ -154,7 +167,7 @@ public class JBlocksPane extends JDesktopPane {
 
         app.add(editor, BorderLayout.CENTER);
         app.add(chScroll, BorderLayout.EAST);
-
+        
         // add app to the desktop-pane
         add(app);
     }

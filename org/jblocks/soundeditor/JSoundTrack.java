@@ -18,14 +18,14 @@ import javax.swing.JComponent;
 class JSoundTrack extends JComponent {
 
     // <member>
-    private final short[] samples;
+    private final Track track;
     private final int height;
     private Point dragOff;
     private Point backupLocation;
 
-    public JSoundTrack(short[] samples, int h) {
+    public JSoundTrack(Track t, int h) {
         setOpaque(true);
-        this.samples = samples;
+        this.track = t;
         this.height = h;
 
         addMouseListener(new MouseAdapter() {
@@ -34,6 +34,10 @@ class JSoundTrack extends JComponent {
             public void mousePressed(MouseEvent evt) {
                 backupLocation = getLocation();
                 dragOff = evt.getPoint();
+                Container parent = getParent();
+                if (parent instanceof JTrackPane) {
+                    ((JTrackPane) parent).toFront(JSoundTrack.this);
+                }
                 JSoundTrack.this.requestFocus();
             }
 
@@ -57,6 +61,7 @@ class JSoundTrack extends JComponent {
                         getY() + evt.getY() - dragOff.y);
             }
         });
+        setToolTipText("<HTML><b>Track-Name:</b> <i>" + t.getName() + "</i></HTML>");
     }
 
     /**
@@ -64,7 +69,7 @@ class JSoundTrack extends JComponent {
      */
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(samples.length, height);
+        return new Dimension(track.createUserView().length, height);
     }
 
     /**
@@ -77,6 +82,8 @@ class JSoundTrack extends JComponent {
         Rectangle clip = g.getClipBounds();
         g.fillRect(clip.x, clip.y, clip.width, clip.height);
         g.setColor(c);
+
+        short[] samples = track.createUserView();
 
         int xoff = clip.x;
         int lastY = samples[xoff];

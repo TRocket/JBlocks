@@ -21,7 +21,7 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
 
     // <global>
     private static final int TOP = 6;
-    private static final int LEFT_RIGHT = 2;
+    private static final int LEFT_RIGHT = 1;
     private static final int BOTTOM = TOP;
     private static final int ADAPTER_W = 15;
     // <member>
@@ -86,7 +86,7 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g.setStroke(new java.awt.BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
+        g.setStroke(new java.awt.BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
 
         // TOP
         g.setColor(col);

@@ -11,15 +11,15 @@ import javax.swing.JComponent;
  *
  * @author ZeroLuck
  */
-class JTrackPane extends JComponent {
+public class JTrackPane extends JComponent {
 
     // <member>
     private final int height;
     private int lines;
 
-    public JTrackPane(int h) {
+    public JTrackPane(int h, int max) {
         height = h;
-        lines = 5;
+        lines = max;
     }
     
     public void addTrack(JSoundTrack t) {
@@ -77,5 +77,13 @@ class JTrackPane extends JComponent {
         for (int i = 0; i < lines + 1; i++) {
             g.drawLine(0, i * height, size.width, i * height);
         }
+    }
+
+    void toFront(Component c) {
+        if (c.getParent() != this) {
+            return;
+        }
+        remove(c);
+        add(c, 0);
     }
 }

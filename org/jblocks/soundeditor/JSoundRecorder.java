@@ -1,7 +1,5 @@
 package org.jblocks.soundeditor;
 
-import org.jblocks.sound.SimplePlayer;
-import org.jblocks.sound.Recorder;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -18,6 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.SoftBevelBorder;
 import org.jblocks.sound.SoundInput;
+import org.jblocks.sound.SimplePlayer;
+import org.jblocks.sound.Recorder;
 
 /**
  *
@@ -89,6 +89,7 @@ public class JSoundRecorder extends JPanel {
             @Override
             public void finished() {
                 recordButton.setEnabled(true);
+                playButton.setEnabled(true);
             }
 
             @Override
@@ -146,6 +147,16 @@ public class JSoundRecorder extends JPanel {
         add(center, BorderLayout.CENTER);
 
         setBorder(new EmptyBorder(5, 5, 5, 5));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+        player.stop();
+        rec.reset();
     }
 
     private void setTime(long millis) {
