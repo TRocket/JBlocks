@@ -11,25 +11,48 @@ import javax.swing.JComponent;
  *
  * @author ZeroLuck
  */
-public class JTrackPane extends JComponent {
+public final class JTrackPane extends JComponent {
 
     // <member>
     private final int height;
     private int lines;
+    private CurrentPos pos;
 
     public JTrackPane(int h, int max) {
         height = h;
         lines = max;
+        pos = new CurrentPos(h * max);
+        add(pos, 0);
+        resetPos();
     }
-    
-    public void addTrack(JSoundTrack t) {
-        t.setLocation(0, 0);
-        t.setSize(t.getPreferredSize());
+
+    void addTrack(JSoundTrack t) {
         t.setForeground(Color.RED);
-        add(t);
+        add(t, 1);
+        doLayout();
+    }
+
+    @Override
+    public void doLayout() {
+        for (Component c : getComponents()) {
+            c.setSize(c.getPreferredSize());
+        }
     }
     
-    public boolean locate(final JSoundTrack track) {
+    void resetPos() {
+        pos.setPos(-100);
+    }
+
+    void setPos(int p) {
+        pos.setPos(p);
+        this.repaint();
+    }
+
+    int getPos() {
+        return pos.getPos();
+    }
+
+    boolean locate(final JSoundTrack track) {
         int x = track.getX();
         int y = track.getY();
         if (x < 0) {
@@ -37,7 +60,7 @@ public class JTrackPane extends JComponent {
         }
         if (y < 0) {
             y = 0;
-        } 
+        }
         if (y % height > height / 2) {
             y += height;
         }
@@ -55,7 +78,6 @@ public class JTrackPane extends JComponent {
         }
         return true;
     }
-    
 
     /**
      * {@inheritDoc}
@@ -84,6 +106,37 @@ public class JTrackPane extends JComponent {
             return;
         }
         remove(c);
-        add(c, 0);
+        add(c, 1);
+        repaint();
+    }
+
+    private static class CurrentPos extends JComponent {
+
+        private static final int LINE_WIDTH = 3;
+        private final int height;
+
+        public CurrentPos(int h) {
+            height = h;
+        }
+
+        public void setPos(int pos) {
+            setLocation(pos - LINE_WIDTH / 2, 0);
+            repaint();
+        }
+
+        public int getPos() {
+            return getX() + LINE_WIDTH / 2;
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            return new Dimension(LINE_WIDTH, height);
+        }
+
+        @Override
+        public void paint(Graphics g) {
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, LINE_WIDTH, height);
+        }
     }
 }

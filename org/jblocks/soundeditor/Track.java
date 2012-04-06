@@ -1,52 +1,53 @@
 package org.jblocks.soundeditor;
 
+import org.jblocks.sound.SoundInput;
+
 /**
  *
  * @author ZeroLuck
  */
 class Track {
 
-    private final int minOffset;
-    private int offset;
-    private short[] samples;
-    private int end;
-    private final int maxEnd;
-    private int spp;
-    private String name;
+    private final int offset;
+    private final short[] samples;
+    private final int end;
+    private final int spp;
+    private final String name;
 
-    public Track(short[] samples, int samplesPerPixel, int off, int e, String name) {
-        this.samples = samples;
-        this.offset = 0;
-        this.minOffset = off;
-        this.end = e;
-        this.maxEnd = e;
-        this.spp = samplesPerPixel;
-        this.name = name;
+    public Track(Track parent, int off, int e) {
+        if (e < off) {
+            throw new IllegalArgumentException("end is smaller than the offset");
+        }
+        this.samples = parent.samples;
+        this.spp = parent.spp;
+        this.name = parent.name;
+
+        this.offset = parent.offset + off;
+        this.end = parent.offset + e;
     }
 
     public Track(short[] samples, int samplesPerPixel, String name) {
-        this(samples, samplesPerPixel, 0, samples.length, name);
+        this.samples = samples;
+        this.offset = 0;
+        this.end = samples.length;
+        this.name = name;
+        this.spp = samplesPerPixel;
     }
-
-    public void setOffset(int p) {
-        offset = Math.min(minOffset + p * spp, end);
-    }
-
+    
     public String getName() {
         return name;
     }
-    
-    
-    public void setEnd(int p) {
-        end = Math.min(minOffset + p * spp, maxEnd);
+
+    public short[] getSamples() {
+        return samples;
     }
-    
+
     public int getOffset() {
-        return offset - minOffset;
+        return offset;
     }
-    
+
     public int getEnd() {
-        return end - minOffset;
+        return end;
     }
 
     /**
@@ -65,8 +66,9 @@ class Track {
         int length = end - offset;
         short[] view = new short[length / spp];
         for (int i = 0; i < view.length; i++) {
-            view[i] = samples[offset + i * spp]; 
+            view[i] = samples[offset + i * spp];
         }
         return view;
     }
+
 }

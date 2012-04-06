@@ -2,14 +2,9 @@ package org.jblocks.sound;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
-import org.jblocks.sound.SoundInput;
-import org.jblocks.sound.Recorder.RecorderListener;
 
 /**
  *
@@ -19,11 +14,18 @@ public class SimplePlayer implements Runnable {
 
     private Thread playerThread;
     private volatile boolean stopRequest;
+    private volatile boolean pause;
     private SoundInput sound;
-    private List<PlayerListener> listeners;
+    private final List<PlayerListener> listeners;
+    private final int BUFFER_SIZE;
+
+    public SimplePlayer(int bufsize) {
+        listeners = new ArrayList<PlayerListener>();
+        BUFFER_SIZE = bufsize;
+    }
 
     public SimplePlayer() {
-        listeners = new ArrayList<PlayerListener>();
+        this(8096);
     }
 
     /**
@@ -72,9 +74,14 @@ public class SimplePlayer implements Runnable {
             throw new IllegalStateException("The player is already playing a sound");
         }
         stopRequest = false;
+        pause = false;
         sound = inp;
         playerThread = new Thread(this, "Audio-Player");
         playerThread.start();
+    }
+
+    public void setPause(boolean p) {
+        pause = p;
     }
 
     private void fireFinished() {
@@ -83,25 +90,48 @@ public class SimplePlayer implements Runnable {
         }
     }
 
-    private void fireError(final Throwable t) {
+    private boolean fireError(final Throwable t) {
+        int size = listeners.size();
+        if (size <= 0) {
+            return false;
+        }
         for (PlayerListener pl : listeners) {
             pl.error(t);
+        }
+        return true;
+    }
+
+    private void fireTimeUpdate(final long newTime) {
+        synchronized (listeners) {
+            int size = listeners.size();
+            for (int i = 0; i < size; i++) {
+                listeners.get(i).timeUpdate(newTime);
+            }
         }
     }
 
     @Override
     public void run() {
         try {
-            SourceDataLine line = AudioSystem.getSourceDataLine(sound.getFormat());
+            AudioFormat fmt = sound.getFormat();
+            int div = (int) (fmt.getFrameRate() * fmt.getFrameSize());
+
+            SourceDataLine line = AudioSystem.getSourceDataLine(fmt);
             line.open();
             line.start();
-            byte[] buf = new byte[8096];
+            byte[] buf = new byte[BUFFER_SIZE];
+            long written = 0;
             int len;
             while ((len = sound.read(buf, 0, buf.length)) != -1 && !stopRequest) {
                 int off = 0;
                 while (off < len) {
                     off += line.write(buf, off, len - off);
                 }
+                while (pause && !stopRequest) {
+                    Thread.sleep(5);
+                }
+                written += len;
+                fireTimeUpdate((long) ((double) written / div * 1000));
             }
             if (!stopRequest) {
                 line.drain();
@@ -110,7 +140,9 @@ public class SimplePlayer implements Runnable {
             line.close();
             fireFinished();
         } catch (Throwable t) {
-            fireError(t);
+            if (!fireError(t)) {
+                System.err.println("WARNING: Unhandled Throwable in org.jblocks.SimplePlayer.");
+            }
         }
     }
 
@@ -119,5 +151,7 @@ public class SimplePlayer implements Runnable {
         public void finished();
 
         public void error(Throwable t);
+
+        public void timeUpdate(long newTime);
     }
 }

@@ -151,7 +151,7 @@ public class SoftwareMixer extends SoundInput {
             int i;
 
             switch (SAMPLE_SIZE) {
-                case 1:
+               case 1:
                     for (int j = 0; j < inputsSize; j++) {
                         SoundInput inp = inputs.get(j);
                         if (inp.eof()) {
@@ -165,7 +165,7 @@ public class SoftwareMixer extends SoundInput {
                             }
                         }
                     }
-                    break;
+                    break; 
                 case 2:
                     for (int j = 0; j < inputsSize; j++) {
                         SoundInput inp = inputs.get(j);
@@ -181,21 +181,6 @@ public class SoftwareMixer extends SoundInput {
                         }
                     }
                     break;
-                case 4:
-                    for (int j = 0; j < inputsSize; j++) {
-                        SoundInput inp = inputs.get(j);
-                        if (inp.eof()) {
-                            remove.add(inp);
-                        } else {
-                            int cnt = readFully(inp, inBuf.array(), 0, len);
-                            for (i = 0; i < cnt; i += SAMPLE_SIZE) {
-                                long s = outBuf.getInt(i);
-                                s += inBuf.getInt(i);
-                                outBuf.putInt(i, clip32(s));
-                            }
-                        }
-                    }
-                    break;
 
                 default:
                     throw new UnsupportedOperationException("unsupported sample-size!");
@@ -206,7 +191,7 @@ public class SoftwareMixer extends SoundInput {
     }
 
     /**
-     * closes this mixer <b>and all of its inputs</b>!
+     * closes this mixer <b>and all of it's inputs</b>!
      */
     @Override
     public void close() {

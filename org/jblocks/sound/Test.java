@@ -3,6 +3,7 @@ package org.jblocks.sound;
 import java.io.File;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.SourceDataLine;
+import org.jblocks.soundeditor.TimedSoftwareMixer;
 
 /**
  *
@@ -18,21 +19,11 @@ public class Test {
         SoundInput inp = SoundInput.fromStream(AudioSystem.getAudioInputStream(new File("C:/JTest/test.wav"))); 
         SoundInput inp2 = SoundInput.fromStream(AudioSystem.getAudioInputStream(new File("C:/JTest/test2.wav")));
         
-        SoftwareMixer mix = new SoftwareMixer(inp.getFormat());
-        mix.addInput(inp);
-        mix.addInput(inp2);
+        TimedSoftwareMixer mix = new TimedSoftwareMixer(inp.getFormat());
+        mix.addTimed(inp, 0);
+        mix.addTimed(inp2, 10000);
         
-        SourceDataLine line = AudioSystem.getSourceDataLine(inp.getFormat());
-        line.open();
-        line.start();
-        int len;
-        byte[] buf = new byte[line.getBufferSize()];
-        while ((len = mix.read(buf, 0, buf.length)) != -1) {
-            int off = 0;
-            while (off < len) {
-                off += line.write(buf, off, len - off);
-            }
-        }
-        mix.close();
+        SimplePlayer p = new SimplePlayer();
+        p.play(mix);
     }
 }

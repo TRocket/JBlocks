@@ -52,6 +52,9 @@ public class JSoundRecorder extends JPanel {
         stopButton.setToolTipText("Stop");
         final JButton recordButton = new JButton(JSoundEditor.icon_microphone);
         recordButton.setToolTipText("Record");
+        final JButton trashButton = new JButton(JSoundEditor.icon_trash);
+        trashButton.setToolTipText("Reset");
+
 
         playButton.setEnabled(false);
         stopButton.setEnabled(false);
@@ -83,18 +86,23 @@ public class JSoundRecorder extends JPanel {
                 stopButton.setEnabled(false);
             }
         });
-        
+
         player.addPlayerListener(new SimplePlayer.PlayerListener() {
 
             @Override
             public void finished() {
                 recordButton.setEnabled(true);
                 playButton.setEnabled(true);
+                trashButton.setEnabled(true);
             }
 
             @Override
             public void error(Throwable t) {
                 finished();
+            }
+
+            @Override
+            public void timeUpdate(long newTime) {
             }
         });
 
@@ -107,6 +115,7 @@ public class JSoundRecorder extends JPanel {
                     recordButton.setEnabled(false);
                     playButton.setEnabled(false);
                     stopButton.setEnabled(true);
+                    trashButton.setEnabled(false);
                 }
             }
         });
@@ -121,10 +130,20 @@ public class JSoundRecorder extends JPanel {
                     volume.setPeak(0);
                     recordButton.setEnabled(true);
                     playButton.setEnabled(true);
+                    trashButton.setEnabled(true);
                 }
                 if (player.isPlaying()) {
                     player.stop();
                 }
+            }
+        });
+
+        trashButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                rec.reset();
+                setTime(0);
             }
         });
 
@@ -135,11 +154,14 @@ public class JSoundRecorder extends JPanel {
                 recordButton.setEnabled(false);
                 stopButton.setEnabled(true);
                 playButton.setEnabled(false);
-                
-                player.play(SoundInput.fromByteArray(rec.getAudioData(), rec.getFormat()));
+                trashButton.setEnabled(false);
+
+                byte[] data = rec.getAudioData();
+                player.play(SoundInput.fromByteArray(data, 0, data.length, rec.getFormat()));
             }
         });
 
+        center.add(trashButton);
         center.add(playButton);
         center.add(recordButton);
         center.add(stopButton);

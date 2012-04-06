@@ -133,7 +133,7 @@ public class JBlocksPane extends JDesktopPane {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                final JInternalFrame frm = new JInternalFrame("ZeroLuck's Audio-Recorder");
+                final JInternalFrame frm = new JInternalFrame("ZeroLuck's Sound-Editor");
                 frm.setResizable(true);
                 frm.setClosable(true);
                 frm.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);

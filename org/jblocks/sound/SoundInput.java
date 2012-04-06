@@ -89,10 +89,16 @@ public abstract class SoundInput {
      * @param fmt - the AudioFormat of the byte array.
      * @return - the created SoundInput object.
      */
-    public static SoundInput fromByteArray(final byte[] b, final AudioFormat fmt) {
+    public static SoundInput fromByteArray(final byte[] b, final int start, final int length, final AudioFormat fmt) {
+        if (start < 0) {
+            throw new IllegalArgumentException("start < 0");
+        }
+        if (start + length > b.length) {
+            throw new IllegalArgumentException("start (" + start + ") + length (" + length + ") > buffer-length (" + b.length + ")");
+        }
         return new SoundInput() {
 
-            private int offset = 0;
+            private int offset = start;
 
             @Override
             public AudioFormat getFormat() {
@@ -101,16 +107,16 @@ public abstract class SoundInput {
 
             @Override
             public boolean eof() {
-                return offset < b.length;
+                return offset >= (start + length);
             }
 
             @Override
             public int read(byte[] data, int off, int len) throws IOException {
-                int x = Math.min(len, b.length - offset);
-                if (b.length - offset <= 0) {
+                if(eof()) {
                     return -1;
                 }
-                System.arraycopy(b, offset, data, off, len);
+                int x = Math.min(len, (start + length) - offset);
+                System.arraycopy(b, offset, data, off, x);
                 offset += x;
                 return x;
             }
