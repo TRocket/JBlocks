@@ -300,6 +300,17 @@ public abstract class AbstrBlock extends JComponent {
             }
         }
     }
+    
+    @Override
+    public void setBackground(Color c) {
+        super.setBackground(c);
+        for (Component comp : getComponents()) {
+            if (comp instanceof AbstrInput) {
+                comp.setBackground(c);
+            }
+        }
+    }
+    
     // <member>
     private String bspec;
     private String type;

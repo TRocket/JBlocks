@@ -3,6 +3,7 @@ package org.jblocks.sound;
 import java.io.IOException;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
+import org.jblocks.utils.StreamUtils;
 
 /**
  * @author ZeroLuck
@@ -73,11 +74,7 @@ public abstract class SoundInput {
 
             @Override
             public void close() {
-                try {
-                    in.close();
-                } catch (IOException io) {
-                    // what to do?
-                }
+                StreamUtils.safeClose(in);
             }
         };
     }

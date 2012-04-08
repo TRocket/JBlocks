@@ -44,10 +44,31 @@ public class JBlockEditor extends JPanel {
     private JPanel ctgPanel;
     private JScriptPane pane;
     private JScrollPane paneScroll;
-    private JScriptPane curr;
+    private Category curr;
     private JScrollPane currScroll;
     private JCategoryChooser chooser;
-    private HashMap<String, JScriptPane> ctgs = new HashMap<String, JScriptPane>();
+    private HashMap<String, Category> ctgs = new HashMap<String, Category>(30);
+
+    public static class Category {
+
+        private final String name;
+        private final JScriptPane blocks;
+        private final Color color;
+
+        public Category(String n, JScriptPane p, Color c) {
+            this.name = n;
+            this.blocks = p;
+            this.color = c;
+        }
+
+        public Color getColor() {
+            return color;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
 
     /**
      * creates a block-editor with an <b>empty</b> category-chooser. <br />
@@ -71,7 +92,7 @@ public class JBlockEditor extends JPanel {
         super.addNotify();
         cleanup();
     }
-    
+
     /**
      * switches between script-panes. <br />
      * 
@@ -94,15 +115,15 @@ public class JBlockEditor extends JPanel {
     }
 
     public void switchCategory(String name) {
-        JScriptPane bck = curr;
+        Category bck = curr;
         curr = ctgs.get(name);
         if (curr != null) {
             if (bck != null) {
                 ctgPanel.remove(currScroll);
             }
-            
-            curr.setMaximumSize(new Dimension(chooser.getPreferredSize().width, Integer.MAX_VALUE));
-            currScroll = new JScrollPane(curr);
+
+            curr.blocks.setMaximumSize(new Dimension(chooser.getPreferredSize().width, Integer.MAX_VALUE));
+            currScroll = new JScrollPane(curr.blocks);
             ctgPanel.add(currScroll, BorderLayout.CENTER);
             ctgPanel.invalidate();
             ctgPanel.validate();
@@ -132,7 +153,7 @@ public class JBlockEditor extends JPanel {
         JScriptPane p = new JScriptPane(false);
         p.setDragEnabled(false);
         p.setScriptPaneImage(scriptpane);
-        ctgs.put(name, p);
+        ctgs.put(name, new Category(name, p, c));
 
         if (firstCtg) {
             switchCategory(name);
@@ -148,8 +169,9 @@ public class JBlockEditor extends JPanel {
      * @param b - the block
      */
     public void addBlock(String name, final AbstrBlock b) {
-        final JScriptPane p = ctgs.get(name);
-        if (p != null) {
+        final Category c = ctgs.get(name);
+        if (c != null) {
+            b.setBackground(c.color);
             b.addMouseListener(new MouseAdapter() {
 
                 @Override
@@ -164,13 +186,13 @@ public class JBlockEditor extends JPanel {
 
                                 @Override
                                 public void dragFinished(JDragPane jdrag, Component c, Point location) {
-                                    Point p = javax.swing.SwingUtilities.
-                                            convertPoint(jdrag, location, pane);
-                                    
+                                    Point p = javax.swing.SwingUtilities.convertPoint(jdrag, location, pane);
+
                                     // FIXME: use JScrollPane.visibleRect() (or similar)
-                                    if (p.x < 0 || p.y < 0)
+                                    if (p.x < 0 || p.y < 0) {
                                         return;
-                                    
+                                    }
+
                                     pane.add(c);
                                     c.setLocation(p);
                                     pane.invalidate();
@@ -184,7 +206,7 @@ public class JBlockEditor extends JPanel {
                                 }
                             };
                             JDragPane.getDragPane(JBlockEditor.this).
-                                    setDrag(block, p, b.getLocation(), evt.getPoint(), handler);
+                                    setDrag(block, c.blocks, b.getLocation(), evt.getPoint(), handler);
 
                         } catch (RuntimeException ex) {
                             ex.printStackTrace(System.err);
@@ -192,8 +214,8 @@ public class JBlockEditor extends JPanel {
                     }
                 }
             });
-            p.add(b);
-            p.cleanup();
+            c.blocks.add(b);
+            c.blocks.cleanup();
         }
     }
 
@@ -204,10 +226,14 @@ public class JBlockEditor extends JPanel {
      * @param c - the JComponent
      */
     public void addComponent(String name, JComponent c) {
-        final JScriptPane p = ctgs.get(name);
-        if (p != null) {
-            p.add(c);
+        final Category cg = ctgs.get(name);
+        if (cg != null) {
+            cg.blocks.add(c);
         }
+    }
+    
+    public Category getCategory(String name) {
+        return ctgs.get(name);
     }
 
     /**
@@ -219,8 +245,8 @@ public class JBlockEditor extends JPanel {
     }
 
     public void cleanup() {
-        for (JScriptPane p : ctgs.values()) {
-            p.cleanup();
+        for (Category c : ctgs.values()) {
+            c.blocks.cleanup();
         }
     }
 }

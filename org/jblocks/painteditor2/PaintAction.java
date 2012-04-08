@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
  *
  * @author ZeroLuck
  */
-public interface PaintAction {
+interface PaintAction {
 
     public void draw(BufferedImage img, Graphics2D g);
 }

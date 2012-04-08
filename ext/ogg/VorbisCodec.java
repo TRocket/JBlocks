@@ -28,6 +28,8 @@ public class VorbisCodec {
      * 
      * Writes the specified AudioInputStream ogg-vorbis encoded to the specified OutputStream. <br />
      * WARNING: This can take much time. (some minutes) <br />
+     * <br />
+     * Just 44100Hz 16bits stereo is supported! <br />
      * 
      * @param in - the input stream.
      * @param out - the output stream.

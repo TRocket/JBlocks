@@ -16,9 +16,9 @@ public class BlockEditorTest {
     public static JBlockEditor createTestEditor() {
         JBlockEditor ch = new JBlockEditor();
 
-        ch.addCategory("Control", Color.ORANGE);
-        ch.addCategory("Motion", Color.BLUE);
-        ch.addCategory("Operators", Color.GREEN);
+        ch.addCategory("Control", new Color(0xD6900A));
+        ch.addCategory("Motion", new Color(0xff4a6cd6));
+        ch.addCategory("Operators", new Color(0xff62c213));
         ch.addCategory("Lists", Color.RED);
 
         ch.addCategory("Touching", Color.CYAN);
@@ -35,9 +35,15 @@ public class BlockEditorTest {
         ch.addBlock("Control", JScriptPane.createBlock("reporter", "y pos"));
         ch.addBlock("Control", JScriptPane.createBlock("boolean", "visible"));
         
-        ch.addBlock("Control", JScriptPane.createBlock("reporter", "test %{b}%{i}"));
+        ch.addBlock("Control", JScriptPane.createBlock("reporter", "test %{b}%{r}"));
         ch.addBlock("Control", JScriptPane.createBlock("command", "when %{b}%{br}%{s}"));
-
+        
+        ch.addBlock("Operators", JScriptPane.createBlock("reporter", "%{r}+%{r}"));
+        ch.addBlock("Operators", JScriptPane.createBlock("reporter", "%{r}-%{r}"));
+        ch.addBlock("Operators", JScriptPane.createBlock("reporter", "%{r}*%{r}"));
+        ch.addBlock("Operators", JScriptPane.createBlock("reporter", "%{r}/%{r}"));
+        ch.addBlock("Operators", JScriptPane.createBlock("reporter", "%{r}mod%{r}"));
+        
         ch.cleanup();
 
         return ch;

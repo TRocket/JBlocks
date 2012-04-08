@@ -28,9 +28,6 @@ public class SoftwareMixer extends SoundInput {
      * @param fmt - the AudioFormat of this mixer.
      */
     public SoftwareMixer(AudioFormat fmt) {
-        if (fmt.getChannels() != 1) {
-            throw new IllegalArgumentException("the AudioFormat isn't mono!");
-        }
         this.fmt = fmt;
     }
 

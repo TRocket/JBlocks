@@ -147,15 +147,18 @@ public class JScriptPane extends JPanel {
         if (block == null) {
             throw new IllegalArgumentException("\"" + type + "\" isn't a correct block type.");
         }
+        final Color textColor = Color.BLACK;
         StringBuilder sb = new StringBuilder();
-        int off = 0;
+        int off = 0; 
         int len = bs.length();
         while (off < len) {
             char c = bs.charAt(off++);
             if (c == '%') {
                 String str = sb.toString();
                 if (!str.trim().isEmpty()) {
-                    block.add(new JLabel(str));
+                    JLabel lab = new JLabel(str);
+                    lab.setForeground(textColor);
+                    block.add(lab);
                 }
                 sb.delete(0, sb.length());
                 if (bs.charAt(off++) != '{') {
@@ -174,7 +177,9 @@ public class JScriptPane extends JPanel {
         }
         String str = sb.toString();
         if (!str.trim().isEmpty()) {
-            block.add(new JLabel(str));
+            JLabel lab = new JLabel(str);
+            lab.setForeground(textColor);
+            block.add(lab);
         }
 
         block.setBlockType(type);
@@ -194,7 +199,7 @@ public class JScriptPane extends JPanel {
             set.add(b);
             h += b.getHeight();
             if (b instanceof JCommandBlock || b instanceof JHatBlock) {
-                h -= 6; 
+                h -= 6;
             }
         }
 
@@ -203,7 +208,7 @@ public class JScriptPane extends JPanel {
                 set.add(b);
                 h += b.getHeight();
                 if (b instanceof JCommandBlock || b instanceof JHatBlock) {
-                    h -= 6; 
+                    h -= 6;
                 }
             }
         }
@@ -238,7 +243,6 @@ public class JScriptPane extends JPanel {
     }
     // <member>
     private boolean drag = true;
-
 
     public void setDragEnabled(boolean b) {
         drag = b;
@@ -279,7 +283,7 @@ public class JScriptPane extends JPanel {
             }
         }
 
-        return new Dimension(w + 10 , h + 100);
+        return new Dimension(w + 10, h + 100);
     }
 
     /**

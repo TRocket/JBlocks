@@ -2,17 +2,21 @@ package org.jblocks.soundeditor;
 
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -24,7 +28,6 @@ class JSoundTrack extends JComponent {
     private final Track track;
     private final int height;
     private Point dragOff;
-    
     private Point backupLocation;
 
     public JSoundTrack(Track t, int h) {
@@ -36,7 +39,6 @@ class JSoundTrack extends JComponent {
 
             @Override
             public void mousePressed(MouseEvent evt) {
-
                 backupLocation = getLocation();
                 dragOff = evt.getPoint();
                 Container parent = getParent();
@@ -44,11 +46,11 @@ class JSoundTrack extends JComponent {
                     ((JTrackPane) parent).toFront(JSoundTrack.this);
                 }
                 JSoundTrack.this.requestFocus();
+
             }
 
             @Override
             public void mouseReleased(MouseEvent evt) {
-
                 Container parent = getParent();
                 if (parent instanceof JTrackPane) {
                     if (((JTrackPane) parent).locate(JSoundTrack.this)) {
@@ -56,6 +58,7 @@ class JSoundTrack extends JComponent {
                     }
                 }
                 setLocation(backupLocation);
+
             }
         });
 
@@ -64,23 +67,38 @@ class JSoundTrack extends JComponent {
             @Override
             public void keyPressed(KeyEvent evt) {
                 if (evt.getKeyCode() == KeyEvent.VK_DELETE) {
-                    Container c = getParent();
-                    c.remove(JSoundTrack.this);
-                    c.repaint();
+                    delete();
                 }
             }
         });
+
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem deleteItem = new JMenuItem("Delete");
+        deleteItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                delete();
+            }
+        });
+        menu.add(deleteItem);
+        
 
         addMouseMotionListener(new MouseMotionAdapter() {
 
             @Override
             public void mouseDragged(MouseEvent evt) {
-
                 setLocation(getX() + evt.getX() - dragOff.x,
                         getY() + evt.getY() - dragOff.y);
             }
         });
         setToolTipText("<HTML><b>Track:</b> <i>" + t.getName() + "</i></HTML>");
+    }
+
+    private void delete() {
+        Container c = getParent();
+        c.remove(JSoundTrack.this);
+        c.repaint();
     }
 
     /**
@@ -124,5 +142,4 @@ class JSoundTrack extends JComponent {
 
 
     }
-
 }

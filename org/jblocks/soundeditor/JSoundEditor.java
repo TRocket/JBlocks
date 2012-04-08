@@ -1,33 +1,49 @@
 package org.jblocks.soundeditor;
 
+import ext.ogg.VorbisCodec;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
+import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 import org.jblocks.JBlocks;
+import org.jblocks.sound.AudioFormat16Filter;
 import org.jblocks.sound.SimplePlayer;
 import org.jblocks.sound.SoftwareMixer;
 import org.jblocks.sound.SoundInput;
+import org.jblocks.utils.StreamUtils;
 
 /**
  *
@@ -37,6 +53,8 @@ import org.jblocks.sound.SoundInput;
  * @author ZeroLuck
  * @version 0.1
  * @see org.jblocks.sound.SoftwareMixer
+ * @see org.jblocks.soundeditor.TimedSoftwareMixer
+ * 
  */
 public final class JSoundEditor extends JPanel {
 
@@ -46,6 +64,7 @@ public final class JSoundEditor extends JPanel {
     static ImageIcon icon_stop;
     static ImageIcon icon_pause;
     static ImageIcon icon_open;
+    static ImageIcon icon_save;
     static ImageIcon icon_synthesizer;
     static ImageIcon icon_cutout;
     static ImageIcon icon_trash;
@@ -59,48 +78,22 @@ public final class JSoundEditor extends JPanel {
     private JToolBar tools;
     private JTrackPane tracks;
     private SoundEditorTool tool;
-    private final AudioFormat editorFormat = new AudioFormat(22050, 16, 1, true, false);
+    private final AudioFormat editorFormat = new AudioFormat(44100, 16, 1, true, false);
     private final SimplePlayer player;
 
     static {
+        // should we use an image-pool instead?
         icon_microphone = new ImageIcon(JBlocks.class.getResource("res/microphone.png"));
         icon_play = new ImageIcon(JBlocks.class.getResource("res/play.png"));
         icon_stop = new ImageIcon(JBlocks.class.getResource("res/stop.png"));
         icon_pause = new ImageIcon(JBlocks.class.getResource("res/pause.png"));
         icon_open = new ImageIcon(JBlocks.class.getResource("res/open.png"));
+        icon_save = new ImageIcon(JBlocks.class.getResource("res/save.png"));
         icon_synthesizer = new ImageIcon(JBlocks.class.getResource("res/synthesizer.png"));
         icon_trash = new ImageIcon(JBlocks.class.getResource("res/trash.png"));
         icon_cutout = new ImageIcon(JBlocks.class.getResource("res/cut-out.png"));
         icon_eraser = new ImageIcon(JBlocks.class.getResource("res/eraser.png"));
         icon_cursor = new ImageIcon(JBlocks.class.getResource("res/cursor.png"));
-    }
-
-    // just a test method, will be removed later...
-    private static short[] read(String file) throws Exception {
-        AudioInputStream in = AudioSystem.getAudioInputStream(new File(file));
-        System.out.println(in.getFormat());
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buf = new byte[1024];
-        int len;
-        while ((len = in.read(buf)) != -1) {
-            out.write(buf, 0, len);
-        }
-        in.close();
-        byte[] bytes = out.toByteArray();
-        short[] shorts = new short[bytes.length / 2];
-        ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts);
-
-        return shorts;
-    }
-
-    private short[] getDefaultTrack() {
-        try {
-            // ZeroLuck: This works just on my PC. It will be removed later.
-            return read("C:/JTest/test2.wav");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
-        }
     }
 
     public JSoundEditor() {
@@ -115,7 +108,25 @@ public final class JSoundEditor extends JPanel {
 
         JButton openButton = new JButton(icon_open);
         openButton.setToolTipText("Import");
+        openButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                openImportFileChooser();
+            }
+        });
         tools.add(openButton);
+
+        JButton saveButton = new JButton(icon_save);
+        saveButton.setToolTipText("Save");
+        saveButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                openExportFileChooser();
+            }
+        });
+        tools.add(saveButton);
 
         JButton cleanButton = new JButton(icon_trash);
         cleanButton.addActionListener(new ActionListener() {
@@ -124,6 +135,7 @@ public final class JSoundEditor extends JPanel {
             public void actionPerformed(ActionEvent ae) {
                 tracks.removeAll();
                 tracks.repaint();
+                player.stop();
             }
         });
         cleanButton.setToolTipText("Clean");
@@ -168,10 +180,10 @@ public final class JSoundEditor extends JPanel {
                 player.stop();
             }
         });
-        
+
         tools.add(playButton);
         tools.add(stopButton);
-        
+
         player.addPlayerListener(new SimplePlayer.PlayerListener() {
 
             @Override
@@ -196,10 +208,6 @@ public final class JSoundEditor extends JPanel {
         tools.add(new JSeparator(JSeparator.VERTICAL));
 
 
-        Track t = new Track(getDefaultTrack(), (int) getFormat().getFrameRate() / PIX_FOR_SECOND, "Hello World");
-        tracks.addTrack(new JSoundTrack(t, TRACK_HEIGHT));
-
-
         // <tools>
         addTool(new CursorTool(this), icon_cursor, "cursor");
         addTool(new CutOutTool(this), icon_cutout, "cut out");
@@ -210,7 +218,286 @@ public final class JSoundEditor extends JPanel {
         scroll.setRowHeaderView(new TrackRowView(TRACK_HEIGHT, TRACK_CNT));
     }
 
-    private void play() {
+    /**
+     * Exports the editor's sound to the specified OutputStream. <br />
+     * The user will be informed if an error occurs! <br />
+     * 
+     * @param out - the OutputStream
+     * @param t - the output format (WAV, AU, OGG, ...)
+     * @param q - the quality of the file. (only for OGG)
+     */
+    private void export(OutputStream out, String t, float q) {
+        try {
+            if (t.equals("OGG")) {
+                AudioFormat fmt = new AudioFormat(44100, 16, 2, true, false);
+                SoundInput sound = new AudioFormat16Filter(createMixedAudioData(), fmt);
+                ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                byte[] b = new byte[1024];
+                int len;
+                while ((len = sound.read(b, 0, b.length)) != -1) {
+                    bout.write(b, 0, len);
+                }
+                VorbisCodec.encode(new AudioInputStream(new ByteArrayInputStream(bout.toByteArray()), fmt, bout.size() / 2), out, q);
+            } else {
+                AudioFormat fmt = getFormat();
+                SoundInput sound = createMixedAudioData();
+                ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                byte[] b = new byte[1024];
+                int len;
+                while ((len = sound.read(b, 0, b.length)) != -1) {
+                    bout.write(b, 0, len);
+                }
+                Type type = Type.WAVE;
+                if (t != null) {
+                    if (t.equals("WAV")) {
+                        type = Type.WAVE;
+                    } else if (t.equals("AIFC")) {
+                        type = Type.AIFC;
+                    } else if (t.equals("AIFF")) {
+                        type = Type.AIFF;
+                    } else if (t.equals("SND")) {
+                        type = Type.SND;
+                    } else if (t.equals("AU")) {
+                        type = Type.AU;
+                    }
+                }
+                AudioSystem.write(new AudioInputStream(new ByteArrayInputStream(bout.toByteArray()), fmt, bout.size() / 2), type, out);
+            }
+        } catch (IOException io) {
+            inform(JOptionPane.ERROR_MESSAGE, "Error while exporting sound!\nError: " + io);
+        } catch (OutOfMemoryError mem) {
+            inform(JOptionPane.ERROR_MESSAGE, "Java out of memory! (please try to remove some of your very big tracks)\nError: " + mem);
+        }
+    }
+
+    private void openExportFileChooser() {
+        String[] chooser = new String[]{
+            "OGG",
+            "WAV",
+            "AIFF",
+            "AU"};
+        final Object selected = JOptionPane.showInternalInputDialog(this, "Please select a file type.", "Export", JOptionPane.QUESTION_MESSAGE,
+                null, chooser, null);
+
+        if (selected == null) {
+            return;
+        }
+
+        final JFileChooser ch = new JFileChooser();
+        ch.setMultiSelectionEnabled(false);
+        ch.setApproveButtonText("Save");
+
+        final JDesktopPane desktop = getDesktop();
+        final JInternalFrame frm = new JInternalFrame("Select a sound file...");
+        frm.setClosable(true);
+        frm.setLayout(new BorderLayout());
+        frm.add(ch, BorderLayout.CENTER);
+        frm.pack();
+
+        frm.setVisible(true);
+        Point loc = SwingUtilities.convertPoint(this, getLocation(), desktop);
+        frm.setLocation(loc.x + getWidth() / 2 - frm.getWidth() / 2,
+                loc.y + getHeight() / 2 - frm.getHeight() / 2);
+
+        desktop.add(frm, 0);
+        frm.toFront();
+
+        ch.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                String cmd = ae.getActionCommand();
+                if (cmd != null) {
+                    if (cmd.equals(JFileChooser.CANCEL_SELECTION)) {
+                        frm.dispose();
+                    } else if (cmd.equals(JFileChooser.APPROVE_SELECTION)) {
+                        FileOutputStream out = null;
+                        try {
+                            File f = ch.getSelectedFile();
+                            if (f == null) {
+                                return;
+                            }
+                            if (f.exists()) {
+                                out = new FileOutputStream(f);
+                            } else {
+                                String path = f.getAbsolutePath();
+                                path = StreamUtils.addFileExtension(path, (String) selected);
+                                out = new FileOutputStream(path);
+                            }
+                            export(out, (String) selected, 0.3f);
+                        } catch (IOException io) {
+                            inform(JOptionPane.ERROR_MESSAGE, "Error while opening file!\nError: " + io);
+                        } finally {
+                            StreamUtils.safeClose(out);
+                        }
+                        frm.dispose();
+                    }
+                }
+            }
+        });
+
+    }
+
+    /**
+     * Opens an Open-JFileChooser and lets the user import files. <br />
+     */
+    private void openImportFileChooser() {
+        final String[] ext = new String[]{"wav", "ogg", "aiff", "aif", "au"};
+        final JFileChooser ch = new JFileChooser();
+        ch.setMultiSelectionEnabled(false);
+        ch.setFileFilter(new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+                if (f.isDirectory()) {
+                    return true;
+                }
+                String name = f.getName().toLowerCase();
+                for (String e : ext) {
+                    if (name.endsWith(e)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public String getDescription() {
+                StringBuilder sb = new StringBuilder("Sound files: ");
+                if (ext.length > 0) {
+                    sb.append(ext[0].toUpperCase());
+                    for (int i = 1; i < ext.length; i++) {
+                        sb.append(", ").append(ext[i].toUpperCase());
+                    }
+                }
+                return sb.toString();
+            }
+        });
+        final JDesktopPane desktop = getDesktop();
+        final JInternalFrame frm = new JInternalFrame("Select a sound file...");
+        frm.setClosable(true);
+        frm.setLayout(new BorderLayout());
+        frm.add(ch, BorderLayout.CENTER);
+        frm.pack();
+
+        frm.setVisible(true);
+        Point loc = SwingUtilities.convertPoint(this, getLocation(), desktop);
+        frm.setLocation(loc.x + getWidth() / 2 - frm.getWidth() / 2,
+                loc.y + getHeight() / 2 - frm.getHeight() / 2);
+
+        desktop.add(frm, 0);
+        frm.toFront();
+
+        ch.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                String cmd = ae.getActionCommand();
+                if (cmd != null) {
+                    if (cmd.equals(JFileChooser.CANCEL_SELECTION)) {
+                        frm.dispose();
+                    } else if (cmd.equals(JFileChooser.APPROVE_SELECTION)) {
+                        open(ch.getSelectedFile());
+                        frm.dispose();
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Opens the specified sound-file and adds it to the editor. <br />
+     * 
+     * @see #openImportFileChooser()
+     * @param f - the file to open.
+     */
+    private void open(File f) {
+        try {
+            String name = f.getName().toLowerCase();
+            if (name.endsWith(".ogg")) {
+                // this should be an ogg file.
+                SoundInput in = null;
+                try {
+                    in = VorbisCodec.decode(new FileInputStream(f));
+                    addSound(f.getName(), in);
+                } finally {
+                    if (in != null) {
+                        in.close();
+                    }
+                }
+            } else {
+                // this should be a wav, aiff, ... file
+                AudioInputStream in = null;
+                try {
+                    in = AudioSystem.getAudioInputStream(f);
+                    addSound(f.getName(), SoundInput.fromStream(in));
+                } finally {
+                    StreamUtils.safeClose(in);
+                }
+            }
+        } catch (IOException io) {
+            inform(JOptionPane.ERROR_MESSAGE, "Error while decoding the audio-file!\nError:" + io);
+        } catch (UnsupportedAudioFileException ex) {
+            inform(JOptionPane.ERROR_MESSAGE, "Can't decode the file: This audio-file isn't supported!\nError: " + ex);
+        } catch (OutOfMemoryError mem) {
+            inform(JOptionPane.ERROR_MESSAGE, "Java is out of memory: This audio-file is to big for the editor!\nError: " + mem);
+        }
+    }
+
+    /**
+     * Opens a message dialog. <br />
+     * 
+     * @param type - the type of the message. see: {@link javax.swing.JOptionPane}
+     * @param msg - the message to display. 
+     */
+    private void inform(int type, String msg) {
+        JOptionPane.showInternalMessageDialog(this, msg, "Message", type);
+    }
+
+    /**
+     * Adds the SoundInput to the editor. <br />
+     * This <b>doesn't</b> closes the SoundInput!<br />
+     * 
+     * PROBLEM: This can throw a {@link java.lang.OutOfMemoryError} <br />
+     * 
+     * @throws java.io.IOException
+     * @param snd - the SoundInput
+     * @param name - the name of the sound.
+     */
+    private void addSound(String name, SoundInput src) throws IOException {
+        SoundInput in = new AudioFormat16Filter(src, getFormat());
+        AudioFormat fmt = in.getFormat();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf, 0, buf.length)) != -1) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        byte[] bytes = out.toByteArray();
+        short[] shorts = new short[bytes.length / 2];
+        ByteBuffer byteBuf = ByteBuffer.wrap(bytes);
+        if (fmt.isBigEndian()) {
+            byteBuf.order(ByteOrder.BIG_ENDIAN);
+        } else {
+            byteBuf.order(ByteOrder.LITTLE_ENDIAN);
+        }
+        byteBuf.asShortBuffer().get(shorts);
+
+        // try to release memory...
+        byteBuf = null;
+        bytes = null;
+        out = null;
+        buf = null;
+
+        Track t = new Track(shorts, (int) getFormat().getFrameRate() / PIX_FOR_SECOND, name == null ? "unnamed" : name);
+        tracks.addTrack(new JSoundTrack(t, TRACK_HEIGHT));
+    }
+
+    /**
+     * PROBLEM: This can throw a {@link java.lang.OutOfMemoryError} <br />
+     */
+    private SoundInput createMixedAudioData() {
         AudioFormat fmt = getFormat();
         TimedSoftwareMixer mix = new TimedSoftwareMixer(fmt);
         for (Component comp : tracks.getComponents()) {
@@ -228,9 +515,24 @@ public final class JSoundEditor extends JPanel {
                 mix.addTimed(inp, (long) ((double) t.getX() / PIX_FOR_SECOND * 1000));
             }
         }
-        player.play(mix);
+        return mix;
     }
 
+    /**
+     * Plays the sound tracks in the editor. <br />
+     */
+    private void play() {
+        try {
+            player.play(createMixedAudioData());
+        } catch (OutOfMemoryError mem) {
+            inform(JOptionPane.ERROR_MESSAGE, "Java is out of memory! (try to remove some of the large sound-tracks!)\nError: " + mem);
+        }
+    }
+
+    /**
+     * Returns the desktop pane on which this JSoundEditor is, or null <br />
+     * 
+     */
     private JDesktopPane getDesktop() {
         Container parent = getParent();
         while (parent != null) {
@@ -241,16 +543,58 @@ public final class JSoundEditor extends JPanel {
         }
         return null;
     }
+    private int recordingCounter = 0;
 
     private void openRecorderDialog() {
         Container desktop = getDesktop();
         if (desktop != null) {
-            JInternalFrame frm = new JInternalFrame("Microphone Recorder");
+            final JInternalFrame frm = new JInternalFrame("Microphone Recorder");
             frm.setClosable(true);
             frm.setLayout(new BorderLayout());
-            JSoundRecorder p = new JSoundRecorder();
+            final JSoundRecorder p = new JSoundRecorder(getFormat());
             frm.add(p, BorderLayout.CENTER);
             desktop.add(frm, 0);
+            JPanel south = new JPanel(new BorderLayout());
+            JPanel southEast = new JPanel(new FlowLayout());
+            JButton cancel = new JButton("Cancel");
+            cancel.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    frm.dispose();
+                    p.release();
+                }
+            });
+            southEast.add(cancel);
+            JButton ok = new JButton("OK");
+            ok.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    AudioFormat fmt = p.getFormat();
+                    byte[] data = p.getAudioData();
+                    p.release();
+                    frm.dispose();
+                    short[] samples = new short[data.length / 2];
+                    ShortBuffer buf = ShortBuffer.wrap(samples);
+                    ByteBuffer dataBuf = ByteBuffer.wrap(data);
+                    if (fmt.isBigEndian()) {
+                        dataBuf.order(ByteOrder.BIG_ENDIAN);
+                    } else {
+                        dataBuf.order(ByteOrder.LITTLE_ENDIAN);
+                    }
+                    buf.put(dataBuf.asShortBuffer());
+
+                    tracks.addTrackLocated(new JSoundTrack(
+                            new Track(samples, (int) ((double) getFormat().getSampleRate() / PIX_FOR_SECOND),
+                            "Recording - " + (recordingCounter++ + 1)),
+                            TRACK_HEIGHT));
+                }
+            });
+
+            southEast.add(ok);
+            south.add(southEast, BorderLayout.EAST);
+            frm.add(south, BorderLayout.SOUTH);
 
             frm.pack();
             frm.setVisible(true);

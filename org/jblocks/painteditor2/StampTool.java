@@ -7,14 +7,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
 
 /**
  *
  * @author ZeroLuck
  */
-public class StampTool extends PaintTool implements MouseListener, MouseMotionListener {
+class StampTool extends PaintTool implements MouseListener, MouseMotionListener {
 
     private int startX;
     private int startY;

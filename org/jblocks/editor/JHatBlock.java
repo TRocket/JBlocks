@@ -36,7 +36,7 @@ class JHatBlock extends AbstrBlock implements Puzzle {
 
     @Override
     protected void paintBlockBorder(Graphics grp) {
-        Color col = new Color(0xD6900A); //getBackground();
+        Color col = getBackground();
         Color dark = Color.BLACK;
         Color shadow = col.darker();
         Color darkShadow = shadow.darker();

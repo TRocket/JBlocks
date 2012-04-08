@@ -16,7 +16,7 @@ public final class JTrackPane extends JComponent {
     // <member>
     private final int height;
     private int lines;
-    private CurrentPos pos;
+    private final CurrentPos pos;
 
     public JTrackPane(int h, int max) {
         height = h;
@@ -28,7 +28,21 @@ public final class JTrackPane extends JComponent {
 
     void addTrack(JSoundTrack t) {
         t.setForeground(Color.RED);
-        add(t, 1);
+        if (getComponentCount() > 0) {
+            add(t, 1);
+        } else {
+            add(t);
+        }
+        doLayout();
+    }
+
+    void addTrackLocated(JSoundTrack t) {
+        t.setLocation(0, 0);
+        if (getComponentCount() > 0) {
+            add(t, 1);
+        } else {
+            add(t);
+        }
         doLayout();
     }
 
@@ -38,7 +52,7 @@ public final class JTrackPane extends JComponent {
             c.setSize(c.getPreferredSize());
         }
     }
-    
+
     void resetPos() {
         pos.setPos(-100);
     }
@@ -106,7 +120,11 @@ public final class JTrackPane extends JComponent {
             return;
         }
         remove(c);
-        add(c, 1);
+        if (getComponentCount() > 0) {
+            add(c, 1);
+        } else {
+            add(c);
+        }
         repaint();
     }
 

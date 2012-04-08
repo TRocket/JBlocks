@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
  *
  * @author ZeroLuck
  */
-public class RectTool extends PaintTool implements MouseListener, MouseMotionListener {
+class RectTool extends PaintTool implements MouseListener, MouseMotionListener {
 
     private int startX;
     private int startY;

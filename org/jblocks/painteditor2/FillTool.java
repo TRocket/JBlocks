@@ -19,7 +19,7 @@ import java.awt.image.WritableRaster;
  *
  * @author ZeroLuck
  */
-public class FillTool extends PaintTool implements MouseListener, MouseMotionListener {
+class FillTool extends PaintTool implements MouseListener, MouseMotionListener {
 
     private Image fillImg;
 

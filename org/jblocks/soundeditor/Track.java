@@ -33,7 +33,7 @@ class Track {
         this.name = name;
         this.spp = samplesPerPixel;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -64,11 +64,10 @@ class Track {
      */
     public short[] createUserView() {
         int length = end - offset;
-        short[] view = new short[length / spp];
+        short[] view = new short[(int) ((double) length / spp)];
         for (int i = 0; i < view.length; i++) {
             view[i] = samples[offset + i * spp];
         }
         return view;
     }
-
 }

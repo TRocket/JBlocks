@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.sound.sampled.AudioFormat;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -30,10 +31,10 @@ public class JSoundRecorder extends JPanel {
     private final Recorder rec;
     private final SimplePlayer player;
 
-    public JSoundRecorder() {
+    public JSoundRecorder(AudioFormat fmt) {
         volume = new VolumeView();
         time = new JLabel("0:00");
-        rec = new Recorder();
+        rec = new Recorder(fmt);
         player = new SimplePlayer();
 
         setLayout(new BorderLayout());
@@ -177,8 +178,20 @@ public class JSoundRecorder extends JPanel {
     @Override
     public void removeNotify() {
         super.removeNotify();
+        release();
+    }
+    
+    public void release() {
         player.stop();
         rec.reset();
+    }
+    
+    public AudioFormat getFormat() {
+        return rec.getFormat();
+    }
+    
+    public byte[] getAudioData() {
+        return rec.getAudioData();
     }
 
     private void setTime(long millis) {
