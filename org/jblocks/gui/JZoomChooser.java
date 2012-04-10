@@ -107,7 +107,7 @@ public class JZoomChooser extends JComponent {
     public JZoomChooser(int val, int c) {
         value = val;
         cnt = c;
-        setOpaque(true);
+        setOpaque(false);
 
         addMouseMotionListener(new MouseMotionAdapter() {
 

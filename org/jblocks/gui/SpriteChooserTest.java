@@ -7,6 +7,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import org.jblocks.JBlocks;
+import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.editor.JScriptPane;
 
@@ -26,7 +27,7 @@ public class SpriteChooserTest {
                     new ImageIcon(JBlocks.class.getResource("res/jblocks-icon.png")).getImage());
 
             final JScriptPane pane = new JScriptPane();
-            pane.add(JScriptPane.createBlock("hat", "When %{gf} clicked"));
+            pane.add(BlockFactory.createBlock("hat", "When %{gf} clicked"));
             pane.cleanup();
 
             if (i == 0) {

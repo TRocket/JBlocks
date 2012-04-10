@@ -17,15 +17,9 @@ public class SimplePlayer implements Runnable {
     private volatile boolean pause;
     private SoundInput sound;
     private final List<PlayerListener> listeners;
-    private final int BUFFER_SIZE;
-
-    public SimplePlayer(int bufsize) {
-        listeners = new ArrayList<PlayerListener>();
-        BUFFER_SIZE = bufsize;
-    }
 
     public SimplePlayer() {
-        this(8096);
+        listeners = new ArrayList<PlayerListener>();
     }
 
     /**
@@ -119,7 +113,7 @@ public class SimplePlayer implements Runnable {
             SourceDataLine line = AudioSystem.getSourceDataLine(fmt);
             line.open();
             line.start();
-            byte[] buf = new byte[BUFFER_SIZE];
+            byte[] buf = new byte[8096];
             long written = 0;
             int len;
             while ((len = sound.read(buf, 0, buf.length)) != -1 && !stopRequest) {

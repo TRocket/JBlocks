@@ -6,23 +6,20 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.net.URL;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
 import org.jblocks.JBlocks;
+import org.jblocks.byob.JByobEditor;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.painteditor2.JPaintEditor;
 import org.jblocks.soundeditor.JSoundEditor;
-import org.jblocks.soundeditor.JSoundRecorder;
 
 /**
  *
@@ -41,6 +38,7 @@ public class JBlocksPane extends JDesktopPane {
     private static ImageIcon icon_open;
     private static ImageIcon icon_paint_editor;
     private static ImageIcon icon_sound_editor;
+    private static ImageIcon icon_block_editor;
     // <member>
     private JToolBar tools;
     private JBlockEditor editor;
@@ -54,6 +52,7 @@ public class JBlocksPane extends JDesktopPane {
         icon_open = new ImageIcon(JBlocks.class.getResource("res/open.png"));
         icon_paint_editor = new ImageIcon(JBlocks.class.getResource("res/paint-editor.png"));
         icon_sound_editor = new ImageIcon(JBlocks.class.getResource("res/speaker.png"));
+        icon_block_editor = new ImageIcon(JBlocks.class.getResource("res/block-editor.png"));
     }
 
     public JBlocksPane() {
@@ -76,7 +75,7 @@ public class JBlocksPane extends JDesktopPane {
         saveButton.setToolTipText("Save project");
         tools.add(saveButton);
         tools.add(openButton);
-        
+
         JButton runButton = new JButton(icon_run_build);
         runButton.setToolTipText("Run project");
         tools.add(runButton);
@@ -113,15 +112,19 @@ public class JBlocksPane extends JDesktopPane {
                 });
                 frm.add(edt, BorderLayout.CENTER);
                 frm.setVisible(true);
-                add(frm, 0);
-
                 frm.pack();
 
                 int w = frm.getWidth();
                 int h = frm.getHeight();
 
+                frm.setFrameIcon(icon_paint_editor);
                 frm.setLocation(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2);
 
+                add(frm, 0);
+                                try {
+                    frm.setSelected(true);
+                } catch (java.beans.PropertyVetoException e) {
+                }
             }
         });
 
@@ -142,20 +145,36 @@ public class JBlocksPane extends JDesktopPane {
                 Container edt = new JSoundEditor();
                 frm.add(edt, BorderLayout.CENTER);
                 frm.setVisible(true);
-                add(frm, 0);
 
                 frm.setSize((int) (getWidth() / 1.3), (int) (getHeight() / 1.3));
 
                 int w = frm.getWidth();
                 int h = frm.getHeight();
 
+                frm.setFrameIcon(icon_sound_editor);
                 frm.setLocation(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2);
 
+                add(frm, 0);
+                try {
+                    frm.setSelected(true);
+                } catch (java.beans.PropertyVetoException e) {
+                }
             }
         });
 
         tools.add(openSound);
 
+        JButton openByob = new JButton(icon_block_editor);
+        openByob.setToolTipText("Open BYOB-Editor.");
+        openByob.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                JByobEditor.createEditor(JBlocksPane.this, icon_block_editor);
+            }
+        });
+
+        tools.add(openByob);
         // add components to 'app'
         app.setLayout(new BorderLayout());
         app.add(tools, BorderLayout.NORTH);
@@ -167,7 +186,7 @@ public class JBlocksPane extends JDesktopPane {
 
         app.add(editor, BorderLayout.CENTER);
         app.add(chScroll, BorderLayout.EAST);
-        
+
         // add app to the desktop-pane
         add(app);
     }

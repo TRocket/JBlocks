@@ -12,13 +12,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -28,18 +30,16 @@ import org.jblocks.JBlocks;
  *
  * A ScriptPane for the BlockEditor. <br />
  * 
- * @version 0.3
+ * @version 0.4
  * @author ZeroLuck
  */
 public class JScriptPane extends JPanel {
 
     private static BufferedImage scriptpane;
-    private static BufferedImage greenflag;
 
     static {
         try {
             scriptpane = ImageIO.read(JBlocks.class.getResourceAsStream("res/scriptpane.png"));
-            greenflag = ImageIO.read(JBlocks.class.getResourceAsStream("res/goButton.gif"));
         } catch (IOException ex) {
             throw new java.lang.ExceptionInInitializerError(ex);
         }
@@ -84,109 +84,6 @@ public class JScriptPane extends JPanel {
         scrp = img;
     }
 
-    private static void addFmt0(AbstrBlock block, String fmt) {
-        String[] s = fmt.split(";");
-        if (s.length < 1) {
-            throw new IllegalArgumentException("parse error in bs.");
-        }
-        if (s[0].equals("r")) {
-            JReporterInput inp = new JReporterInput();
-            inp.setBackground(block.getBackground());
-            inp.reset();
-            block.add(inp);
-        } else if (s[0].equals("b")) {
-            JBooleanInput inp = new JBooleanInput();
-            inp.setBackground(block.getBackground());
-            inp.reset();
-            block.add(inp);
-        } else if (s[0].equals("gf")) {
-            block.add(new JLabel(new ImageIcon(greenflag)));
-        } else if (s[0].equals("combo")) {
-            JComboBox<String> box = new JComboBox<String>();
-            for (int i = 1; i < s.length; i++) {
-                box.addItem(s[i]);
-            }
-            block.add(box);
-        } else if (s[0].equals("s")) {
-            JBlockSequence seq = new JBlockSequence();
-            block.add(seq);
-        } else if (s[0].equals("br")) {
-            block.add(new NewLineComponent());
-        }
-    }
-
-    /**
-     * 
-     * Creates a block from a String. <br />
-     * Format: <br />
-     *  - %{r}    : a reporter/boolean/text input. <br />
-     *  - %{b}                  : a boolean input. <br />
-     *  - %{s}                  : a sequence.
-     *  - %{br}                 : a new line.
-     *  - %{gf}                 : a green flag icon. <br />
-     *  - %{combo;ITEM_1}       : a combo box. <br />
-     * <br />
-     * 
-     * @param type "control", "cap", "reporter", "boolean" or "hat"
-     * @param bs the format for the block label
-     * @return the created block
-     */
-    public static AbstrBlock createBlock(String type, String bs) {
-        AbstrBlock block = null;
-        if (type.equals("hat")) {
-            block = new JHatBlock();
-        } else if (type.equals("command")) {
-            block = new JCommandBlock();
-        } else if (type.equals("boolean")) {
-            block = new JBooleanBlock();
-        } else if (type.equals("reporter")) {
-            block = new JReporterBlock();
-        } else if (type.equals("cap")) {
-            block = new JCapBlock();
-        }
-        if (block == null) {
-            throw new IllegalArgumentException("\"" + type + "\" isn't a correct block type.");
-        }
-        final Color textColor = Color.BLACK;
-        StringBuilder sb = new StringBuilder();
-        int off = 0; 
-        int len = bs.length();
-        while (off < len) {
-            char c = bs.charAt(off++);
-            if (c == '%') {
-                String str = sb.toString();
-                if (!str.trim().isEmpty()) {
-                    JLabel lab = new JLabel(str);
-                    lab.setForeground(textColor);
-                    block.add(lab);
-                }
-                sb.delete(0, sb.length());
-                if (bs.charAt(off++) != '{') {
-                    throw new IllegalArgumentException("format problem at char " + off + "!");
-                }
-                StringBuilder fmt = new StringBuilder();
-                while (bs.charAt(off) != '}') {
-                    fmt.append(bs.charAt(off));
-                    off++;
-                }
-                addFmt0(block, fmt.toString());
-                off++;
-            } else {
-                sb.append(c);
-            }
-        }
-        String str = sb.toString();
-        if (!str.trim().isEmpty()) {
-            JLabel lab = new JLabel(str);
-            lab.setForeground(textColor);
-            block.add(lab);
-        }
-
-        block.setBlockType(type);
-        block.setBlockSyntax(bs);
-        return block;
-    }
-
     // FIXME: replace the "-6"s.
     private static int doPuzzleH(Puzzle p, int y, Set<Component> set) {
         int h = 0;
@@ -218,6 +115,19 @@ public class JScriptPane extends JPanel {
         return h;
     }
 
+    private List<Component> getComponentsSorted() {
+        List<Component> list = new LinkedList<Component>();
+        list.addAll(Arrays.asList(getComponents()));
+        Collections.sort(list, new Comparator<Component>() {
+
+            @Override
+            public int compare(Component t, Component t1) {
+                return t.getY() - t1.getY();
+            }
+        });
+        return list;
+    }
+
     /**
      *
      * Layouts the scripts like in Scratch. <br />
@@ -228,7 +138,7 @@ public class JScriptPane extends JPanel {
 
         int y = CLEANUP_TOP;
 
-        for (Component c : getComponents()) {
+        for (Component c : getComponentsSorted()) {
             if (!set.contains(c)) {
                 if (c instanceof Puzzle) {
                     y += doPuzzleH((Puzzle) c, y, set) + CLEANUP_SPACE;

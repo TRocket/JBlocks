@@ -1,4 +1,4 @@
-package org.jblocks.editor;
+package org.jblocks.gui;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -38,7 +38,7 @@ public class JCategoryChooser extends JPanel {
      */
     public JCategoryChooser(int categories_per_line) {
         cpline = categories_per_line;
-        setBackground(new Color(0xB0B0B0));
+       // setBackground(new Color(0xB0B0B0));
     }
 
     /**

@@ -26,23 +26,23 @@ public class BlockEditorTest {
         ch.addCategory("Sound", Color.MAGENTA);
         ch.addCategory("Looking", Color.MAGENTA.darker());
 
-        ch.addBlock("Control", JScriptPane.createBlock("hat", "When %{gf} clicked"));
-        ch.addBlock("Control", JScriptPane.createBlock("hat", "When key %{combo;space;a;b;c;d;e;f} pressed"));
-        ch.addBlock("Control", JScriptPane.createBlock("command", "return %{r}"));
+        ch.addBlock("Control", BlockFactory.createBlock("hat", "When %{gf} clicked"));
+        ch.addBlock("Control", BlockFactory.createBlock("hat", "When key %{combo;space;a;b;c;d;e;f} pressed"));
+        ch.addBlock("Control", BlockFactory.createBlock("command", "return %{r}"));
 
-        ch.addBlock("Control", JScriptPane.createBlock("command", "when %{b}%{br}%{s}"));
-        ch.addBlock("Control", JScriptPane.createBlock("reporter", "x pos"));
-        ch.addBlock("Control", JScriptPane.createBlock("reporter", "y pos"));
-        ch.addBlock("Control", JScriptPane.createBlock("boolean", "visible"));
+        ch.addBlock("Control", BlockFactory.createBlock("command", "when %{b}%{br}%{s}"));
+        ch.addBlock("Control", BlockFactory.createBlock("reporter", "x pos"));
+        ch.addBlock("Control", BlockFactory.createBlock("reporter", "y pos"));
+        ch.addBlock("Control", BlockFactory.createBlock("boolean", "visible"));
         
-        ch.addBlock("Control", JScriptPane.createBlock("reporter", "test %{b}%{r}"));
-        ch.addBlock("Control", JScriptPane.createBlock("command", "when %{b}%{br}%{s}"));
+        ch.addBlock("Control", BlockFactory.createBlock("reporter", "test %{b}%{r}"));
+        ch.addBlock("Control", BlockFactory.createBlock("command", "when %{b}%{br}%{s}"));
         
-        ch.addBlock("Operators", JScriptPane.createBlock("reporter", "%{r}+%{r}"));
-        ch.addBlock("Operators", JScriptPane.createBlock("reporter", "%{r}-%{r}"));
-        ch.addBlock("Operators", JScriptPane.createBlock("reporter", "%{r}*%{r}"));
-        ch.addBlock("Operators", JScriptPane.createBlock("reporter", "%{r}/%{r}"));
-        ch.addBlock("Operators", JScriptPane.createBlock("reporter", "%{r}mod%{r}"));
+        ch.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}+%{r}"));
+        ch.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}-%{r}"));
+        ch.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}*%{r}"));
+        ch.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}/%{r}"));
+        ch.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}mod%{r}"));
         
         ch.cleanup();
 

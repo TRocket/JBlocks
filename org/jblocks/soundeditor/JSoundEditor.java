@@ -2,6 +2,7 @@ package org.jblocks.soundeditor;
 
 import ext.ogg.VorbisCodec;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -11,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,6 +23,9 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -43,6 +49,7 @@ import org.jblocks.sound.AudioFormat16Filter;
 import org.jblocks.sound.SimplePlayer;
 import org.jblocks.sound.SoftwareMixer;
 import org.jblocks.sound.SoundInput;
+import org.jblocks.sound.Volume16Filter;
 import org.jblocks.utils.StreamUtils;
 
 /**
@@ -70,6 +77,7 @@ public final class JSoundEditor extends JPanel {
     static ImageIcon icon_trash;
     static ImageIcon icon_eraser;
     static ImageIcon icon_cursor;
+    static ImageIcon icon_volume;
     // <global-2>
     static final int TRACK_HEIGHT = 50;
     private final int TRACK_CNT = 6;
@@ -94,12 +102,13 @@ public final class JSoundEditor extends JPanel {
         icon_cutout = new ImageIcon(JBlocks.class.getResource("res/cut-out.png"));
         icon_eraser = new ImageIcon(JBlocks.class.getResource("res/eraser.png"));
         icon_cursor = new ImageIcon(JBlocks.class.getResource("res/cursor.png"));
+        icon_volume = new ImageIcon(JBlocks.class.getResource("res/volume.png"));
     }
 
     public JSoundEditor() {
         tools = new JToolBar();
         tracks = new JTrackPane(TRACK_HEIGHT, TRACK_CNT);
-        player = new SimplePlayer(2056);
+        player = new SimplePlayer();
         final JScrollPane scroll = new JScrollPane(tracks);
 
         setLayout(new BorderLayout());
@@ -133,9 +142,7 @@ public final class JSoundEditor extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                tracks.removeAll();
-                tracks.repaint();
-                player.stop();
+                clean();
             }
         });
         cleanButton.setToolTipText("Clean");
@@ -195,7 +202,7 @@ public final class JSoundEditor extends JPanel {
             @Override
             public void error(Throwable t) {
                 finished();
-                Toolkit.getDefaultToolkit().beep();
+                inform(JOptionPane.ERROR_MESSAGE, "Error while playing the sounds!\nError: " + t);
             }
 
             @Override
@@ -209,13 +216,19 @@ public final class JSoundEditor extends JPanel {
 
 
         // <tools>
-        addTool(new CursorTool(this), icon_cursor, "cursor");
-        addTool(new CutOutTool(this), icon_cutout, "cut out");
-        addTool(new EraserTool(this, icon_eraser), icon_eraser, "eraser");
+        addTool(new CursorTool(this), icon_cursor, "<HTML><u>cursor</u>: move a track</HTML>");
+        addTool(new CutOutTool(this), icon_cutout, "<HTML><u>cut out</u>: cut out a piece of a track</HTML>");
+        addTool(new EraserTool(this, icon_eraser), icon_eraser, "<HTML><u>eraser</u>: remove a track</HTML>");
+        addTool(new VolumeTool(this), icon_volume, "<HTML><u>volume</u>: change the volume of a track</HTML>");
         // </tool>
 
         scroll.setColumnHeaderView(new TimeColumnView(PIX_FOR_SECOND));
         scroll.setRowHeaderView(new TrackRowView(TRACK_HEIGHT, TRACK_CNT));
+    }
+
+    public void clean() {
+        tracks.removeTracks();
+        player.stop();
     }
 
     /**
@@ -238,6 +251,8 @@ public final class JSoundEditor extends JPanel {
                     bout.write(b, 0, len);
                 }
                 VorbisCodec.encode(new AudioInputStream(new ByteArrayInputStream(bout.toByteArray()), fmt, bout.size() / 2), out, q);
+            } else if (t.equals("JBSP")) {
+                exportProject(out);
             } else {
                 AudioFormat fmt = getFormat();
                 SoundInput sound = createMixedAudioData();
@@ -273,6 +288,7 @@ public final class JSoundEditor extends JPanel {
     private void openExportFileChooser() {
         String[] chooser = new String[]{
             "OGG",
+            /*  "JBSP", */
             "WAV",
             "AIFF",
             "AU"};
@@ -342,7 +358,7 @@ public final class JSoundEditor extends JPanel {
      * Opens an Open-JFileChooser and lets the user import files. <br />
      */
     private void openImportFileChooser() {
-        final String[] ext = new String[]{"wav", "ogg", "aiff", "aif", "au"};
+        final String[] ext = new String[]{"wav", /* "jbsp", */ "ogg", "aiff", "aif", "au"};
         final JFileChooser ch = new JFileChooser();
         ch.setMultiSelectionEnabled(false);
         ch.setFileFilter(new FileFilter() {
@@ -354,7 +370,7 @@ public final class JSoundEditor extends JPanel {
                 }
                 String name = f.getName().toLowerCase();
                 for (String e : ext) {
-                    if (name.endsWith(e)) {
+                    if (name.endsWith("." + e)) {
                         return true;
                     }
                 }
@@ -425,6 +441,8 @@ public final class JSoundEditor extends JPanel {
                         in.close();
                     }
                 }
+            } else if (name.endsWith(".jbsp")) {
+                inportProject(new FileInputStream(f));
             } else {
                 // this should be a wav, aiff, ... file
                 AudioInputStream in = null;
@@ -512,7 +530,9 @@ public final class JSoundEditor extends JPanel {
                     bytes.putShort(i * 2, samples[i]);
                 }
                 SoundInput inp = SoundInput.fromByteArray(data, track.getOffset() * 2, (track.getEnd() - track.getOffset()) * 2, fmt);
-                mix.addTimed(inp, (long) ((double) t.getX() / PIX_FOR_SECOND * 1000));
+                Volume16Filter filter = new Volume16Filter(inp);
+                filter.setVolume(track.getVolume());
+                mix.addTimed(filter, (long) ((double) t.getX() / PIX_FOR_SECOND * 1000));
             }
         }
         return mix;
@@ -533,7 +553,7 @@ public final class JSoundEditor extends JPanel {
      * Returns the desktop pane on which this JSoundEditor is, or null <br />
      * 
      */
-    private JDesktopPane getDesktop() {
+    JDesktopPane getDesktop() {
         Container parent = getParent();
         while (parent != null) {
             if (parent instanceof JDesktopPane) {
@@ -605,6 +625,11 @@ public final class JSoundEditor extends JPanel {
         }
     }
 
+    @Override
+    public void removeNotify() {
+        clean();
+    }
+
     public AudioFormat getFormat() {
         return editorFormat;
     }
@@ -631,5 +656,102 @@ public final class JSoundEditor extends JPanel {
         });
 
         tools.add(b);
+    }
+    private static final String PROJECT_MAGIC = "JBlocks\0SndP\0";
+    private static final int KEY_EOF = 0;
+    private static final int KEY_NEXT = 1;
+    private static final int KEY_TRACKS = 2;
+    private static final int KEY_COMPONENTS = 3;
+
+    private void exportProject(OutputStream os) throws IOException {
+        try {
+            DataOutputStream out = new DataOutputStream(StreamUtils.createBuffered(os));
+            out.writeUTF(PROJECT_MAGIC);
+            out.writeByte(KEY_TRACKS);
+
+            HashMap<short[], Integer> trackMap = new HashMap<short[], Integer>(50);
+
+            int counter = 0;
+            for (Component c : tracks.getComponents()) {
+                if (c instanceof JSoundTrack) {
+                    Track t = ((JSoundTrack) c).getTrack();
+                    short[] smp = t.getSamples();
+                    if (!trackMap.containsKey(smp)) {
+                        out.writeByte(KEY_NEXT);
+                        out.writeInt(smp.length);
+                        for (int i = 0; i < smp.length; i++) {
+                            out.writeShort(smp[i]);
+                        }
+
+                        trackMap.put(smp, counter);
+                        counter++;
+                    }
+                }
+            }
+
+            out.writeByte(KEY_COMPONENTS);
+            for (Component c : tracks.getComponents()) {
+                if (c instanceof JSoundTrack) {
+                    out.writeByte(KEY_NEXT);
+                    JSoundTrack track = (JSoundTrack) c;
+                    Track t = track.getTrack();
+                    out.writeUTF(t.getName());
+                    out.writeInt(t.getOffset());
+                    out.writeInt(t.getEnd());
+                    out.writeInt(t.getSamplesPerPixel());
+                    out.writeInt(track.getX());
+                    out.writeInt(track.getY());
+                    out.writeInt(track.getForeground().getRGB());
+                    out.writeInt(trackMap.get(t.getSamples()));
+                }
+            }
+            out.writeByte(KEY_EOF);
+        } finally {
+            StreamUtils.safeClose(os);
+        }
+    }
+
+    /*
+     * WARNING: This has currently a bug...
+     */
+    private void inportProject(InputStream is) throws IOException {
+        try {
+            DataInputStream in = new DataInputStream(StreamUtils.createBuffered(is));
+            if (!in.readUTF().equals(PROJECT_MAGIC)) {
+                throw new IOException("this isn't a JBlocks sound-editor file!");
+            }
+
+            HashMap<Integer, short[]> trackMap = new HashMap<Integer, short[]>();
+
+            in.readByte(); // KEY_TRACKS
+            byte key;
+            int counter = 0;
+            while ((key = in.readByte()) == KEY_NEXT) {
+                short[] samples = new short[in.readInt()];
+                for (int i = 0; i < samples.length; i++) {
+                    samples[i] = in.readShort();
+                }
+                trackMap.put(counter, samples);
+                counter++;
+            }
+            while ((key = in.readByte()) == KEY_NEXT) {
+                String name = in.readUTF();
+                int off = in.readInt();
+                int end = in.readInt();
+                int spp = in.readInt();
+                int x = in.readInt();
+                int y = in.readInt();
+                int col = in.readInt();
+                int samples = in.readInt();
+
+                JSoundTrack track = new JSoundTrack(new Track(new Track(trackMap.get(samples), spp, name), off, end), TRACK_HEIGHT);
+                track.setForeground(new Color(col));
+                track.setLocation(x, y);
+                tracks.add(track);
+            }
+            tracks.validate();
+        } finally {
+            StreamUtils.safeClose(is);
+        }
     }
 }

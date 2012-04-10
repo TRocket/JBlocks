@@ -1,21 +1,26 @@
 package org.jblocks.editor;
 
+import org.jblocks.gui.JCategoryChooser;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import org.jblocks.JBlocks;
 import org.jblocks.gui.JDragPane;
 
@@ -87,6 +92,9 @@ public class JBlockEditor extends JPanel {
         ctgPanel.add(chooser, BorderLayout.NORTH);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addNotify() {
         super.addNotify();
@@ -114,6 +122,12 @@ public class JBlockEditor extends JPanel {
         }
     }
 
+    /**
+     * Switchs to a category. <br />
+     * This is usually called from the block-chooser itself. <br />
+     * 
+     * @param name - the name of the category
+     */
     public void switchCategory(String name) {
         Category bck = curr;
         curr = ctgs.get(name);
@@ -161,6 +175,27 @@ public class JBlockEditor extends JPanel {
         }
     }
 
+    private static void getDragTargets0(List<JScriptPane> panes, Container cont) {
+        for (Component c : cont.getComponents()) {
+            if (c instanceof JScriptPane) {
+                panes.add((JScriptPane) c);
+            }
+            if (c instanceof Container) {
+                getDragTargets0(panes, (Container) c);
+            }
+        }
+    }
+
+    /**
+     * Returns all JScriptPanes on the editor's JDragPane. <br />
+     */
+    private JScriptPane[] getDragTargets() {
+        List<JScriptPane> panes = new ArrayList<JScriptPane>();
+        JDragPane root = JDragPane.getDragPane(this);
+        getDragTargets0(panes, root);
+        return panes.toArray(new JScriptPane[]{});
+    }
+
     /**
      * Adds a new block to a category. <br />
      * 
@@ -180,29 +215,39 @@ public class JBlockEditor extends JPanel {
                     String type = b.getBlockType();
                     if (syntax != null) {
                         try {
-                            AbstrBlock block = JScriptPane.createBlock(type, syntax);
+                            AbstrBlock block = BlockFactory.createBlock(type, syntax);
                             block.setBackground(b.getBackground());
                             JDragPane.DragFinishedHandler handler = new JDragPane.DragFinishedHandler() {
 
                                 @Override
                                 public void dragFinished(JDragPane jdrag, Component c, Point location) {
-                                    Point p = javax.swing.SwingUtilities.convertPoint(jdrag, location, pane);
-
-                                    // FIXME: use JScrollPane.visibleRect() (or similar)
-                                    if (p.x < 0 || p.y < 0) {
-                                        return;
+                                    JScriptPane[] allTargets = getDragTargets();
+                                    JScriptPane target = null;
+                                    for (JScriptPane p : allTargets) {
+                                        Rectangle rect = SwingUtilities.convertRectangle(p, p.getVisibleRect(), jdrag);
+                                        if (p.isDragEnabled() && rect.contains(location)) {
+                                            target = p;
+                                            break;
+                                        }
                                     }
+                                    if (target != null) {
+                                        Point p = SwingUtilities.convertPoint(jdrag, location, target);
 
-                                    pane.add(c);
-                                    c.setLocation(p);
-                                    pane.invalidate();
-                                    pane.validate();
-                                    pane.repaint();
+                                        AbstrBlock dragBlock = (AbstrBlock) c;
 
-                                    // this can be a problem in future.
-                                    // <bad-code>
-                                    ((AbstrBlock) c).releasedEvent(null);
-                                    // </bad-code>
+                                        target.add(c);
+                                        c.setLocation(p);
+                                        target.invalidate();
+                                        target.validate();
+                                        target.repaint();
+
+                                        // this can be a problem in future.
+                                        // <fixme>
+                                        dragBlock.releasedEvent(null);
+                                        // </fixme>
+
+                                        dragBlock.toFront();
+                                    }
                                 }
                             };
                             JDragPane.getDragPane(JBlockEditor.this).
@@ -214,6 +259,7 @@ public class JBlockEditor extends JPanel {
                     }
                 }
             });
+            b.setLocation(0, Integer.MAX_VALUE);
             c.blocks.add(b);
             c.blocks.cleanup();
         }
@@ -231,7 +277,11 @@ public class JBlockEditor extends JPanel {
             cg.blocks.add(c);
         }
     }
-    
+
+    /**
+     * @param name - the name of the category.
+     * @return the category with the specified name or null. 
+     */
     public Category getCategory(String name) {
         return ctgs.get(name);
     }
@@ -244,6 +294,9 @@ public class JBlockEditor extends JPanel {
         return pane;
     }
 
+    /**
+     * "Layouts" the JBlockEditor. <br />
+     */
     public void cleanup() {
         for (Category c : ctgs.values()) {
             c.blocks.cleanup();

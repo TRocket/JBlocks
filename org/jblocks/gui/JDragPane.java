@@ -3,6 +3,7 @@ package org.jblocks.gui;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -150,6 +151,7 @@ public class JDragPane extends JPanel {
         };
         drag.addMouseMotionListener(motion);
         drag.addMouseListener(mouse);
+        doLayout();
     }
 
     private void stopDrag(MouseMotionListener motion, MouseListener mouse, DragFinishedHandler handler) {

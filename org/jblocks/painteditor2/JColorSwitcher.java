@@ -31,7 +31,7 @@ public class JColorSwitcher extends JComponent {
      * @see #setColorB(java.awt.Color) 
      */
     public JColorSwitcher() {
-        setOpaque(true);
+        setOpaque(false);
 
         colA = Color.BLACK;
         colB = Color.RED;

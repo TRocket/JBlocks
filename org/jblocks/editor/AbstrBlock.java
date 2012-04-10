@@ -3,7 +3,6 @@ package org.jblocks.editor;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -24,6 +23,7 @@ import javax.swing.JComponent;
 public abstract class AbstrBlock extends JComponent {
 
     protected Point drag;
+    private boolean draggable = true;
 
     public AbstrBlock() {
         this.setLayout(null);
@@ -36,6 +36,9 @@ public abstract class AbstrBlock extends JComponent {
         this.addMouseMotionListener(listener);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Dimension getPreferredSize() {
         if (!isValid()) {
@@ -61,6 +64,9 @@ public abstract class AbstrBlock extends JComponent {
      */
     protected abstract Insets getBorderInsets(int width, int height);
 
+    /**
+     * Returns the block's JScriptPane or null if it hasn't one. <br />
+     */
     public JScriptPane getScriptPane() {
         Container cont = this;
         while ((cont = cont.getParent()) != null) {
@@ -183,6 +189,10 @@ public abstract class AbstrBlock extends JComponent {
         paintBlockBorder(g);
     }
 
+    /**
+     * Moves the block to the front. <br />
+     * This works just when the block's parent is a JScriptPane. <br />
+     */
     protected void toFront() {
         Container root = getScriptPane();
         if (getParent() == root) {
@@ -300,7 +310,10 @@ public abstract class AbstrBlock extends JComponent {
             }
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setBackground(Color c) {
         super.setBackground(c);
@@ -310,23 +323,66 @@ public abstract class AbstrBlock extends JComponent {
             }
         }
     }
-    
     // <member>
     private String bspec;
     private String type;
 
+    /**
+     * Sets the type of the block. <br />
+     * This doesn't changes anything of the block itself, but <br />
+     * it can be used to identify this block. <br />
+     * 
+     * @see #setBlockSyntax(java.lang.String) 
+     * @param t - the type for this block.
+     */
     protected void setBlockType(String t) {
         type = t;
     }
 
+    /**
+     * Returns the type of the block. <br />
+     * If the type wasn't set with {@link #setBlockType(java.lang.String) } this 
+     * method returns null. <br />
+     */
     protected String getBlockType() {
         return type;
     }
 
+    /**
+     * Sets the syntax of this block. <br />
+     * This doesn't changes anythink of the block itself, but <br />
+     * it can be used to identify this block. <br />
+     * 
+     * @see #getBlockSyntax() 
+     * @param s - the syntax for this block.
+     */
     protected void setBlockSyntax(String s) {
         bspec = s;
     }
 
+    /**
+     * Enables/disables the dragging of this block. <br />
+     * 
+     * @see #isDraggable() 
+     */
+    public void setDraggable(boolean drag) {
+        draggable = drag;
+    }
+
+    /**
+     * Returns true if this block is draggable, otherwise false. <br />
+     * 
+     * @see #setDraggable(boolean) 
+     */
+    public boolean isDraggable() {
+        return draggable;
+    }
+
+    /**
+     * Returns the syntax of this block. <br />
+     * If the syntax wasn't set with {@link #setBlockSyntax(java.lang.String) } 
+     * this method returns null. <br />
+     */
     protected String getBlockSyntax() {
         return bspec;
     }
@@ -335,7 +391,7 @@ public abstract class AbstrBlock extends JComponent {
 
         private boolean veto() {
             JScriptPane pne = getScriptPane();
-            if (pne == null || !pne.isDragEnabled()) {
+            if (pne == null || !pne.isDragEnabled() || !draggable) {
                 return true;
             }
             return false;

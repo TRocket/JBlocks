@@ -10,6 +10,7 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.geom.RoundRectangle2D;
+import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -22,12 +23,32 @@ import javax.swing.event.DocumentListener;
  */
 class JReporterInput extends AbstrInput {
 
+    /**
+     * The input will accept reporter-blocks and text input. <br />
+     */
+    public static final int TYPE_TEXT_AND_REPORTER = 0;
+    /**
+     * The input will just accept reporter-blocks. <br />
+     */
+    public static final int TYPE_REPORTER = 1;
+    //
+    //
+    private int type;
+
+    public JReporterInput() {
+        super();
+        type = TYPE_TEXT_AND_REPORTER;
+    }
+
     private static Color bright(Color c, float f) {
         return new Color(Math.min((int) (c.getRed() * f), 255),
                 Math.min((int) (c.getGreen() * f), 255),
                 Math.min((int) (c.getBlue() * f), 255));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void paintBlockBorder(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
@@ -52,11 +73,17 @@ class JReporterInput extends AbstrInput {
         g.setStroke(basic);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Insets getBorderInsets(int width, int height) {
         return new Insets(2, height / 4, 2, height / 4);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean contains(int x, int y) {
         Dimension size = getSize();
@@ -66,31 +93,66 @@ class JReporterInput extends AbstrInput {
         return rect.contains(x, y);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean accepts(AbstrBlock block) {
-        if (!isBorderEnabled()) {
+        JComponent inp = getInput();
+        if (inp instanceof JReporterBlock) {
             return false;
         }
-
         return block instanceof JReporterBlock;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Dimension getDefaultSize() {
         return new Dimension(20, 12); // shouldn't happen
     }
 
+    /**
+     * Sets the type of this JReporterInput. <br />
+     * <code>reset()</code> has to be called. <br />
+     * 
+     * @see #reset() 
+     * @see #TYPE_REPORTER
+     * @see #TYPE_TEXT_AND_REPORTER
+     * @see #TYPE_NUMBERS_AND_REPORTER
+     * @param t - the new type of this JReporterInput.
+     */
+    public void setType(int t) {
+        type = t;
+    }
+
+    /**
+     * Returns the type of this JReporterInput. <br />
+     * @see #setType(int) 
+     */
+    public int getType() {
+        return type;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void reset() {
-        setBorderEnabled(true);
-        TextInput txt = new TextInput();
-        setInput(txt);
+        if (type == TYPE_REPORTER) {
+            setBorderEnabled(true);
+            setInput(null);
+        } else if (type == TYPE_TEXT_AND_REPORTER) {
+            setBorderEnabled(false);
+            TextInput txt = new TextInput();
+            setInput(txt);
+        }
     }
 
     private class TextInput extends JTextField {
 
         public TextInput() {
-            super();
             this.getDocument().addDocumentListener(new DocumentListener() {
 
                 private void update() {
@@ -112,7 +174,6 @@ class JReporterInput extends AbstrInput {
                     update();
                 }
             });
-            JScriptPane pne = getScriptPane();
         }
 
         @Override

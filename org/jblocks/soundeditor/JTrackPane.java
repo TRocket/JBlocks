@@ -53,13 +53,23 @@ public final class JTrackPane extends JComponent {
         }
     }
 
+    void removeTracks() {
+        for (Component c : getComponents()) {
+            if (c instanceof JSoundTrack) {
+                remove(c);
+            }
+        }
+        validate();
+        repaint();
+    }
+
     void resetPos() {
-        pos.setPos(-100);
+        setPos(-100);
     }
 
     void setPos(int p) {
         pos.setPos(p);
-        this.repaint();
+        repaint();
     }
 
     int getPos() {
@@ -139,7 +149,6 @@ public final class JTrackPane extends JComponent {
 
         public void setPos(int pos) {
             setLocation(pos - LINE_WIDTH / 2, 0);
-            repaint();
         }
 
         public int getPos() {
@@ -152,7 +161,7 @@ public final class JTrackPane extends JComponent {
         }
 
         @Override
-        public void paint(Graphics g) {
+        public void paintComponent(Graphics g) {
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, LINE_WIDTH, height);
         }

@@ -1,5 +1,7 @@
 package org.jblocks.utils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,7 +27,33 @@ public class StreamUtils {
         }
         return file;
     }
-    
+
+    /**
+     * Creates, if the OutputStream isn't already a BufferedOutputStream,<br />
+     * a new buffered version. <br />
+     * 
+     * @param out - the OutputStream
+     */
+    public static OutputStream createBuffered(OutputStream out) {
+        if (out instanceof BufferedOutputStream) {
+            return out;
+        }
+        return new BufferedOutputStream(out);
+    }
+
+    /**
+     * Creates, if the InputStream isn't already a BufferedInputStream,<br />
+     * a new buffered version. <br />
+     * 
+     * @param in - the InputStream
+     */
+    public static InputStream createBuffered(InputStream in) {
+        if (in instanceof BufferedInputStream) {
+            return in;
+        }
+        return new BufferedInputStream(in);
+    }
+
     /**
      * Closes the InputStream. <br />
      * 

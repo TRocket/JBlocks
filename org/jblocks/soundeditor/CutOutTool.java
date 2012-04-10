@@ -88,12 +88,15 @@ public class CutOutTool extends SoundEditorTool {
         
         JSoundTrack a = new JSoundTrack(trackA, src.getHeight());
         JSoundTrack b = new JSoundTrack(trackB, src.getHeight());
+        a.setForeground(src.getForeground());
+        b.setForeground(src.getForeground());
         a.setLocation(src.getX(), src.getY());
         b.setLocation(src.getX() + end, src.getY());
         JTrackPane parent = (JTrackPane) src.getParent();
         parent.remove(src);
-        parent.addTrack(a);
-        parent.addTrack(b);
+        parent.add(a);
+        parent.add(b);
+        parent.validate();
         parent.repaint();
     }
 
