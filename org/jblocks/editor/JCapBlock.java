@@ -4,7 +4,6 @@
  */
 package org.jblocks.editor;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -14,7 +13,6 @@ import java.awt.Insets;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 
 /**
@@ -24,9 +22,9 @@ import java.awt.event.MouseEvent;
 class JCapBlock extends AbstrBlock implements Puzzle {
 
     // <global>
-    private static final int TOP = 6;
+    private static final int TOP = 5;
     private static final int LEFT_RIGHT = 1;
-    private static final int BOTTOM = 2;
+    private static final int BOTTOM = 1;
     private static final int ADAPTER_W = 15;
     // <member>
     private PuzzleAdapter overMe;
@@ -59,7 +57,6 @@ class JCapBlock extends AbstrBlock implements Puzzle {
         Color col = getBackground();
         Rectangle clip = g.getClipBounds();
         Dimension size = getSize();
-        Stroke basic = g.getStroke();
 
         Color shadow = col.darker();
         Color darkShadow = shadow.darker();
@@ -67,7 +64,6 @@ class JCapBlock extends AbstrBlock implements Puzzle {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g.setStroke(new java.awt.BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
 
         // TOP
         g.setColor(col);
@@ -82,21 +78,14 @@ class JCapBlock extends AbstrBlock implements Puzzle {
         g.setColor(shadow);
         g.drawLine(0, 0, 0, size.height - BOTTOM);
 
-
-        g.setStroke(basic);
         g.setColor(darkShadow);
         g.drawLine(size.width - 1, 0, size.width - 1, size.height - BOTTOM);
-        g.setColor(shadow);
-        g.drawLine(size.width - 2, 2, size.width - 2, size.height - BOTTOM);
-
 
         // draw BOTTOM
         g.setClip(0, size.height - BOTTOM, size.width, BOTTOM);
 
-        g.setColor(shadow);
-        g.drawLine(0, size.height - BOTTOM, size.width, size.height - BOTTOM);
         g.setColor(darkShadow);
-        g.drawLine(1, size.height - BOTTOM + 1, size.width - 1, size.height - BOTTOM + 1);
+        g.drawLine(0, size.height - BOTTOM, size.width, size.height - BOTTOM);
 
         g.setClip(clip);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -146,14 +135,6 @@ class JCapBlock extends AbstrBlock implements Puzzle {
 
 
         super.pressedEvent(evt);
-    }
-
-    @Override
-    protected void dragEvent(MouseEvent evt) {
-        if (overMe.neighbour != null) {
-            AbstrBlock.removeFromPuzzle(this, overMe);
-        }
-        super.dragEvent(evt);
     }
 
     @Override

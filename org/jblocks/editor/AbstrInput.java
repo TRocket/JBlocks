@@ -18,7 +18,7 @@ import javax.swing.JComponent;
  * <br />
  * 
  * Implementations of this class have to draw the input's border <br />
- * and some input specified methods. <br />
+ * and implement some input specified methods. <br />
  * 
  * @see AbstrBlock
  * @author ZeroLuck

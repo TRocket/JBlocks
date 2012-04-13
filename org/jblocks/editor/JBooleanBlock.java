@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 
 /**
  *
@@ -36,21 +37,26 @@ class JBooleanBlock extends JReporterBlock {
 
         Dimension size = getSize();
         Color col = getBackground();
-      //  Stroke basic = g.getStroke();
+        Shape clip = g.getClip();
 
         Polygon plg = getPlg(size);
         
         g.setColor(col);
         g.fillPolygon(plg);
 
-      //  g.setStroke(new java.awt.BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
-        g.setColor(col.darker());
+        g.setClip(0, 0, size.width, size.height / 2);
+        g.setColor(Colors.bright(col, 1.15f));
+        g.drawPolygon(plg);
+        
+        
+        g.setClip(0, size.height / 2, size.width, size.height / 2);
+        g.setColor(Colors.bright(col, 0.85f));
         g.drawPolygon(plg);
 
+        g.setClip(clip);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_OFF);
 
-      //  g.setStroke(basic);
     }
 
     @Override

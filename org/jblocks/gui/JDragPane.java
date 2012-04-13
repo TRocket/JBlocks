@@ -3,7 +3,6 @@ package org.jblocks.gui;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -40,14 +39,26 @@ public class JDragPane extends JPanel {
 
             @Override
             public void mouseDragged(MouseEvent me) {
-                drag.setLocation(me.getX() - dragOff.x, me.getY() - dragOff.y);
+                handleEvent(me, 0, 0);
             }
 
             @Override
             public void mouseMoved(MouseEvent me) {
-                drag.setLocation(me.getX() - dragOff.x, me.getY() - dragOff.y);
+                handleEvent(me, 0, 0);
             }
         });
+    }
+
+    /**
+     * @param evt the MouseEvent
+     * @param dx delta-X to MouseEvent.getPoint()
+     * @param dy delta-Y to MouseEvent.getPoint()
+     */
+    private void handleEvent(MouseEvent evt, int dx, int dy) {
+        drag.setLocation(evt.getX() - dragOff.x + dx, evt.getY() - dragOff.y + dy);
+        if (drag instanceof org.jblocks.editor.Puzzle) {
+            ((org.jblocks.editor.Puzzle) drag).layoutPuzzle();
+        }
     }
 
     /**
@@ -64,7 +75,7 @@ public class JDragPane extends JPanel {
     @Override
     public void doLayout() {
         for (Component c : getComponents()) {
-            if (drag != c) {
+            if (c == glassPane || c == view) {
                 c.setSize(getSize());
             }
         }
@@ -134,12 +145,12 @@ public class JDragPane extends JPanel {
 
             @Override
             public void mouseDragged(MouseEvent me) {
-                drag.setLocation(me.getX() + drag.getX() - dragOff.x, me.getY() + drag.getY() - dragOff.y);
+                handleEvent(me, drag.getX(), drag.getY());
             }
 
             @Override
             public void mouseMoved(MouseEvent me) {
-                drag.setLocation(me.getX() + drag.getX() - dragOff.x, me.getY() + drag.getY() - dragOff.y);
+                handleEvent(me, drag.getX(), drag.getY());
             }
         };
         final MouseListener mouse = new MouseAdapter() {

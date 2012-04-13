@@ -111,6 +111,9 @@ public class JBlocksPane extends JDesktopPane {
                     }
                 });
                 frm.add(edt, BorderLayout.CENTER);
+
+                
+                add(frm, 0);
                 frm.setVisible(true);
                 frm.pack();
 
@@ -120,8 +123,7 @@ public class JBlocksPane extends JDesktopPane {
                 frm.setFrameIcon(icon_paint_editor);
                 frm.setLocation(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2);
 
-                add(frm, 0);
-                                try {
+                try {
                     frm.setSelected(true);
                 } catch (java.beans.PropertyVetoException e) {
                 }

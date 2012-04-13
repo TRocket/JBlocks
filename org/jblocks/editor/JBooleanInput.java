@@ -53,12 +53,6 @@ class JBooleanInput extends AbstrInput {
         return new Insets(2, height / 2, 2, height / 2);
     }
 
-    private static Color bright(Color c, float f) {
-        return new Color(Math.min((int) (c.getRed() * f), 255),
-                Math.min((int) (c.getGreen() * f), 255),
-                Math.min((int) (c.getBlue() * f), 255));
-    }
-
     @Override
     protected void paintBlockBorder(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
@@ -72,7 +66,7 @@ class JBooleanInput extends AbstrInput {
 
         Polygon plg = getPlg(size);
 
-        g.setColor(bright(col, 1.1F));
+        g.setColor(Colors.bright(col, 1.1F));
         g.fillPolygon(plg);
 
         g.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));

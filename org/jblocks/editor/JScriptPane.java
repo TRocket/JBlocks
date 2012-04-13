@@ -27,10 +27,26 @@ import javax.swing.JPopupMenu;
 import org.jblocks.JBlocks;
 
 /**
- *
- * A ScriptPane for the BlockEditor. <br />
+ * <p>
+ * A JScriptPane is a container in which the user can drop blocks and scripts. <br />
+ * It has a background-image which can be 
+ * setted with {@link #setScriptPaneImage(java.awt.Image)} <br />
+ * Dragging blocks from this container can be disabled with {@link #setDragEnabled(boolean) }. <br />
+ * </p>
  * 
- * @version 0.4
+ * <p>
+ * By default a JScriptPane has a JPopupMenu in which the user can cleanup the scripts. <br />
+ * (You can either call {@link #cleanup() } to do this).
+ * If you don't want that the user can do this you can disable this with calling 
+ * the {@link org.jblocks.editor.JScriptPane#JScriptPane(boolean) } constructor.<br />
+ * </p>
+ * 
+ * <p>
+ * Dragging from this JScriptPane to another JScriptPane is possible
+ * if the other JScriptPane is a (indirect) children of the same JDragPane (and dragging is enabled).
+ * </p>
+ * 
+ * @see org.jblocks.editor.JBlockEditor
  * @author ZeroLuck
  */
 public class JScriptPane extends JPanel {
@@ -50,15 +66,25 @@ public class JScriptPane extends JPanel {
     // <member>
     private Image scrp = scriptpane;
 
+    /**
+     * Creates a new JScriptPane with an JPopupMenu. <br />
+     * @see #JScriptPane(boolean) 
+     */
     public JScriptPane() {
         this(true);
     }
 
-    public JScriptPane(boolean clean) {
+    /**
+     * Creates a new JScriptPane. <br />
+     * You can select having a JPopupMenu or don't have one. <br />
+     * 
+     * @param popup true if you want a JPopupMenu otherwise false 
+     */
+    public JScriptPane(boolean popup) {
         setBackground(Color.WHITE);
         setLayout(null);
 
-        if (clean) {
+        if (popup) {
             JPopupMenu menu = new JPopupMenu();
             JMenuItem item = new JMenuItem("cleanup");
             item.addActionListener(new ActionListener() {
@@ -73,10 +99,22 @@ public class JScriptPane extends JPanel {
         }
     }
 
+    /**
+     * Returns the background-image of this JScriptPane. <br />
+     * 
+     * @see #setScriptPaneImage(java.awt.Image) 
+     */
     public Image getScriptPaneImage() {
         return scrp;
     }
 
+    /**
+     * Sets the background-image of this JScriptPane. <br />
+     * 
+     * @see #getScriptPaneImage() 
+     * @param img the new background-image to display
+     * @throws IllegalArgumentException if 'img' is null
+     */
     public void setScriptPaneImage(Image img) {
         if (img == null) {
             throw new IllegalArgumentException("img is null!");
@@ -129,8 +167,9 @@ public class JScriptPane extends JPanel {
     }
 
     /**
-     *
-     * Layouts the scripts like in Scratch. <br />
+     * Cleanups the JScriptPane so that all blocks and scripts are good visible.
+     * <p />
+     * (Layouts the scripts like in Scratch by MIT).
      */
     public void cleanup() {
         doLayout();
@@ -154,10 +193,21 @@ public class JScriptPane extends JPanel {
     // <member>
     private boolean drag = true;
 
+    /**
+     * Enables/Disables dragging of blocks/scripts in this JScriptPane. <br />
+     * 
+     * @see #isDragEnabled() 
+     * @param b true if you want drag otherwise false
+     */
     public void setDragEnabled(boolean b) {
         drag = b;
     }
 
+    /**
+     * Returns true if dragging is enabled otherwise false. <br />
+     * 
+     * @see #setDragEnabled(boolean) 
+     */
     public boolean isDragEnabled() {
         return drag;
     }
@@ -215,9 +265,11 @@ public class JScriptPane extends JPanel {
     }
 
     /**
+     * Returns the location of the specified JComponent of it's JScriptPane.<br />
      * 
      * @param c the component
-     * @return the location of the component on the script pane.
+     * @return the location of the component on it's JScriptPane.
+     * @throws IllegalStateException if the component hasn't an (indirect) JScriptPane parent.
      */
     public static Point getLocationOnScriptPane(JComponent c) {
         Point p = new Point();
@@ -227,9 +279,10 @@ public class JScriptPane extends JPanel {
             p.y += cont.getY();
             cont = cont.getParent();
             if (cont instanceof JScriptPane) {
-                break;
+                return p;
             }
         }
-        return p;
+      //  return p;
+        throw new IllegalStateException("the component has no JScriptPane parent!");
     }
 }

@@ -2,21 +2,32 @@ package org.jblocks.byob;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import org.jblocks.editor.AbstrBlock;
 import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.JScriptPane;
+import org.jblocks.editor.JVariableInput;
 
 /**
  *
@@ -30,6 +41,7 @@ public class JByobEditor extends JPanel {
     private final AbstrBlock block;
     private final String category;
     private final List<ByobEditorListener> listeners;
+    private final Icon editorIcon;
 
     public static interface ByobEditorListener {
 
@@ -50,10 +62,11 @@ public class JByobEditor extends JPanel {
      * @param category - the category of the block.
      * @param c - the color of the category.
      */
-    protected JByobEditor(String type, String startLabel, String category, Color c) {
+    protected JByobEditor(String type, String startLabel, String category, Color c, Icon icn) {
         super(new BorderLayout());
         this.listeners = new ArrayList<ByobEditorListener>();
         this.script = new JScriptPane();
+        this.editorIcon = icn;
         this.category = category;
         script.setComponentPopupMenu(null);
         add(script, BorderLayout.CENTER);
@@ -81,15 +94,42 @@ public class JByobEditor extends JPanel {
 
         hat = BlockFactory.createBlock("hat", "");
         block = BlockFactory.createBlock(type, "");
-        block.add(new JLabel(startLabel));
+        block.add(createInput(InputTypeChooser.TYPE_TEXT, startLabel));
         block.setBackground(c);
-        block.add(new Plus());
+        block.add(createPlus());
         hat.setDraggable(false);
         block.setDraggable(false);
         hat.add(block);
 
         script.add(hat);
         script.cleanup();
+
+        block.addContainerListener(new ContainerListener() {
+
+            @Override
+            public void componentAdded(ContainerEvent ce) {
+            }
+
+            @Override
+            public void componentRemoved(ContainerEvent ce) {
+                plusCheck();
+            }
+        });
+    }
+
+    private void plusCheck() {
+        Plus last = null;
+        for (Component c : block.getComponents()) {
+            if (c instanceof Plus) {
+                if (last != null) {
+                    block.remove(last);
+                }
+                last = (Plus) c;
+            } else {
+                last = null;
+            }
+        }
+        validate();
     }
 
     /**
@@ -108,6 +148,104 @@ public class JByobEditor extends JPanel {
         for (ByobEditorListener m : listeners) {
             m.cancel();
         }
+    }
+
+    /**
+     * Returns the Plus's JDesktopPane or null if it hasn't one. <br />
+     */
+    public JDesktopPane getDesktop() {
+        Container cont = this;
+        while ((cont = cont.getParent()) != null) {
+            if (cont instanceof JDesktopPane) {
+                return (JDesktopPane) cont;
+            }
+        }
+        return null;
+    }
+
+    private Component createInput(String type, String label) {
+        Component newc = null;
+        if (type.equals(InputTypeChooser.TYPE_TEXT)) {
+            newc = new JLabel(label);
+        } else {
+            newc = new JVariableInput(label);
+        }
+        if (newc instanceof JComponent) {
+            final JComponent comp = (JComponent) newc;
+            JPopupMenu menu = new JPopupMenu();
+            JMenuItem itemDelete = new JMenuItem("delete");
+            itemDelete.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    Container parent = comp.getParent();
+                    if (parent != null) {
+                        parent.remove(comp);
+                        parent.validate();
+                    }
+                }
+            });
+            menu.add(itemDelete);
+            comp.setComponentPopupMenu(menu);
+        }
+        return newc;
+    }
+
+    private void replacePlus(Plus p, String type, String label) {
+        Component insert = createInput(type, label);
+        int counter = 0;
+        for (Component c : block.getComponents()) {
+            if (c == p) {
+                break;
+            }
+            counter++;
+        }
+
+        block.add(insert, counter);
+        block.add(createPlus(), counter);
+    }
+
+    private Plus createPlus() {
+        final Plus p = new Plus();
+        p.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                final JInternalFrame frm = new JInternalFrame("Select an input type");
+                frm.setFrameIcon(editorIcon);
+                frm.setClosable(true);
+                frm.setLayout(new BorderLayout());
+                InputTypeChooser ch = new InputTypeChooser();
+                ch.addInputTypeChooserListener(new InputTypeChooser.InputTypeChooserListener() {
+
+                    @Override
+                    public void cancel() {
+                        frm.dispose();
+                    }
+
+                    @Override
+                    public void finished(String type, String label) {
+                        frm.dispose();
+                        replacePlus(p, type, label);
+                    }
+                });
+                frm.add(ch, BorderLayout.CENTER);
+                frm.pack();
+
+                JDesktopPane desktop = getDesktop();
+                Point loc = SwingUtilities.convertPoint(JByobEditor.this, getLocation(), desktop);
+
+                frm.setLocation(loc.x + getWidth() / 2 - frm.getWidth() / 2, loc.y + getHeight() / 2 - frm.getHeight() / 2);
+                frm.setVisible(true);
+
+                desktop.add(frm, 0);
+                try {
+                    frm.setSelected(true);
+                } catch (PropertyVetoException ex) {
+                }
+            }
+        });
+        return p;
     }
 
     private void fireFinishEvent(final String syntax, final String category) {
@@ -143,7 +281,7 @@ public class JByobEditor extends JPanel {
         if (editorIcon != null) {
             frm.setFrameIcon(editorIcon);
         }
-        JByobEditor edt = new JByobEditor(type, text, category, c);
+        JByobEditor edt = new JByobEditor(type, text, category, c, editorIcon);
         edt.addByobEditorListener(new ByobEditorListener() {
 
             @Override

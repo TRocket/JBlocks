@@ -5,6 +5,8 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Composite;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
@@ -15,9 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -66,6 +71,7 @@ public final class JPaintEditor extends JPanel {
     private JColorSwitcher colorSwitcher;
     private int actionsBackImgOffset = 0;
     private float alpha = 1F;
+    private Stroke strk = new BasicStroke(4);
 
     public static interface PaintEditorListener {
 
@@ -189,7 +195,7 @@ public final class JPaintEditor extends JPanel {
         JPanel leftCenterCenter = new JPanel();
         leftCenterCenter.setLayout(new BoxLayout(leftCenterCenter, BoxLayout.PAGE_AXIS));
 
-        JPanel othersPanel = new JPanel();
+        JPanel othersPanel = new JPanel(new LineLayout());
         othersPanel.setBorder(BorderFactory.createTitledBorder("Settings"));
 
         othersPanel.add(fill);
@@ -203,6 +209,42 @@ public final class JPaintEditor extends JPanel {
             }
         });
         othersPanel.add(antialising);
+        final JComboBox<Icon> strokes = new JComboBox<Icon>();
+        for (int i = 1; i < 50; i += Math.pow(i, 0.6)) {
+            strokes.addItem(new StrokeIcon(new BasicStroke(i), new Dimension(45, 45)));
+        }
+        strokes.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                setLineStroke(((StrokeIcon) strokes.getSelectedItem()).getStroke());
+            }
+        });
+        final JCheckBox roundStrokes = new JCheckBox("Round strokes");
+        roundStrokes.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                if (roundStrokes.isSelected()) {
+                    int cnt = strokes.getItemCount();
+                    for (int i = 0; i < cnt; i++) {
+                        StrokeIcon icn = (StrokeIcon) strokes.getItemAt(i);
+                        icn.setStroke(new BasicStroke(icn.getStroke().getLineWidth(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    }
+                } else {
+                    int cnt = strokes.getItemCount();
+                    for (int i = 0; i < cnt; i++) {
+                        StrokeIcon icn = (StrokeIcon) strokes.getItemAt(i);
+                        icn.setStroke(new BasicStroke(icn.getStroke().getLineWidth()));
+                    }
+                }
+                setLineStroke(((StrokeIcon) strokes.getSelectedItem()).getStroke());
+                strokes.repaint();
+            }
+        });
+        othersPanel.add(roundStrokes);
+        strokes.setSelectedIndex(3);
+        othersPanel.add(strokes);
         leftCenterCenter.add(othersPanel);
         leftCenter.add(leftCenterNorth, BorderLayout.NORTH);
         leftCenter.add(leftCenterCenter, BorderLayout.CENTER);
@@ -254,6 +296,20 @@ public final class JPaintEditor extends JPanel {
         bottom.add(bottomEast, BorderLayout.EAST);
 
         add(bottom, BorderLayout.SOUTH);
+    }
+    
+    /**
+     * Returns the desktop pane on which this JPaintEditor is, or null <br />
+     */
+    private JDesktopPane getDesktop() {
+        Container parent = getParent();
+        while (parent != null) {
+            if (parent instanceof JDesktopPane) {
+                return (JDesktopPane) parent;
+            }
+            parent = parent.getParent();
+        }
+        return null;
     }
 
     /**
@@ -395,6 +451,7 @@ public final class JPaintEditor extends JPanel {
         actionsOffset = 0;
         actions.clear();
         removeBackImage();
+        setPreviewAction(null);
         paintUpdate();
     }
 
@@ -450,7 +507,11 @@ public final class JPaintEditor extends JPanel {
     }
 
     Stroke getLineStroke() {
-        return new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+        return strk;
+    }
+
+    void setLineStroke(Stroke s) {
+        strk = s;
     }
 
     int getLineWidthHeight() {

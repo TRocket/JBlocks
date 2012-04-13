@@ -6,8 +6,10 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 
@@ -26,19 +28,23 @@ class JReporterBlock extends AbstrBlock {
 
         Dimension size = getSize();
         Color col = getBackground();
-      //  Stroke basic = g.getStroke();
+        Shape clip = g.getClip();
 
         g.setColor(col);
         g.fillRoundRect(0, 0, size.width, size.height, size.height / 2, size.height / 2);
 
-      //  g.setStroke(new java.awt.BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
-        g.setColor(col.darker());
+        g.setColor(Colors.bright(col, 1.15f));
+        g.setClip(0, 0, size.width, size.height / 2);
         g.drawRoundRect(0, 0, size.width - 1, size.height - 1, size.height / 2, size.height / 2);
-        
+
+        g.setColor(Colors.bright(col, 0.85f));
+        g.setClip(0, size.height / 2, size.width, size.height / 2);
+        g.drawRoundRect(0, 0, size.width - 1, size.height - 1, size.height / 2, size.height / 2);
+
+        g.setClip(clip);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_OFF);
 
-      //  g.setStroke(basic);
     }
 
     @Override
@@ -56,21 +62,18 @@ class JReporterBlock extends AbstrBlock {
     }
 
     @Override
-    protected void dragEvent(MouseEvent evt) {
-        super.dragEvent(evt);
-    }
-
-    @Override
     protected void pressedEvent(MouseEvent evt) {
         Container parent = getParent();
         Container pane = getScriptPane();
         if (parent != pane) {
+            Point loc = JScriptPane.getLocationOnScriptPane(this);
+
             if (parent instanceof AbstrInput) {
                 ((AbstrInput) parent).reset();
             }
             parent.remove(this);
-            
-            setLocation(JScriptPane.getLocationOnScriptPane(this));
+
+            setLocation(loc);
             pane.add(this);
             layoutRoot();
         }
@@ -80,9 +83,7 @@ class JReporterBlock extends AbstrBlock {
 
     @Override
     protected void releasedEvent(MouseEvent evt) {
-        AbstrInput inp = AbstrInput.findInput(getScriptPane(),
-                new Rectangle(JScriptPane.getLocationOnScriptPane(this),
-                getSize()), this);
+        AbstrInput inp = AbstrInput.findInput(getScriptPane(), getBounds(), this);
 
         if (inp != null) {
             getParent().remove(this);

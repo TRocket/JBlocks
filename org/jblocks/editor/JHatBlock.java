@@ -11,6 +11,7 @@ import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
+import org.jblocks.gui.JDragPane;
 
 /**
  *
@@ -23,8 +24,8 @@ class JHatBlock extends AbstrBlock implements Puzzle {
     // <global>
     private static final float RND_X = 1 / 1.5F;
     private static final int RND_Y = 20;
-    private static final int LEFT = 2;
-    private static final int RIGHT = 2;
+    private static final int LEFT = 1;
+    private static final int RIGHT = 1;
     private static final int BOTTOM = 6;
     private static final int ADAPTER_W = 15;
     // <member>
@@ -62,7 +63,7 @@ class JHatBlock extends AbstrBlock implements Puzzle {
         g.setColor(dark);
         g.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g.drawOval(0, 1, rndx, rndy - 1);
-        g.drawLine(rndx + 1, RND_Y - 2, size.width - 3, RND_Y - 2);
+        g.drawLine(rndx + 1, RND_Y - 2, size.width - 2, RND_Y - 2);
 
         g.setStroke(new BasicStroke(1));
         g.setClip(clip);
@@ -70,27 +71,21 @@ class JHatBlock extends AbstrBlock implements Puzzle {
         // draw LEFT and RIGHT
         g.setColor(darkShadow);
         g.drawLine(0, RND_Y, 0, size.height - BOTTOM);
-        g.setColor(shadow);
-        g.drawLine(1, RND_Y, 1, size.height - BOTTOM);
 
         g.setStroke(basic);
-        g.setColor(darkShadow);
-        g.drawLine(size.width - 1, RND_Y, size.width - 1, size.height - BOTTOM);
         g.setColor(shadow);
-        g.drawLine(size.width - 2, RND_Y - 2, size.width - 2, size.height - BOTTOM);
+        g.drawLine(size.width - 1, RND_Y, size.width - 1, size.height - BOTTOM);
 
         // draw BOTTOM
         g.setClip(new Rectangle(0, size.height - BOTTOM, size.width, BOTTOM).intersection(clip));
 
-        g.setColor(shadow);
-        g.drawLine(0, size.height - BOTTOM, size.width, size.height - BOTTOM);
         g.setColor(darkShadow);
-        g.drawLine(1, size.height - BOTTOM + 1, size.width - 1, size.height - BOTTOM + 1);
+        g.drawLine(0, size.height - BOTTOM, size.width, size.height - BOTTOM);
 
         g.setColor(col);
-        g.fillRoundRect(15, size.height - BOTTOM - 5, ADAPTER_W, BOTTOM + 5, 5, 5);
+        g.fillRoundRect(15, size.height - BOTTOM - 6, ADAPTER_W, BOTTOM + 5, 5, 5);
         g.setColor(darkShadow);
-        g.drawRoundRect(15, size.height - BOTTOM - 5, ADAPTER_W, BOTTOM + 4, 5, 5);
+        g.drawRoundRect(15, size.height - BOTTOM - 6, ADAPTER_W, BOTTOM + 5, 5, 5);
 
         g.setClip(clip);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -150,16 +145,11 @@ class JHatBlock extends AbstrBlock implements Puzzle {
 
     @Override
     protected void pressedEvent(MouseEvent evt) {
-        super.pressedEvent(evt);
         if (underMe.neighbour != null) {
-            AbstrBlock.puzzleToFront(this);
+            Drag.dragPuzzle(JDragPane.getDragPane(this), getParent(), evt.getPoint(), this);
+        } else {
+            super.pressedEvent(evt);
         }
-    }
-
-    @Override
-    protected void dragEvent(MouseEvent evt) {
-        super.dragEvent(evt);
-        layoutPuzzle();
     }
 
     /**

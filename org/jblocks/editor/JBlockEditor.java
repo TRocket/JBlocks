@@ -3,34 +3,35 @@ package org.jblocks.editor;
 import org.jblocks.gui.JCategoryChooser;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import org.jblocks.JBlocks;
 import org.jblocks.gui.JDragPane;
 
 /**
- *
- * A block-editor class. <br />
- * The block-editor can switch between script-panes, <br />
- * and has a block-category system. <br />
+ * <p>
+ * A JBlockEditor can switch between several {@link org.jblocks.editor.JScriptPane}s. <br />
+ * The editor has a build-in {@link org.jblocks.gui.JCategoryChooser} for
+ * choosing blocks and dragging them on the current JScriptPane. <br />
+ * </p>
  * 
- * @version 0.1
+ * <p>
+ * The JBlockEditor has to be a (indirect) children of a {@link org.jblocks.gui.JDragPane}. <br />
+ * Dragging from this JBlockEditor to another JBlockEditor is possible
+ * if the other JBlockEditor is a (indirect) children of the same JDragPane.
+ * </p>
+ * 
+ * @see org.jblocks.gui.JCategoryChooser
+ * @see org.jblocks.gui.JDragPane
  * @author ZeroLuck
  */
 public class JBlockEditor extends JPanel {
@@ -175,27 +176,6 @@ public class JBlockEditor extends JPanel {
         }
     }
 
-    private static void getDragTargets0(List<JScriptPane> panes, Container cont) {
-        for (Component c : cont.getComponents()) {
-            if (c instanceof JScriptPane) {
-                panes.add((JScriptPane) c);
-            }
-            if (c instanceof Container) {
-                getDragTargets0(panes, (Container) c);
-            }
-        }
-    }
-
-    /**
-     * Returns all JScriptPanes on the editor's JDragPane. <br />
-     */
-    private JScriptPane[] getDragTargets() {
-        List<JScriptPane> panes = new ArrayList<JScriptPane>();
-        JDragPane root = JDragPane.getDragPane(this);
-        getDragTargets0(panes, root);
-        return panes.toArray(new JScriptPane[]{});
-    }
-
     /**
      * Adds a new block to a category. <br />
      * 
@@ -217,43 +197,10 @@ public class JBlockEditor extends JPanel {
                         try {
                             AbstrBlock block = BlockFactory.createBlock(type, syntax);
                             block.setBackground(b.getBackground());
-                            JDragPane.DragFinishedHandler handler = new JDragPane.DragFinishedHandler() {
-
-                                @Override
-                                public void dragFinished(JDragPane jdrag, Component c, Point location) {
-                                    JScriptPane[] allTargets = getDragTargets();
-                                    JScriptPane target = null;
-                                    for (JScriptPane p : allTargets) {
-                                        Rectangle rect = SwingUtilities.convertRectangle(p, p.getVisibleRect(), jdrag);
-                                        if (p.isDragEnabled() && rect.contains(location)) {
-                                            target = p;
-                                            break;
-                                        }
-                                    }
-                                    if (target != null) {
-                                        Point p = SwingUtilities.convertPoint(jdrag, location, target);
-
-                                        AbstrBlock dragBlock = (AbstrBlock) c;
-
-                                        target.add(c);
-                                        c.setLocation(p);
-                                        target.invalidate();
-                                        target.validate();
-                                        target.repaint();
-
-                                        // this can be a problem in future.
-                                        // <fixme>
-                                        dragBlock.releasedEvent(null);
-                                        // </fixme>
-
-                                        dragBlock.toFront();
-                                    }
-                                }
-                            };
-                            JDragPane.getDragPane(JBlockEditor.this).
-                                    setDrag(block, c.blocks, b.getLocation(), evt.getPoint(), handler);
-
+                            block.setLocation(b.getLocation());
+                            Drag.drag(JDragPane.getDragPane(JBlockEditor.this), c.blocks, evt.getPoint(), block);
                         } catch (RuntimeException ex) {
+                            // syntax error in BlockFactory...
                             ex.printStackTrace(System.err);
                         }
                     }

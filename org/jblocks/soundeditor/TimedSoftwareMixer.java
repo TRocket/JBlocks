@@ -59,10 +59,10 @@ public class TimedSoftwareMixer extends SoftwareMixer {
         AudioFormat fmt = getFormat();
         // this should be fixed.
         // <fixme>
-        int cnt = super.read(data, off, Math.min(len, 2000));
+        int cnt = super.read(data, off, Math.min(len, 2500));
         // </fixme>
         currentRead += cnt;
-        currentTime = currentRead / (fmt.getFrameSize() * (int) fmt.getFrameRate()) * 1000;
+        currentTime = (int) ((double) currentRead / (fmt.getFrameSize() * (int) fmt.getFrameRate()) * 1000);
         
         return cnt;
     }

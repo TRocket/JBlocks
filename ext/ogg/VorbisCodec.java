@@ -15,6 +15,7 @@ public class VorbisCodec {
     private static final Class<?> oggLib;
 
     static {
+        
         ClassLoader loader = new URLClassLoader(
                 new URL[]{VorbisCodec.class.getResource("ogg.dat")});
         try {

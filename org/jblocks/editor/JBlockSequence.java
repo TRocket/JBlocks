@@ -1,6 +1,5 @@
 package org.jblocks.editor;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -27,6 +26,7 @@ class JBlockSequence extends JComponent {
     private static final int ADAPTER_H = 6;
     // <member>
     private AbstrBlock stack;
+    private boolean capEnd = false;
 
     public JBlockSequence() {
         // nothing...
@@ -75,10 +75,12 @@ class JBlockSequence extends JComponent {
                     }
                 }
             }
-            ymax += 1 + lastp;
+            if (capEnd) {
+                ymax += lastp;
+            }
             dim = new Dimension(Math.max(75, xmax + 10), ymax);
         } else {
-            dim = new Dimension(75, 35);
+            dim = new Dimension(70, 35);
         }
         setPreferredSize(dim);
     }
@@ -110,6 +112,7 @@ class JBlockSequence extends JComponent {
      * @param hat the new hat of the stack
      */
     public void setStack(AbstrBlock hat) {
+        capEnd = false;
         if (hat == null) {
             stack = null;
             removeAll();
@@ -121,6 +124,9 @@ class JBlockSequence extends JComponent {
             AbstrBlock[] seq = getPuzzlePieces((Puzzle) hat, PuzzleAdapter.TYPE_DOWN);
             for (AbstrBlock b : seq) {
                 add(b);
+            }
+            if (seq[seq.length - 1] instanceof JCapBlock) {
+                capEnd = true;
             }
         } else {
             throw new IllegalArgumentException("hat is not a instanceof Puzzle.");
@@ -149,8 +155,6 @@ class JBlockSequence extends JComponent {
         g.fillRect(0, 0, size.width, size.height);
 
         // TOP
-        g.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
-
         g.setColor(col);
         g.fillRoundRect(ADAPTER_X, 0 - 5, ADAPTER_W, ADAPTER_H + 5, 5, 5);
         g.setColor(shadow);
@@ -167,19 +171,24 @@ class JBlockSequence extends JComponent {
         g.fillRect(0, 0, 0, size.height);
         g.fillRect(size.width, 0, 0, size.height);
         g.setColor(shadow);
-        g.drawLine(0, 0, 0, size.height - ADAPTER_H);
-        g.drawLine(size.width - 1, 0, size.width - 1, size.height - ADAPTER_H);
+        g.drawLine(0, 0, 0, size.height - (capEnd ? 0 : ADAPTER_H));
+        g.drawLine(size.width - 1, 0, size.width - 1, size.height - (capEnd ? 0 : ADAPTER_H));
 
         // BOTTOM
-        g.setColor(col);
-        g.fillRect(0, size.height - ADAPTER_H, ADAPTER_X + 2, ADAPTER_H);
-        g.fillRect(ADAPTER_X + ADAPTER_W, size.height - ADAPTER_H, size.width, ADAPTER_H);
-        g.setColor(shadow);
-        g.drawLine(0, size.height - ADAPTER_H, ADAPTER_X, size.height - ADAPTER_H);
-        g.drawLine(ADAPTER_X + ADAPTER_W, size.height - ADAPTER_H, size.width, size.height - ADAPTER_H);
+        if (capEnd) {
+            g.setColor(shadow);
+            g.drawLine(0, size.height - 1, size.width, size.height - 1);
+        } else {
+            g.setColor(col);
+            g.fillRect(0, size.height - ADAPTER_H, ADAPTER_X + 2, ADAPTER_H);
+            g.fillRect(ADAPTER_X + ADAPTER_W, size.height - ADAPTER_H, size.width, ADAPTER_H);
+            g.setColor(shadow);
+            g.drawLine(0, size.height - ADAPTER_H, ADAPTER_X, size.height - ADAPTER_H);
+            g.drawLine(ADAPTER_X + ADAPTER_W, size.height - ADAPTER_H, size.width, size.height - ADAPTER_H);
 
-        g.setClip(ADAPTER_X, size.height - ADAPTER_H, ADAPTER_W, ADAPTER_H);
-        g.drawRoundRect(ADAPTER_X, size.height - ADAPTER_H - 5, ADAPTER_W - 1, ADAPTER_H + 4, 5, 5);
+            g.setClip(0, size.height - ADAPTER_H, size.width, ADAPTER_H);
+            g.drawRoundRect(ADAPTER_X + 1, size.height - ADAPTER_H - 5, ADAPTER_W - 1, ADAPTER_H + 4, 5, 5);
+        }
 
         g.setClip(clip);
 
@@ -235,6 +244,7 @@ class JBlockSequence extends JComponent {
      */
     static void removeFromSequence(AbstrBlock b) {
         Container pane = b.getScriptPane();
+        Point loc = JScriptPane.getLocationOnScriptPane(b);
         JBlockSequence seq = (JBlockSequence) b.getParent();
         if (seq.getStack() == b) {
             seq.setStack(null);
@@ -250,8 +260,7 @@ class JBlockSequence extends JComponent {
 
         AbstrBlock[] blcks = getPuzzlePieces((Puzzle) b, PuzzleAdapter.TYPE_DOWN);
         for (AbstrBlock item : blcks) {
-            Point p = JScriptPane.getLocationOnScriptPane(b);
-            b.setLocation(p);
+            b.setLocation(loc);
             pane.add(item);
         }
 

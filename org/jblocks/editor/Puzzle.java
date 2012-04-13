@@ -4,7 +4,7 @@ package org.jblocks.editor;
  *
  * @author ZeroLuck
  */
-interface Puzzle {
+public interface Puzzle {
 
     void layoutPuzzle();
     

@@ -8,7 +8,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.JComponent;
@@ -65,6 +64,19 @@ class Plus extends JComponent {
                 a.actionPerformed(new java.awt.event.ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
             }
         }
+    }
+    
+    /**
+     * Adds the specified ActionListener. <br />
+     * 
+     * @param m - the listener
+     */
+    public void addActionListener(ActionListener m) {
+        listenerList.add(ActionListener.class, m);
+    }
+    
+    public void removeActionListener(ActionListener m) {
+        listenerList.remove(ActionListener.class, m);
     }
 
     private class PlusMouseListener implements MouseListener {

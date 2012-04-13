@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import org.jblocks.editor.BlockFactory;
 
 /**
  * A GUI class for the Build-Your-Own-Block Editor. <br />
@@ -22,10 +23,6 @@ import javax.swing.JTextField;
  */
 class InputTypeChooser extends JPanel {
 
-    public static final String TYPE_REPORTER_TEXT_INPUT = "reporter,text";
-    public static final String TYPE_BOOLEAN_INPUT = "boolean";
-    public static final String TYPE_SEQUENCE_INPUT = "sequence";
-    public static final String TYPE_REPORTER_INPUT = "reporter";
     public static final String TYPE_TEXT = "text";
     // <member>
     private List<InputTypeChooserListener> listeners;
@@ -94,13 +91,13 @@ class InputTypeChooser extends JPanel {
 
 
         JRadioButton textInput = new JRadioButton("Reporter / Text", true);
-        textInput.setActionCommand(TYPE_REPORTER_TEXT_INPUT);
+        textInput.setActionCommand(BlockFactory.TYPE_REPORTER_AND_TEXT_INPUT);
         JRadioButton booleanInput = new JRadioButton("Boolean");
-        booleanInput.setActionCommand(TYPE_BOOLEAN_INPUT);
+        booleanInput.setActionCommand(BlockFactory.TYPE_BOOLEAN_INPUT);
         JRadioButton sequenceInput = new JRadioButton("C-Shape");
-        sequenceInput.setActionCommand(TYPE_SEQUENCE_INPUT);
+        sequenceInput.setActionCommand(BlockFactory.TYPE_SEQUENCE_INPUT);
         JRadioButton reporterInput = new JRadioButton("Reporter");
-        reporterInput.setActionCommand(TYPE_REPORTER_INPUT);
+        reporterInput.setActionCommand(BlockFactory.TYPE_REPORTER_INPUT);
 
         final ButtonGroup centerGroup = new ButtonGroup();
         centerGroup.add(textInput);
@@ -127,9 +124,7 @@ class InputTypeChooser extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                for (InputTypeChooserListener m : listeners) {
-                    m.cancel();
-                }
+                cancel();
             }
         });
 
@@ -138,6 +133,7 @@ class InputTypeChooser extends JPanel {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 if (inputLabel.getText().isEmpty()) {
+                    cancel();
                     return;
                 }
                 String nc = northGroup.getSelection().getActionCommand();
@@ -162,13 +158,19 @@ class InputTypeChooser extends JPanel {
         add(south, BorderLayout.SOUTH);
     }
 
+    private void cancel() {
+        for (InputTypeChooserListener m : listeners) {
+            m.cancel();
+        }
+    }
+
     /**
      * Adds the specified InputTypeChooserListener. <br />
      * 
      * @throws IllegalArgumentException - if 'm' is null.
      * @param m - the listener
      */
-    public void addBlockCategoryChooserListener(InputTypeChooserListener m) {
+    public void addInputTypeChooserListener(InputTypeChooserListener m) {
         if (m == null) {
             throw new IllegalArgumentException("'m' is null!");
         }
@@ -180,7 +182,7 @@ class InputTypeChooser extends JPanel {
      * 
      * @param m - the listener
      */
-    public void removeBlockCategoryChooserListener(InputTypeChooserListener m) {
+    public void removeInputTypeChooserListener(InputTypeChooserListener m) {
         listeners.remove(m);
     }
 }

@@ -40,12 +40,6 @@ class JReporterInput extends AbstrInput {
         type = TYPE_TEXT_AND_REPORTER;
     }
 
-    private static Color bright(Color c, float f) {
-        return new Color(Math.min((int) (c.getRed() * f), 255),
-                Math.min((int) (c.getGreen() * f), 255),
-                Math.min((int) (c.getBlue() * f), 255));
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -60,7 +54,7 @@ class JReporterInput extends AbstrInput {
         Color col = getBackground();
         Stroke basic = g.getStroke();
 
-        g.setColor(bright(col, 1.3F));
+        g.setColor(Colors.bright(col, 1.3F));
         g.fillRoundRect(0, 0, size.width, size.height, size.height / 2, size.height / 2);
 
         g.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));

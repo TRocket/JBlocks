@@ -25,7 +25,7 @@ public class JBlocksApplet extends JApplet {
             JBlocksLauncher.main(new String[]{});
         } else {
             JBlocksPane.setLaF();
-            
+
             JBlocksPane p = new JBlocksPane();
             setContentPane(new JDragPane(p));
         }

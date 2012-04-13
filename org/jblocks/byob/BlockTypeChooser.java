@@ -161,7 +161,7 @@ public class BlockTypeChooser extends JPanel {
         bool.setBackground(currColor);
 
         selected.setBackground(currColor.brighter());
-        selected.setBorder(BorderFactory.createDashedBorder(null));
+        selected.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
         reporter.repaint();
         command.repaint();

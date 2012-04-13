@@ -11,6 +11,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
+import org.jblocks.gui.JDragPane;
 
 /**
  * An abstract class for blocks. <br />
@@ -22,7 +23,6 @@ import javax.swing.JComponent;
  */
 public abstract class AbstrBlock extends JComponent {
 
-    protected Point drag;
     private boolean draggable = true;
 
     public AbstrBlock() {
@@ -201,34 +201,12 @@ public abstract class AbstrBlock extends JComponent {
         }
     }
 
-    protected void dragEvent(MouseEvent evt) {
-        if (drag == null) { // shouldn't happen...
-            return;
-        }
-        int newX = evt.getX() + getX() - drag.x;
-        int newY = evt.getY() + getY() - drag.y;
-        if (newX < 0) {
-            newX = 0;
-        }
-        if (newY < 0) {
-            newY = 0;
-        }
-        setLocation(newX, newY);
-
-    }
-
-    protected void moveEvent(MouseEvent evt) {
-        drag = evt.getPoint();
-        toFront();
-    }
-
     protected void pressedEvent(MouseEvent evt) {
-        drag = evt.getPoint();
-        toFront();
+        Drag.drag(JDragPane.getDragPane(this), getParent(), evt.getPoint(), this);
     }
 
     protected void releasedEvent(MouseEvent evt) {
-        drag = null;
+        // do nothing
     }
 
     /**
@@ -395,13 +373,6 @@ public abstract class AbstrBlock extends JComponent {
                 return true;
             }
             return false;
-        }
-
-        @Override
-        public void mouseDragged(MouseEvent evt) {
-            if (!veto()) {
-                dragEvent(evt);
-            }
         }
 
         @Override

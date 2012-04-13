@@ -28,7 +28,7 @@ public class BlockEditorTest {
 
         ch.addBlock("Control", BlockFactory.createBlock("hat", "When %{gf} clicked"));
         ch.addBlock("Control", BlockFactory.createBlock("hat", "When key %{combo;space;a;b;c;d;e;f} pressed"));
-        ch.addBlock("Control", BlockFactory.createBlock("command", "return %{r}"));
+        ch.addBlock("Control", BlockFactory.createBlock("cap", "return %{r}"));
 
         ch.addBlock("Control", BlockFactory.createBlock("command", "when %{b}%{br}%{s}"));
         ch.addBlock("Control", BlockFactory.createBlock("reporter", "x pos"));
@@ -36,7 +36,8 @@ public class BlockEditorTest {
         ch.addBlock("Control", BlockFactory.createBlock("boolean", "visible"));
         
         ch.addBlock("Control", BlockFactory.createBlock("reporter", "test %{b}%{r}"));
-        ch.addBlock("Control", BlockFactory.createBlock("command", "when %{b}%{br}%{s}"));
+        ch.addBlock("Control", BlockFactory.createBlock("command", "when %{b}%{s}%{br}else%{s}"));
+        ch.addBlock("Control", BlockFactory.createBlock("command", "script variable %{var;variable}"));
         
         ch.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}+%{r}"));
         ch.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}-%{r}"));
