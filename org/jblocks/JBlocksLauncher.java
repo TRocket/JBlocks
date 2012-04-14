@@ -25,12 +25,6 @@ public class JBlocksLauncher {
     	Splash splash = new Splash();
     	splash.setVisible(true);
     	splash.setText("JBlocks 0.4");
-    	try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
         JBlocksPane.setLaF();
         
         JBlocksPane p = new JBlocksPane();
