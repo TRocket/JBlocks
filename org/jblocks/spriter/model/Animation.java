@@ -8,16 +8,16 @@ import java.util.Vector;
  */
 public class Animation {
 private String name;
-private Vector<Frame> frames;
+private Vector<KeyFrame> keyFrames;
 	/**
 	 * 
 	 * @param name the name of this animation
-	 * @param frames a Vector of Frames
+	 * @param keyFrames a Vector of Frames
 	 */
-	public Animation(String name, Vector<Frame> frames) {
+	public Animation(String name, Vector<KeyFrame> keyFrames) {
 		super();
 		this.name = name;
-		this.frames = frames;
+		this.keyFrames = keyFrames;
 	}
 
 	/**
@@ -28,10 +28,10 @@ private Vector<Frame> frames;
 	}
 
 	/**
-	 * @return the frames
+	 * @return the keyFrames
 	 */
-	public Vector<Frame> getFrames() {
-		return frames;
+	public Vector<KeyFrame> getFrames() {
+		return keyFrames;
 	}
 
 	
