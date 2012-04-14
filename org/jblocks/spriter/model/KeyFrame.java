@@ -5,31 +5,32 @@ package org.jblocks.spriter.model;
  * @author TRocket
  */
 public class KeyFrame {
-private String name;
-private float duration;
-	/**
-	 * 
-	 * @param name the name of this KeyFrame
-	 * @param duration the duration of this KeyFrame
-	 */
-	public KeyFrame(String name, float duration){
-		super();
-		this.name = name;
-		this.duration = duration;
-	}
 
-	/**
-	 * @return the name of this KeyFrame
-	 */
-	public String getName() {
-		return name;
-	}
+    private String name;
+    private float duration;
 
-	/**
-	 * @return the duration of this KeyFrame
-	 */
-	public float getDuration() {
-		return duration;
-	}
+    /**
+     * 
+     * @param name the name of this KeyFrame
+     * @param duration the duration of this KeyFrame
+     */
+    public KeyFrame(String name, float duration) {
+        super();
+        this.name = name;
+        this.duration = duration;
+    }
 
+    /**
+     * @return the name of this KeyFrame
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @return the duration of this KeyFrame
+     */
+    public float getDuration() {
+        return duration;
+    }
 }
