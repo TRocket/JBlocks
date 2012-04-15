@@ -13,7 +13,7 @@ public class Test {
      * @param args
      */
     public static void main(String[] args) throws Exception {
-        SCML scml = SCMLReader.readSCMLFile(Test.class.getResourceAsStream("sample.SCML"));
+        SCML scml = SCMLReader.readSCMLFile(Test.class.getResourceAsStream("sample.SCML"), "C:\\Users\\Thomas\\Downloads\\BetaFileFormatRelease\\example hero\\");
 
         for (Character s : scml.getCharacters()) {
             System.out.println("character name: " + s.getName());

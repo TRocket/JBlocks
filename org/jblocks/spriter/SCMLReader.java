@@ -1,10 +1,14 @@
 package org.jblocks.spriter;
 
+import java.awt.Image;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,8 +38,8 @@ public class SCMLReader {
      * @throws IOException if file can't be read
      * @throws ParserConfigurationException if there is a serious configuration problem with the parser
      */
-    public static SCML readSCMLFile(InputStream in) throws SAXException, IOException, ParserConfigurationException {
-        return readXML(in);
+    public static SCML readSCMLFile(InputStream in, String basePath) throws SAXException, IOException, ParserConfigurationException {
+        return readXML(in, basePath);
     }
 
     /**
@@ -45,7 +49,8 @@ public class SCMLReader {
      * @throws IOException if file can't be read
      * @throws ParserConfigurationException if there is a serious configuration problem with the parser
      */
-    private static SCML readXML(InputStream in) throws SAXException, IOException, ParserConfigurationException {
+    private static SCML readXML(InputStream in, String basePath) throws SAXException, IOException, ParserConfigurationException {
+    	ArrayList<String> imageFiles = new ArrayList<String>();
         String docRootName;
         NodeList characters;
             //make a document builder and parse the xml
@@ -107,6 +112,7 @@ public class SCMLReader {
                     Sprite currentSprite;
 
                     String currentSpriteImage = getValue(currentSpriteNode, "image");
+                    imageFiles.add(currentSpriteImage);
                     int curruntSpriteColor = Integer.parseInt(getValue(currentSpriteNode, "color"));
                     float currentSpriteopacity = Float.parseFloat(getValue(currentSpriteNode, "opacity"));
                     float currentSpriteAngle = Float.parseFloat(getValue(currentSpriteNode, "angle"));
@@ -122,7 +128,8 @@ public class SCMLReader {
                 currentFrame = new Frame(currentFrameName, currentFrameSprites);
                 frames.add(currentFrame);
             }
-            return new SCML(currentCharacters, frames);
+            System.out.println(loadimages(imageFiles, basePath));
+            return new SCML(currentCharacters, frames, loadimages(imageFiles, basePath));
     }
 
     private static String getValue(Node node, String name) {
@@ -131,5 +138,21 @@ public class SCMLReader {
         Node item = elements.item(0);
         String value = item.getFirstChild().getNodeValue();
         return value;
+    }
+    
+    private static HashMap<String, Image> loadimages(ArrayList<String> paths, String basePath) throws IOException{
+    	HashMap<String, Image> images = new HashMap<String, Image>();
+    	int i = 0;
+    	for (String p:paths) {
+    		System.out.println("on: " + i);
+			if (!images.containsKey(p)) {
+				System.out.println("reading file: " + i);
+				Image currentImage = ImageIO.read(new File(basePath + p));
+				images.put(p, currentImage);
+			}
+			i++;
+		}
+		return images;
+    	
     }
 }
