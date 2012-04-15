@@ -6,7 +6,7 @@ package org.jblocks.scriptengine;
  */
 public abstract class Block {
 
-    private Object[] parameters;
+    private final Object[] parameters;
 
     public Block(int parameterCount) {
         parameters = new Object[parameterCount];
@@ -32,13 +32,16 @@ public abstract class Block {
     }
 
     /**
-     * Returns the count of parameters this block has.
+     * Returns the count of parameters this block has. <br />
      */
     public int getParameterCount() {
         return parameters.length;
     }
-    
-    protected Object[] getParameters() {
+
+    /**
+     * Returns all the parameters of this block. <br />
+     */
+    public Object[] getParameters() {
         return parameters;
     }
 

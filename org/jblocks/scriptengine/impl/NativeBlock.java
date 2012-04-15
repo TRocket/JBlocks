@@ -1,10 +1,10 @@
 package org.jblocks.scriptengine.impl;
 
 import org.jblocks.scriptengine.Block;
+import org.jblocks.scriptengine.impl.DefaultScriptThread.StackElement;
 
 /**
- *
- * A NativeBlock is <i>always</i> native. <br />
+ * A NativeBlock is written in Java. <br />
  * 
  * @author ZeroLuck
  */
@@ -14,35 +14,35 @@ class NativeBlock extends Block {
         super(paramCount);
     }
 
-    @Override
-    public Object[] getParameters() {
-        return super.getParameters();
+    /**
+     * This has to be executed <b>fast</b>. <br />
+     * This code can block the Thread-Scheduler. <br />
+     */
+    public Object evaluate(StackElement o, Object... params) {
+        /* 
+         * just a test.
+         * this will be replaced later. 
+         */
+        System.out.println("Hello");
+
+        return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Block clone() {
         int len = getParameterCount();
         NativeBlock n = new NativeBlock(len);
         for (int i = 0; i < len; i++) {
             Object o = getParameter(i);
-            if (o instanceof NativeBlock) {
-                n.setParameter(i, ((NativeBlock) o).clone());
-            } else if (o instanceof Number | o instanceof String) {
-                n.setParameter(i, o);
+            if (o instanceof Block) {
+                n.setParameter(i, ((Block) o).clone());
             } else {
-                throw new IllegalStateException("can't clone parameter '" + o + "'");
+                n.setParameter(i, o);
             }
         }
         return n;
-    }
-
-    /**
-     * This has to be executed <b>very fast</b>. <br />
-     * No sleeps! <br />
-     */
-    public Object evaluate(Object... params) {
-        System.out.println("Hello");
-
-        return null;
     }
 }

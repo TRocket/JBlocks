@@ -1,6 +1,7 @@
 package org.jblocks.scriptengine;
 
 import java.io.InputStream;
+import java.util.Map;
 
 /**
  *
@@ -15,4 +16,7 @@ public interface IScriptEngine {
     public IScriptThread execute(IScript s);
 
     public IScriptThread[] getThreads();
+    
+    public Map getGlobalVariables();
+    
 }

@@ -6,5 +6,7 @@ package org.jblocks.scriptengine;
  */
 public interface IScriptThread {
 
-    public abstract void stop();
+    public void stop();
+
+    public boolean isAlive();
 }

@@ -3,6 +3,8 @@ package org.jblocks.scriptengine.impl;
 import java.util.Arrays;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.IScript;
+import org.jblocks.scriptengine.IScriptEngine;
+import org.jblocks.scriptengine.impl.DefaultScriptThread.StackElement;
 
 /**
  *
@@ -11,25 +13,36 @@ import org.jblocks.scriptengine.IScript;
 public class Test {
 
     public static void main(String[] args) {
-        DefaultScriptEngine eng = new DefaultScriptEngine();
-        NativeBlock nb = new NativeBlock(1) {
+        IScriptEngine eng = new DefaultScriptEngine();
+        NativeBlock nb = new NativeBlock(2) {
 
             @Override
-            public Object evaluate(Object... params) {
+            public Object evaluate(StackElement ctx, Object... params) {
                 System.out.println(Arrays.toString(params));
                 return null;
             }
         };
-        NativeBlock rep = new NativeBlock(2) {
+        NativeBlock var = new NativeBlock(0) {
 
             @Override
-            public Object evaluate(Object... params) {
-                return "1: --->>" + params[0] + "  2: ---->>" + params[1];
+            public Object evaluate(StackElement ctx, Object... params) {
+                System.out.println(Arrays.toString(ctx.parent.param));
+                return null;
             }
         };
-        nb.setParameter(0, rep);
-        IScript script = eng.compile(new Block[]{nb, nb, nb});
-        for (int i = 0; i < 4; i++) {
+        NativeBlock ret = new NativeBlock(0) {
+
+            @Override
+            public Object evaluate(StackElement ctx, Object... params) {
+                return "Hallo Welt aus Deutschland";
+            }
+        };
+        ByobBlock byob = new ByobBlock(2, new Block[]{var, var});
+        byob.setParameter(0, ret);
+        byob.setParameter(1, new ByobBlock(1, new Block[]{var, ret}));
+        nb.setParameter(0, ret);
+        IScript script = eng.compile(new Block[]{byob});
+        for (int i = 0; i < 1; i++) {
             eng.execute(script);
         }
     }

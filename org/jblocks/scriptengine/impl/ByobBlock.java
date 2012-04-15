@@ -8,8 +8,7 @@ import org.jblocks.scriptengine.Block;
  */
 class ByobBlock extends Block {
 
-    private Block[] seq;
-    private Object retValue;
+    private final Block[] seq;
 
     public ByobBlock(int paramCount, Block[] sequence) {
         super(paramCount);
@@ -20,25 +19,31 @@ class ByobBlock extends Block {
         return seq;
     }
 
-    @Override
-    public Object[] getParameters() {
-        return super.getParameters();
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Block clone() {
-        int len = getParameterCount();
-        NativeBlock n = new NativeBlock(len);
+        int len = seq.length;
+        Block[] seqClone = new Block[len];
+        for (int i = 0; i < len; i++) {
+            seqClone[i] = seq[i].clone();
+        }
+        len = getParameterCount();
+        ByobBlock n = new ByobBlock(len, seqClone);
         for (int i = 0; i < len; i++) {
             Object o = getParameter(i);
-            if (o instanceof NativeBlock) {
-                n.setParameter(i, ((NativeBlock) o).clone());
-            } else if (o instanceof Number | o instanceof String) {
-                n.setParameter(i, o);
+            if (o instanceof Block) {
+                n.setParameter(i, ((Block) o).clone());
             } else {
-                throw new IllegalStateException("can't clone parameter '" + o + "'");
+                n.setParameter(i, o);
             }
         }
         return n;
+    }
+    
+    @Override
+    public String toString() {
+        return "ByobBlock";
     }
 }

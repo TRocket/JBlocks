@@ -1,5 +1,7 @@
 package org.jblocks.scriptengine.impl;
 
+import java.util.Arrays;
+import java.util.Map;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.IScriptThread;
 
@@ -7,20 +9,15 @@ import org.jblocks.scriptengine.IScriptThread;
  *
  * @author ZeroLuck
  */
-class DefaultScriptThread implements IScriptThread {
+public class DefaultScriptThread implements IScriptThread {
 
-    private boolean stopRequest;
-    private Offset stack;
+    private boolean stopRequest = false;
+    private StackElement stack;
+    private final Map<String, Object> globalVariables;
 
-    public DefaultScriptThread(Block[] commands) {
-        stopRequest = false;
-        ByobBlock script = new ByobBlock(0, commands);
-        stack = new Offset(null, script, script.getSequence());
-    }
-
-    @Override
-    public void stop() {
-        stopRequest = true;
+    public DefaultScriptThread(Map<String, Object> globalVariables, Block[] commands) {
+        this.globalVariables = globalVariables;
+        this.stack = new StackElement(null, new ByobBlock(0, commands), commands, false);
     }
 
     public boolean step() {
@@ -28,49 +25,67 @@ class DefaultScriptThread implements IScriptThread {
             return true;
         }
         if (stack.off >= stack.commands.length) {
-            if (stack.perform instanceof NativeBlock) {
-                NativeBlock nat = (NativeBlock) stack.perform;
-                stack.parent.commands[stack.parent.off - 1] = nat.evaluate(stack.commands);
-                stack = stack.parent;
-            } else if (stack.perform instanceof ByobBlock) {
+            if (stack.perform instanceof ByobBlock) {   // BYOB
                 ByobBlock byob = (ByobBlock) stack.perform;
                 Block[] seq = byob.getSequence();
-                if (seq == stack.commands) {
+                if (seq == stack.commands) {    // finish
                     stack = stack.parent;
                 } else {
-                    Offset child = new Offset(stack.parent, byob, byob.getSequence());
+                    StackElement child = new StackElement(stack.parent, byob, byob.getSequence(), false);
+                    System.arraycopy(stack.param, 0, child.param, 0, stack.param.length);
                     stack = child;
                 }
-            } else {
-                throw new RuntimeException("the block isn't supported!");
+            } else {    // NATIVE
+                NativeBlock nat = (NativeBlock) stack.perform;
+                Object val = nat.evaluate(stack, stack.param);
+                stack = stack.parent;
+                if (stack.doParam) {
+                    stack.param[stack.off - 1] = val;
+                }
             }
         } else {
-            Object obj = stack.commands[stack.off];
+            Object val = stack.commands[stack.off];
             stack.off++;
-            
-            if (obj instanceof ByobBlock) {
-                Offset child = new Offset(stack, (ByobBlock) obj, ((ByobBlock) obj).getParameters());
+            if (val instanceof Block) {
+                Block cmd = (Block) val;
+                StackElement child = new StackElement(stack, cmd, cmd.getParameters(), true);
                 stack = child;
-            } else if (obj instanceof NativeBlock) {
-                Offset child = new Offset(stack, (NativeBlock) obj, ((NativeBlock) obj).getParameters());
-                stack = child;
+            } else {
+                if (stack.doParam) {
+                    stack.param[stack.off - 1] = val;
+                }
             }
         }
         return false;
     }
 
-    private static class Offset {
+    @Override
+    public void stop() {
+        stopRequest = true;
+    }
 
-        int off;
-        final Offset parent;
-        final Object[] commands;
+    @Override
+    public boolean isAlive() {
+        return !stopRequest;
+    }
+
+    class StackElement {
+
+        int off = 0;
         final Block perform;
+        final StackElement parent;
+        final Object[] commands;
+        final Object[] param;
+        final Map<String, Object> global;
+        final boolean doParam;
 
-        public Offset(Offset parent, Block perform, Object[] commands) {
-            this.off = 0;
+        public StackElement(StackElement parent, Block perform, Object[] commands, boolean doParam) {
+            this.perform = perform;
             this.parent = parent;
             this.commands = commands;
-            this.perform = perform;
+            this.param = new Object[perform.getParameterCount()];
+            this.doParam = doParam;
+            this.global = globalVariables;
         }
     }
 }
