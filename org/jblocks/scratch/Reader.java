@@ -1,67 +1,68 @@
 package org.jblocks.scratch;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
-public class Reader {
-	/*
-	 * Fixed ofrmat objects
-	 */
-	/*
-	 * Non-pointer object
-	 */
-	static final int FIXED_FORMAT_OBJECT_STRING = 9; 
-	static final int FIXED_FORMAT_OBJECT_SYBOL = 10; 
-	static final int FIXED_FORMAT_OBJECT_BYTEARRAY = 11; 
+
+public class Reader extends Objects{
+DataInputStream in;
+	public Reader(DataInputStream in){
+		this.in = in;
+	}
 	
-	static final int FIXED_FORMAT_OBJECT_SOUNDBUFFER = 12; 
-	static final int FIXED_FORMAT_OBJECT_BITMAP = 13; 
-	static final int FIXED_FORMAT_OBJECT_UTF8 = 14; 
-	/*
-	 * Collections
-	 */
-	static final int FIXED_FORMAT_OBJECT_ARRAY = 20; 
-	static final int FIXED_FORMAT_OBJECT_ORDEREDCOLLECTION = 21; 
-	static final int FIXED_FORMAT_OBJECT_SET = 22; 
-	static final int FIXED_FORMAT_OBJECT_IDENTITYSET = 23;
+	public void read() throws IOException{
+		byte[] header = new byte[10];
+		in.read(header);
+		if (new String(header).equals("ScratchV01\n") || new String(header).equals("ScratchV02\n")) {
+			throw new IOException("incorrect header(file may be damaged or corrupt?");
+		}
+		System.out.println(new String(header));
+		
+		readObjTable();
+		
+	}
 	
-	static final int FIXED_FORMAT_OBJECT_DICTIONARY = 24; 
-	static final int FIXED_FORMAT_OBJECT_IDENTITYDICTIONARY = 25;
-	/*
-	 * Colors
-	 */
-	static final int FIXED_FORMAT_OBJECT_COLOR = 30; 
-	static final int FIXED_FORMAT_OBJECT_TRANSLUCENTCOLOR = 31;
-	/*
-	 * Dimensions
-	 */
-	static final int FIXED_FORMAT_OBJECT_POINT = 32; 
-	static final int FIXED_FORMAT_OBJECT_RECTANGLE = 33; 
-	/*
-	 * Forms
-	 */
-	static final int FIXED_FORMAT_OBJECT_FORM = 34; 
-	static final int FIXED_FORMAT_OBJECT_COLORFORM = 35;
-	/*
-	 * 36-98 reserved
-	 */
+	HashMap<String, Object> readObjTable() throws IOException{
+		System.out.println(in.readInt());
+		int length;
+		byte[] str = new byte[4];
+		in.read(str);
+		if (!new String(str).equals("ObjS")) {
+			throw new IOException();
+		}
+		if (in.readByte() != 1) {
+			throw new IOException();
+		}
+		in.read(str);
+		if (!new String(str).equals("Stch")) {
+			throw new IOException();
+		}
+		if (in.readByte() != 1) {
+			throw new IOException();
+		}
+		length = in.readByte();
+		
+		System.out.println(length);
+		ArrayList<Object> objects;
+		length =in.readInt();
+		System.out.println(in.readByte());
+		for (int i = 0; i < 1000; i++) {
+			System.out.println(in.readByte() + " ");
+		}
+
+		
+		
+		return null;
+		
+	}
+	
+	public Object readObject(){
+		return null;
+		
+	}
 	
 	
-	/*
-	 * User-class Objects
-	 */
-	/*
-	 * Morphic-related
-	 */
-	static final int FIXED_FORMAT_OBJECT_MORPH = 100; 
-	static final int FIXED_FORMAT_OBJECT_BORDERDMORPH = 101; 
-	static final int FIXED_FORMAT_OBJECT_RECTANGLEMORPH = 102; 
-	static final int FIXED_FORMAT_OBJECT_ELLIPSEMORPH = 103; 
-	static final int FIXED_FORMAT_OBJECT_ALIGNMENTMORPH = 104; 
-	static final int FIXED_FORMAT_OBJECT_STRINGMORPH = 105; 
-	static final int FIXED_FORMAT_OBJECT_UPDATINGSTRINGMORPH = 106; 
-	static final int FIXED_FORMAT_OBJECT_SIMPLESLIDERMORPH = 107; 
-	static final int FIXED_FORMAT_OBJECT_SIMPLEBUTTONMORPH = 108; 
-	static final int FIXED_FORMAT_OBJECT_SAMPLEDSOUND = 109; 
-	static final int FIXED_FORMAT_OBJECT_IMAGEMORPH= 110; 
-	static final int FIXED_FORMAT_OBJECT_SKETCHMORPH = 111; 
 }
