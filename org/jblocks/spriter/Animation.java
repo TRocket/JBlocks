@@ -1,7 +1,4 @@
-package org.jblocks.spriter.model;
-
-import java.util.List;
-
+package org.jblocks.spriter;
 
 /**
  * this this class contains data about a spriter Animation in a Spriter Character
@@ -11,14 +8,14 @@ import java.util.List;
 public class Animation {
 
     private String name;
-    private List<KeyFrame> keyFrames;
+    private KeyFrame[] keyFrames;
 
     /**
      * 
      * @param name the name of this animation
      * @param keyFrames a Vector of Frames
      */
-    public Animation(String name, List<KeyFrame> keyFrames) {
+    public Animation(String name, KeyFrame[] keyFrames) {
         super();
         this.name = name;
         this.keyFrames = keyFrames;
@@ -34,7 +31,7 @@ public class Animation {
     /**
      * @return the keyFrames
      */
-    public List<KeyFrame> getFrames() {
+    public KeyFrame[] getFrames() {
         return keyFrames;
     }
 }

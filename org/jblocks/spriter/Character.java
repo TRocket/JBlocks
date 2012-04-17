@@ -1,6 +1,5 @@
-package org.jblocks.spriter.model;
+package org.jblocks.spriter;
 
-import java.util.List;
 
 
 /**
@@ -11,14 +10,14 @@ import java.util.List;
 public class Character {
 
     private String name;
-    private List<Animation> animations;
+    private Animation[] animations;
 
     /**
      * 
      * @param name the name of this Charater
      * @param animations the animation this Charater sould have
      */
-    public Character(String name, List<Animation> animations) {
+    public Character(String name, Animation[] animations) {
         super();
         this.name = name;
         this.animations = animations;
@@ -34,7 +33,7 @@ public class Character {
     /**
      * @return the animations this Character has
      */
-    public List<Animation> getAnimations() {
+    public Animation[] getAnimations() {
         return animations;
     }
 }

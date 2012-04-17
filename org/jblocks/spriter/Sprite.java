@@ -1,4 +1,4 @@
-package org.jblocks.spriter.model;
+package org.jblocks.spriter;
 
 /**
  * I hold data from a spriter sprite
@@ -7,16 +7,16 @@ package org.jblocks.spriter.model;
  */
 public class Sprite {
 
-    private String image;
-    private int color;
-    private float opacity;
-    private float angle;
-    private boolean xFlip;
-    private boolean yFlip;
-    private float width;
-    private float height;
-    private float x;
-    private float y;
+    private final String image;
+    private final int color;
+    private final float opacity;
+    private final float angle;
+    private final boolean xFlip;
+    private final boolean yFlip;
+    private final float width;
+    private final float height;
+    private final float x;
+    private final float y;
 
     /**
      * 

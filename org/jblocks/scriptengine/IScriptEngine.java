@@ -16,7 +16,8 @@ public interface IScriptEngine {
     public IScriptThread execute(IScript s);
 
     public IScriptThread[] getThreads();
-    
+
     public Map getGlobalVariables();
-    
+
+    public Block getDefaultBlock(String name);
 }

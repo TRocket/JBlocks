@@ -1,6 +1,5 @@
 package org.jblocks.scriptengine.impl;
 
-import java.util.Arrays;
 import java.util.Map;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.IScriptThread;
@@ -17,7 +16,7 @@ public class DefaultScriptThread implements IScriptThread {
 
     public DefaultScriptThread(Map<String, Object> globalVariables, Block[] commands) {
         this.globalVariables = globalVariables;
-        this.stack = new StackElement(null, new ByobBlock(0, commands), commands, false);
+        this.stack = new StackElement(null, new ByobBlock(0, commands), commands, false, globalVariables);
     }
 
     public boolean step() {
@@ -31,24 +30,31 @@ public class DefaultScriptThread implements IScriptThread {
                 if (seq == stack.commands) {    // finish
                     stack = stack.parent;
                 } else {
-                    StackElement child = new StackElement(stack.parent, byob, byob.getSequence(), false);
+                    StackElement child = new StackElement(stack.parent, byob, byob.getSequence(), false, globalVariables);
                     System.arraycopy(stack.param, 0, child.param, 0, stack.param.length);
                     stack = child;
                 }
-            } else {    // NATIVE
+            } else if (stack.perform instanceof NativeBlock) {    // NATIVE
                 NativeBlock nat = (NativeBlock) stack.perform;
+                StackElement cp = stack.parent;
                 Object val = nat.evaluate(stack, stack.param);
+
                 stack = stack.parent;
-                if (stack.doParam) {
-                    stack.param[stack.off - 1] = val;
+
+                if (stack == cp) {
+                    if (stack.doParam) {
+                        stack.param[stack.off - 1] = val;
+                    }
                 }
+            } else {
+                throw new java.lang.UnsupportedOperationException("block '" + stack.perform + "' isn't supported");
             }
         } else {
             Object val = stack.commands[stack.off];
             stack.off++;
             if (val instanceof Block) {
                 Block cmd = (Block) val;
-                StackElement child = new StackElement(stack, cmd, cmd.getParameters(), true);
+                StackElement child = new StackElement(stack, cmd, cmd.getParameters(), true, globalVariables);
                 stack = child;
             } else {
                 if (stack.doParam) {
@@ -69,23 +75,23 @@ public class DefaultScriptThread implements IScriptThread {
         return !stopRequest;
     }
 
-    class StackElement {
+    public static class StackElement {
 
         int off = 0;
         final Block perform;
-        final StackElement parent;
+        StackElement parent;
         final Object[] commands;
         final Object[] param;
         final Map<String, Object> global;
         final boolean doParam;
 
-        public StackElement(StackElement parent, Block perform, Object[] commands, boolean doParam) {
+        public StackElement(StackElement parent, Block perform, Object[] commands, boolean doParam, Map<String, Object> global) {
             this.perform = perform;
             this.parent = parent;
             this.commands = commands;
             this.param = new Object[perform.getParameterCount()];
             this.doParam = doParam;
-            this.global = globalVariables;
+            this.global = global;
         }
     }
 }

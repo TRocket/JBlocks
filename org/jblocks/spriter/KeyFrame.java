@@ -1,4 +1,4 @@
-package org.jblocks.spriter.model;
+package org.jblocks.spriter;
 
 /**
  * this this class contains data about a spriter KeyFrame in a Spriter animation
@@ -6,15 +6,15 @@ package org.jblocks.spriter.model;
  */
 public class KeyFrame {
 
-    private String name;
-    private float duration;
+    private final String name;
+    private final float duration;
 
     /**
      * 
      * @param name the name of this KeyFrame
      * @param duration the duration of this KeyFrame
      */
-    public KeyFrame(String name, float duration) {
+    public KeyFrame(final String name, final float duration) {
         super();
         this.name = name;
         this.duration = duration;

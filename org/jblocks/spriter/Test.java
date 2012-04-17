@@ -1,12 +1,5 @@
 package org.jblocks.spriter;
 
-import org.jblocks.spriter.model.Animation;
-import org.jblocks.spriter.model.Character;
-import org.jblocks.spriter.model.Frame;
-import org.jblocks.spriter.model.KeyFrame;
-import org.jblocks.spriter.model.SCML;
-import org.jblocks.spriter.model.Sprite;
-
 public class Test {
 
     /**

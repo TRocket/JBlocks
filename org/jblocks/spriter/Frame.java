@@ -1,13 +1,12 @@
-package org.jblocks.spriter.model;
+package org.jblocks.spriter;
 
-import java.util.List;
 
 public class Frame {
 
     private String name;
-    private List<Sprite> sprites;
+    private Sprite[] sprites;
 
-    public Frame(String name, List<Sprite> sprites) {
+    public Frame(String name, Sprite[] sprites) {
         super();
         this.name = name;
         this.sprites = sprites;
@@ -23,7 +22,7 @@ public class Frame {
     /**
      * @return the sprites
      */
-    public List<Sprite> getSprites() {
+    public Sprite[] getSprites() {
         return sprites;
     }
 }

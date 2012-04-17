@@ -6,7 +6,6 @@ package org.jblocks.scriptengine.impl;
 
 import java.io.InputStream;
 import java.util.Map;
-import java.util.Queue;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.IScript;
 import org.jblocks.scriptengine.IScriptEngine;
@@ -27,13 +26,13 @@ import org.jblocks.scriptengine.IScriptThread;
  */
 public class DefaultScriptEngine implements IScriptEngine, Runnable {
 
-    private final Queue<DefaultScriptThread> threads;
+    private final RepeatingQueue<DefaultScriptThread> threads;
     private final Map globalVariables;
     private Thread scriptThread;
 
     public DefaultScriptEngine() {
-        threads = new java.util.LinkedList<DefaultScriptThread>();
-        globalVariables = new java.util.HashMap(1000);
+        threads = new RepeatingQueue();
+        globalVariables = new java.util.HashMap(100);
     }
 
     @Override
@@ -49,7 +48,7 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
     private void startThreadIfNecessary() {
         if (scriptThread == null || !scriptThread.isAlive()) {
             scriptThread = new Thread(this, "DefaultScriptEngine");
-            scriptThread.setPriority(8);
+            scriptThread.setPriority(1);
             scriptThread.start();
         }
     }
@@ -67,7 +66,7 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
     @Override
     public IScriptThread[] getThreads() {
         synchronized (threads) {
-            return threads.toArray(new IScriptThread[]{});
+            return threads.toArray();
         }
     }
 
@@ -75,19 +74,15 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
     public void run() {
         while (true) {
             synchronized (threads) {
-                DefaultScriptThread thread = threads.poll();
+                DefaultScriptThread thread = threads.peek();
                 if (thread == null) {
                     return;
                 }
-                boolean add = true;
                 for (int i = 0; i < 10; i++) {
                     if (thread.step()) {
-                        add = false;
+                        threads.remove();
                         break;
                     }
-                }
-                if (add) {
-                    threads.add(thread);
                 }
             }
         }
@@ -96,6 +91,21 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
     @Override
     public Map getGlobalVariables() {
         return globalVariables;
+    }
+
+    @Override
+    public Block getDefaultBlock(String name) {
+        if (name.equals("FOR")) {
+            return DefaultBlocks.FOR.clone();
+        }
+        if (name.equals("WHILE")) {
+            return DefaultBlocks.WHILE.clone();
+        }
+        if (name.equals("RETURN")) {
+            return DefaultBlocks.RETURN.clone();
+        }
+
+        throw new java.lang.IllegalArgumentException("the block with the name '" + name + "' isn't supported!");
     }
 
     private static class DefaultScript implements IScript {
