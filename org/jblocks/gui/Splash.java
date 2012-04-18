@@ -19,7 +19,7 @@ public class Splash extends JFrame {
      */
     private static final long serialVersionUID = -6966282063729475150L;
     private static BufferedImage splashImage;
-
+    
     static {
         try {
             splashImage = ImageIO.read(JBlocks.class.getResourceAsStream("res/splash.png"));
@@ -27,11 +27,10 @@ public class Splash extends JFrame {
             throw new ExceptionInInitializerError(ex);
         }
     }
-    JImagePanel image;
-    String text;
-    JPanel panel = new JPanel();
-    JProgressBar progbar;
-
+    private JImagePanel image;
+    private JPanel panel = new JPanel();
+    private JProgressBar progbar;
+    
     public Splash() {
         progbar = new JProgressBar();
         image = new JImagePanel(splashImage);
@@ -50,25 +49,18 @@ public class Splash extends JFrame {
         this.setBackground(new Color(0, 0, 0, 0));
         this.setLocation(x, y);
         BufferedImage icon = null;
-
+        
         this.setIconImage(icon);
-
+        
         image.paint(getGraphics());
     }
-
-    @Override
-    public void repaint() {
-        image.setText(text);
-
-        super.repaint();
-    }
-
+    
     public String getText() {
-        return text;
+        return image.getText();
     }
-
+    
     public void setText(String text) {
-        this.text = text;
+        image.setText(text);
         this.repaint();
     }
 }

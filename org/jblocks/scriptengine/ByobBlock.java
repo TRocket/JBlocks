@@ -1,12 +1,10 @@
-package org.jblocks.scriptengine.impl;
-
-import org.jblocks.scriptengine.Block;
+package org.jblocks.scriptengine;
 
 /**
  *
  * @author ZeroLuck
  */
-class ByobBlock extends Block {
+public class ByobBlock extends Block {
 
     private final Block[] seq;
 

@@ -4,10 +4,11 @@ import java.util.Arrays;
 
 /**
  * This is just for speed. <br />
+ * (should be little bit faster than the usual java.util Queues...) <br />
  * 
  * @author ZeroLuck
  */
-public class RepeatingQueue<E> {
+class RepeatingQueue<E> {
 
     private E[] elements;
     private int index;

@@ -1,5 +1,7 @@
 package org.jblocks.scriptengine.impl;
 
+import org.jblocks.scriptengine.NativeBlock;
+import org.jblocks.scriptengine.ByobBlock;
 import java.util.Map;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.IScriptThread;
@@ -19,6 +21,10 @@ public class DefaultScriptThread implements IScriptThread {
         this.stack = new StackElement(null, new ByobBlock(0, commands), commands, false, globalVariables);
     }
 
+    public StackElement getStack() {
+        return stack;
+    }
+    
     public boolean step() {
         if (stopRequest || stack == null) {
             return true;

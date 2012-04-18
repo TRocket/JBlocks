@@ -1,31 +1,30 @@
-package org.jblocks.scriptengine.impl;
-
-import org.jblocks.scriptengine.Block;
-import org.jblocks.scriptengine.impl.DefaultScriptThread.StackElement;
+package org.jblocks.scriptengine;
 
 /**
  * A NativeBlock is written in Java. <br />
  * 
  * @author ZeroLuck
  */
-class NativeBlock extends Block {
+public class NativeBlock extends Block implements Executable {
+
+    private Executable exec;
 
     public NativeBlock(int paramCount) {
         super(paramCount);
     }
 
+    private NativeBlock(int paramCount, Executable e) {
+        super(paramCount);
+        exec = e;
+    }
+
     /**
      * This has to be executed <b>fast</b>. <br />
-     * This code can block the Thread-Scheduler. <br />
+     * This code can block the thread-scheduler. <br />
      */
-    public Object evaluate(StackElement o, Object... params) {
-        /* 
-         * just a test.
-         * this will be replaced later. 
-         */
-        System.out.println("Hello");
-
-        return null;
+    @Override
+    public Object evaluate(Object ctx, Object... params) {
+        return exec.evaluate(ctx, params);
     }
 
     /**
@@ -34,7 +33,7 @@ class NativeBlock extends Block {
     @Override
     public Block clone() {
         int len = getParameterCount();
-        NativeBlock n = new NativeBlock(len);
+        NativeBlock n = new NativeBlock(len, this);
         for (int i = 0; i < len; i++) {
             Object o = getParameter(i);
             if (o instanceof Block) {
@@ -44,5 +43,10 @@ class NativeBlock extends Block {
             }
         }
         return n;
+    }
+
+    @Override
+    public String toString() {
+        return "NativeBlock";
     }
 }

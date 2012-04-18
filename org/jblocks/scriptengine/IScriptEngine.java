@@ -19,5 +19,5 @@ public interface IScriptEngine {
 
     public Map getGlobalVariables();
 
-    public Block getDefaultBlock(String name);
+    public Block getDefaultBlock(Block.Default def);
 }

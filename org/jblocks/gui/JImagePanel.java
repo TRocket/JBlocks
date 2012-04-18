@@ -2,6 +2,7 @@ package org.jblocks.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import javax.swing.JPanel;
@@ -36,7 +37,7 @@ public class JImagePanel extends JPanel {
         g.drawImage(image, 0, 0, null); // see javadoc for more info on the
 
         if (text != null) {
-            g.setColor(new Color(0, 46, 184));
+            g.setFont(new Font(Font.SANS_SERIF, Font.BOLD | Font.ITALIC, 18));
             g.drawString(text, image.getWidth(this) - g.getFontMetrics().stringWidth(text) - 30,
                     image.getHeight(this) - g.getFontMetrics().getHeight() - 30);
         }

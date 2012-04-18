@@ -50,4 +50,10 @@ public abstract class Block {
      */
     @Override
     public abstract Block clone();
+
+    public static enum Default {
+
+        FOR, RETURN, WHILE, IF, IF_ELSE, READ_GLOBAL_VARIABLE, READ_PARAM_VARIABLE,
+        WRITE_GLOBAL_VARIABLE, WRITE_PARAM_VARIABLE
+    }
 }

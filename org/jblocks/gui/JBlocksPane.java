@@ -1,6 +1,7 @@
 package org.jblocks.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
@@ -17,8 +18,10 @@ import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 import org.jblocks.JBlocks;
 import org.jblocks.byob.JByobEditor;
+import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.painteditor2.JPaintEditor;
+import org.jblocks.scriptengine.IScriptEngine;
 import org.jblocks.soundeditor.JSoundEditor;
 
 /**
@@ -44,6 +47,7 @@ public class JBlocksPane extends JDesktopPane {
     private JBlockEditor editor;
     private JPanel app;
     private JSpriteChooser spriteChooser;
+    private IScriptEngine scriptEngine;
 
     static {
         icon_run_build = new ImageIcon(JBlocks.class.getResource("res/run-build.png"));
@@ -59,7 +63,7 @@ public class JBlocksPane extends JDesktopPane {
         app = new JPanel();
         tools = new JToolBar();
 
-        editor = org.jblocks.editor.BlockEditorTest.createTestEditor();
+        editor = createBlockEditor();
 
         JButton openButton = new JButton(icon_open);
         openButton.setToolTipText("Open project");
@@ -112,7 +116,7 @@ public class JBlocksPane extends JDesktopPane {
                 });
                 frm.add(edt, BorderLayout.CENTER);
 
-                
+
                 add(frm, 0);
                 frm.setVisible(true);
                 frm.pack();
@@ -191,6 +195,40 @@ public class JBlocksPane extends JDesktopPane {
 
         // add app to the desktop-pane
         add(app);
+
+        // set the default script-engine.
+        scriptEngine = new org.jblocks.scriptengine.impl.DefaultScriptEngine();
+    }
+
+    private JBlockEditor createBlockEditor() {
+        JBlockEditor edt = new JBlockEditor();
+        
+        // standard blocks
+        edt.addCategory("Control", new Color(0xD6900A));
+        edt.addBlock("Control", BlockFactory.createBlock("hat", "When %{gf} clicked"));
+        edt.addBlock("Control", BlockFactory.createBlock("cap", "return %{r}"));
+        edt.addBlock("Control", BlockFactory.createBlock("command", "while %{b}%{br}%{s}"));
+        edt.addBlock("Control", BlockFactory.createBlock("command", "if %{b}%{br}%{s}"));
+        edt.addBlock("Control", BlockFactory.createBlock("command", "if %{b}%{br}%{s}%{br}else%{s}"));
+        edt.addBlock("Control", BlockFactory.createBlock("command", "repeat %{r}%{br}%{s}"));
+        // not implemented yet
+        
+        edt.addCategory("Motion", new Color(0xff4a6cd6));
+        edt.addCategory("Operators", new Color(0xff62c213));
+        edt.addCategory("Variables", Color.RED);
+        edt.addCategory("Sprites", Color.MAGENTA.darker());
+        edt.addCategory("IO & Network", Color.CYAN);
+        edt.addCategory("GUI & System", new Color(0xffD0D000));
+        edt.addCategory("Sound", Color.MAGENTA);
+        
+        edt.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}+%{r}"));
+        edt.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}-%{r}"));
+        edt.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}*%{r}"));
+        edt.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}/%{r}"));
+        edt.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}mod%{r}"));
+        
+        edt.cleanup();
+        return edt;
     }
 
     private static JBlocksPane getJBlocksPane(Component c) {
@@ -208,10 +246,10 @@ public class JBlocksPane extends JDesktopPane {
         return null;
     }
 
+    // will be removed later
     public static void openFileChooserRead(Component c, String text) {
         JBlocksPane jblocks = getJBlocksPane(c);
         JFileChooser chooser = new JFileChooser();
-        java.net.URL a;
         JInternalFrame frm = new JInternalFrame("File Chooser");
         frm.setClosable(true);
         frm.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);

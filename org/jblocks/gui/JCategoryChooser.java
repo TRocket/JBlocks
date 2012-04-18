@@ -24,7 +24,7 @@ import javax.swing.JPanel;
 public class JCategoryChooser extends JPanel {
 
     // <global>
-    private static int CATEGORY_WIDTH = 75;
+    private static int CATEGORY_WIDTH = 85;
     private static int CATEGORY_LEFT = 10;
     private static int CATEGORY_RIGHT = 5;
     private static int CATEGORY_BOTTOM = 5;
