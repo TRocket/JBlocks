@@ -51,7 +51,7 @@ public class JSmallColorChooser extends JComponent {
     private static final int Y_CNT = 10;
     public static final int GRADIENT = 0;
     public static final int RECTANGULAR = 1;
-    private static final BufferedImage gradient;
+    private static final BufferedImage gradient = JBlocks.getImage("gradient.png");
     private static final Color[] colors = new Color[]{
         Color.RED,
         Color.BLUE,
@@ -69,14 +69,6 @@ public class JSmallColorChooser extends JComponent {
     private Point gsel = new Point(0, 0);
     private Point sel = new Point(0, 0);
     private ArrayList<ColorChangedListener> clist = new ArrayList<ColorChangedListener>();
-
-    static {
-        try {
-            gradient = ImageIO.read(JBlocks.class.getResourceAsStream("res/gradient.png"));
-        } catch (IOException ex) {
-            throw new ExceptionInInitializerError(ex);
-        }
-    }
 
     /**
      * creates a new color-chooser. <br />

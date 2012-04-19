@@ -11,7 +11,10 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
+import org.jblocks.JBlocks;
 import org.jblocks.gui.JDragPane;
+import org.jblocks.scriptengine.Block;
+import org.jblocks.scriptengine.IScriptEngine;
 
 /**
  * An abstract class for blocks. <br />
@@ -24,6 +27,7 @@ import org.jblocks.gui.JDragPane;
 public abstract class AbstrBlock extends JComponent {
 
     private boolean draggable = true;
+
 
     public AbstrBlock() {
         this.setLayout(null);
@@ -365,6 +369,31 @@ public abstract class AbstrBlock extends JComponent {
         return bspec;
     }
 
+    /**
+     * Tries to execute the block. <br />
+     * The block has to exist.
+     * {@link #getBlockSyntax()} is used to identify the block. <br />
+     * 
+     * @see org.jblocks.JBlocks#getContextForComponent(java.awt.Component) 
+     * @see org.jblocks.scriptengine.IScriptEngine
+     */
+    protected void tryToExecute() {
+        if (bspec == null) {
+            System.out.println("no block spec");
+            return;
+        }
+        JBlocks context = JBlocks.getContextForComponent(this);
+        if (context != null) {
+            try {
+                Block b = ScriptGrabber.getCodeFromBlock(this, context.getInstalledBlocks());
+                IScriptEngine eng = context.getScriptEngine();
+                eng.execute(eng.compile(new Block[]{b}));
+            } catch (RuntimeException ex) {
+                System.out.println("couldn't run: " + ex.getMessage());
+            }
+        }
+    }
+
     private class BlockMouseListener extends MouseAdapter {
 
         private boolean veto() {
@@ -373,6 +402,13 @@ public abstract class AbstrBlock extends JComponent {
                 return true;
             }
             return false;
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent evt) {
+            if (evt.getClickCount() >= 2) {
+                tryToExecute();
+            }
         }
 
         @Override

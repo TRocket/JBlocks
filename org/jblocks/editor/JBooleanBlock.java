@@ -29,7 +29,7 @@ class JBooleanBlock extends JReporterBlock {
     }
 
     @Override
-    protected void paintBlockBorder(Graphics grp) {
+    protected void paintBlockBorder(Graphics grp) {        
         Graphics2D g = (Graphics2D) grp;
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -40,15 +40,15 @@ class JBooleanBlock extends JReporterBlock {
         Shape clip = g.getClip();
 
         Polygon plg = getPlg(size);
-        
+
         g.setColor(col);
         g.fillPolygon(plg);
 
         g.setClip(0, 0, size.width, size.height / 2);
         g.setColor(Colors.bright(col, 1.15f));
         g.drawPolygon(plg);
-        
-        
+
+
         g.setClip(0, size.height / 2, size.width, size.height / 2);
         g.setColor(Colors.bright(col, 0.85f));
         g.drawPolygon(plg);

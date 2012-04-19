@@ -18,8 +18,15 @@ class RepeatingQueue<E> {
         elements = (E[]) new Object[1000];
     }
 
-    public E[] toArray() {
-        return Arrays.copyOf(elements, size);
+    public <T> T[] toArray(T[] a) {
+        if (a.length < size) {
+            return (T[]) Arrays.copyOf(elements, size, a.getClass());
+        }
+        System.arraycopy(elements, 0, a, 0, size);
+        if (a.length > size) {
+            a[size] = null;
+        }
+        return a;
     }
 
     public E peek() {

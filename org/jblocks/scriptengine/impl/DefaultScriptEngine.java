@@ -5,7 +5,9 @@
 package org.jblocks.scriptengine.impl;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.Block.Default;
@@ -32,10 +34,12 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
     private final RepeatingQueue<DefaultScriptThread> threads;
     private final Map globalVariables;
     private Thread scriptThread;
+    private final List<ScriptEngineListener> listeners;
 
     public DefaultScriptEngine() {
         threads = new RepeatingQueue();
         globalVariables = new java.util.HashMap(100);
+        listeners = new ArrayList<ScriptEngineListener>(1);
     }
 
     @Override
@@ -61,6 +65,7 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
             DefaultScriptThread thrd = new DefaultScriptThread(globalVariables, ((DefaultScript) s).getCommands());
             threads.add(thrd);
             startThreadIfNecessary();
+            fireStartedEvent(thrd);
             return thrd;
         }
     }
@@ -68,7 +73,7 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
     @Override
     public IScriptThread[] getThreads() {
         synchronized (threads) {
-            return threads.toArray();
+            return threads.toArray(new IScriptThread[]{});
         }
     }
 
@@ -94,12 +99,14 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
                     try {
                         if (thread.step()) {
                             threads.remove();
+                            fireFinishedEvent(thread, null);
                             break;
                         }
                     } catch (Throwable t) {
                         t.printStackTrace(System.err);
                         printStackTrace(thread.getStack());
                         threads.remove();
+                        fireFinishedEvent(thread, t);
                         break;
                     }
                 }
@@ -136,6 +143,30 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
             default:
                 return null;
         }
+    }
+
+    private void fireFinishedEvent(IScriptThread t, Throwable error) {
+        int len = listeners.size();
+        for (int i = 0; i < len; i++) {
+            listeners.get(i).finished(t, error);
+        }
+    }
+
+    private void fireStartedEvent(IScriptThread t) {
+        int len = listeners.size();
+        for (int i = 0; i < len; i++) {
+            listeners.get(i).started(t);
+        }
+    }
+
+    @Override
+    public void addListener(ScriptEngineListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void removeListener(ScriptEngineListener listener) {
+        listeners.remove(listener);
     }
 
     private static class DefaultScript implements IScript {

@@ -7,7 +7,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
@@ -23,9 +22,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -33,7 +30,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
@@ -90,7 +86,8 @@ public final class JSoundEditor extends JPanel {
     private final SimplePlayer player;
 
     static {
-        // should we use an image-pool instead?
+        // TODO: Replace this with JBlocks.getIcon(...)
+        
         icon_microphone = new ImageIcon(JBlocks.class.getResource("res/microphone.png"));
         icon_play = new ImageIcon(JBlocks.class.getResource("res/play.png"));
         icon_stop = new ImageIcon(JBlocks.class.getResource("res/stop.png"));

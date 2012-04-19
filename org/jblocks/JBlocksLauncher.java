@@ -1,7 +1,6 @@
 package org.jblocks;
 
 import java.awt.BorderLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.JDragPane;
@@ -17,27 +16,28 @@ import org.jblocks.gui.Splash;
 public class JBlocksLauncher {
 
     private static final String VERSION = "0.5";
-    
+
     /**
-     * this is the standalone main method
+     * This is the standalone main method
+     * 
      * @param args the command line args
      */
     public static void main(String[] args) {
         // TODO run JBlocks
-    	Splash splash = new Splash();
-    	splash.setVisible(true);
-    	splash.setText("JBlocks " + VERSION + " is starting...");
+        Splash splash = new Splash();
+        splash.setText("JBlocks " + VERSION + " is starting...");
+        splash.setVisible(true);
+        
         JBlocksPane.setLaF();
         
-        JBlocksPane p = new JBlocksPane();
         JFrame frm = new JFrame("JBlocks " + VERSION);
-        frm.setIconImage(new ImageIcon(JBlocks.class.getResource("res/jblocks-icon.png")).getImage());
+        frm.setIconImage(JBlocks.getImage("jblocks-icon.png"));
         frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frm.setSize(1000, 600);
         frm.setLocationByPlatform(true);
         frm.setLayout(new BorderLayout());
-        
-        frm.add(new JDragPane(p), BorderLayout.CENTER);
+
+        frm.add(new JBlocks().getContentPane(), BorderLayout.CENTER);
 
         frm.setVisible(true);
         splash.setVisible(false);

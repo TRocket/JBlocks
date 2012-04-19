@@ -13,6 +13,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
@@ -21,7 +22,6 @@ import org.jblocks.byob.JByobEditor;
 import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.painteditor2.JPaintEditor;
-import org.jblocks.scriptengine.IScriptEngine;
 import org.jblocks.soundeditor.JSoundEditor;
 
 /**
@@ -34,38 +34,23 @@ import org.jblocks.soundeditor.JSoundEditor;
  */
 public class JBlocksPane extends JDesktopPane {
 
-    // <global>
-    private static ImageIcon icon_run_build;
-    private static ImageIcon icon_download_folder;
-    private static ImageIcon icon_save;
-    private static ImageIcon icon_open;
-    private static ImageIcon icon_paint_editor;
-    private static ImageIcon icon_sound_editor;
-    private static ImageIcon icon_block_editor;
     // <member>
-    private JToolBar tools;
-    private JBlockEditor editor;
-    private JPanel app;
-    private JSpriteChooser spriteChooser;
-    private IScriptEngine scriptEngine;
+    private final JToolBar tools;
+    private final JBlockEditor editor;
+    private final JPanel app;
+    private final JSpriteChooser spriteChooser;
+    private final JBlocks context;
+    private final JProgressBar progress;
 
-    static {
-        icon_run_build = new ImageIcon(JBlocks.class.getResource("res/run-build.png"));
-        icon_download_folder = new ImageIcon(JBlocks.class.getResource("res/download-folder.png"));
-        icon_save = new ImageIcon(JBlocks.class.getResource("res/save.png"));
-        icon_open = new ImageIcon(JBlocks.class.getResource("res/open.png"));
-        icon_paint_editor = new ImageIcon(JBlocks.class.getResource("res/paint-editor.png"));
-        icon_sound_editor = new ImageIcon(JBlocks.class.getResource("res/speaker.png"));
-        icon_block_editor = new ImageIcon(JBlocks.class.getResource("res/block-editor.png"));
-    }
-
-    public JBlocksPane() {
+    public JBlocksPane(JBlocks ctx) {
+        this.context = ctx;
+        
         app = new JPanel();
         tools = new JToolBar();
 
         editor = createBlockEditor();
 
-        JButton openButton = new JButton(icon_open);
+        JButton openButton = new JButton(JBlocks.getIcon("open.png"));
         openButton.setToolTipText("Open project");
         openButton.addActionListener(new ActionListener() {
 
@@ -75,20 +60,20 @@ public class JBlocksPane extends JDesktopPane {
             }
         });
 
-        JButton saveButton = new JButton(icon_save);
+        JButton saveButton = new JButton(JBlocks.getIcon("save.png"));
         saveButton.setToolTipText("Save project");
         tools.add(saveButton);
         tools.add(openButton);
 
-        JButton runButton = new JButton(icon_run_build);
+        JButton runButton = new JButton(JBlocks.getIcon("run-build.png"));
         runButton.setToolTipText("Run project");
         tools.add(runButton);
         tools.add(new JSeparator(JSeparator.VERTICAL));
-        JButton blockstoreButton = new JButton(icon_download_folder);
+        JButton blockstoreButton = new JButton(JBlocks.getIcon("download-folder.png"));
         blockstoreButton.setToolTipText("Open Block-Store");
         tools.add(blockstoreButton);
 
-        JButton openPaint = new JButton(icon_paint_editor);
+        JButton openPaint = new JButton(JBlocks.getIcon("paint-editor.png"));
         openPaint.setToolTipText("Open Paint-Editor");
         openPaint.addActionListener(new ActionListener() {
 
@@ -124,7 +109,7 @@ public class JBlocksPane extends JDesktopPane {
                 int w = frm.getWidth();
                 int h = frm.getHeight();
 
-                frm.setFrameIcon(icon_paint_editor);
+                frm.setFrameIcon(JBlocks.getIcon("paint-editor.png"));
                 frm.setLocation(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2);
 
                 try {
@@ -136,7 +121,7 @@ public class JBlocksPane extends JDesktopPane {
 
         tools.add(openPaint);
 
-        JButton openSound = new JButton(icon_sound_editor);
+        JButton openSound = new JButton(JBlocks.getIcon("speaker.png"));
         openSound.setToolTipText("Open Sound-Editor");
         openSound.addActionListener(new ActionListener() {
 
@@ -157,7 +142,7 @@ public class JBlocksPane extends JDesktopPane {
                 int w = frm.getWidth();
                 int h = frm.getHeight();
 
-                frm.setFrameIcon(icon_sound_editor);
+                frm.setFrameIcon(JBlocks.getIcon("speaker.png"));
                 frm.setLocation(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2);
 
                 add(frm, 0);
@@ -170,13 +155,13 @@ public class JBlocksPane extends JDesktopPane {
 
         tools.add(openSound);
 
-        JButton openByob = new JButton(icon_block_editor);
+        JButton openByob = new JButton(JBlocks.getIcon("block-editor.png"));
         openByob.setToolTipText("Open BYOB-Editor.");
         openByob.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                JByobEditor.createEditor(JBlocksPane.this, icon_block_editor);
+                JByobEditor.createEditor(JBlocksPane.this, JBlocks.getIcon("block-editor.png"));
             }
         });
 
@@ -187,17 +172,34 @@ public class JBlocksPane extends JDesktopPane {
 
         spriteChooser = SpriteChooserTest.createTestSpriteChooser2(editor);
 
+        JPanel east = new JPanel(new BorderLayout());
+        
         JScrollPane chScroll = new JScrollPane(spriteChooser);
         chScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
+        
+        progress = new JProgressBar();
+        east.add(chScroll, BorderLayout.CENTER);
+        east.add(progress, BorderLayout.SOUTH);
+        
         app.add(editor, BorderLayout.CENTER);
-        app.add(chScroll, BorderLayout.EAST);
+        app.add(east, BorderLayout.EAST);
 
+        
         // add app to the desktop-pane
         add(app);
+    }
+    
+    public JProgressBar getProgress() {
+        return progress;
+    }
 
-        // set the default script-engine.
-        scriptEngine = new org.jblocks.scriptengine.impl.DefaultScriptEngine();
+    /**
+     * Returns the context of this JBlocksPane. <br />
+     * 
+     * @see org.jblocks.JBlocks
+     */
+    public JBlocks getContext() {
+        return context;
     }
 
     private JBlockEditor createBlockEditor() {
@@ -226,6 +228,9 @@ public class JBlocksPane extends JDesktopPane {
         edt.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}*%{r}"));
         edt.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}/%{r}"));
         edt.addBlock("Operators", BlockFactory.createBlock("reporter", "%{r}mod%{r}"));
+        
+        edt.addBlock("Operators", BlockFactory.createBlock("boolean", "true"));
+        edt.addBlock("Operators", BlockFactory.createBlock("boolean", "false"));
         
         edt.cleanup();
         return edt;

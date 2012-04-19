@@ -66,20 +66,58 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
         layoutPuzzle();
     }
 
+ //   @Override
+    protected void paintBlockBorder2(Graphics grp) {
+        final Graphics2D g = (Graphics2D) grp;
+
+        final Color col = getBackground();
+        final Dimension size = getSize();
+        final int w = size.width;
+        final int h = size.height;
+
+        final Color shadow = col.darker();
+        final Color darkShadow = shadow.darker();
+
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g.setColor(col);
+        g.fillArc(0, 0, LEFT_RIGHT * 2, TOP * 2, 90, 90);
+        g.fillArc(w - LEFT_RIGHT * 2, 0, LEFT_RIGHT * 2, TOP * 2, 0, 90);
+        g.fillArc(w - LEFT_RIGHT * 2, h - TOP * 2, LEFT_RIGHT * 2, TOP * 2, 270, 90);
+        g.fillArc(0, h - TOP * 2, LEFT_RIGHT * 2, TOP * 2, 180, 90);
+
+        g.setColor(darkShadow);
+        g.drawArc(0, 0, LEFT_RIGHT * 2, TOP * 2, 90, 90);
+        g.drawArc(w - LEFT_RIGHT * 2, 0, LEFT_RIGHT * 2, TOP * 2, 0, 90);
+        g.drawArc(w - LEFT_RIGHT * 2, h - TOP * 2, LEFT_RIGHT * 2, TOP * 2, 270, 90);
+        g.drawArc(0, h - TOP * 2, LEFT_RIGHT * 2, TOP * 2, 180, 90);
+
+        g.setColor(col);
+        g.fillRect(0, TOP, LEFT_RIGHT, h - TOP - BOTTOM + 1);
+        g.fillRect(w - LEFT_RIGHT, TOP, LEFT_RIGHT + 1, h - TOP - BOTTOM + 1);
+
+
+        //   g.fillArc(h, h, h, h, h, h);
+
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_OFF);
+    }
+
     /**
      * 
      * {@inheritDoc}
      */
     @Override
-    public void paintBlockBorder(Graphics grp) {
-        Graphics2D g = (Graphics2D) grp;
+    protected void paintBlockBorder(Graphics grp) {
+        final Graphics2D g = (Graphics2D) grp;
 
-        Color col = getBackground();
-        Rectangle clip = g.getClipBounds();
-        Dimension size = getSize();
+        final Color col = getBackground();
+        final Rectangle clip = g.getClipBounds();
+        final Dimension size = getSize();
 
-        Color shadow = col.darker();
-        Color darkShadow = shadow.darker();
+        final Color shadow = col.darker();
+        final Color darkShadow = shadow.darker();
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
@@ -101,8 +139,6 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
 
         g.setColor(darkShadow);
         g.drawLine(size.width - 1, 0, size.width - 1, size.height - BOTTOM);
-      //  g.setColor(shadow);
-      //  g.drawLine(size.width - 2, 2, size.width - 2, size.height - BOTTOM);
 
 
         // draw BOTTOM
@@ -110,7 +146,7 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
 
         g.setColor(darkShadow);
         g.drawLine(0, size.height - BOTTOM, size.width, size.height - BOTTOM);
-        
+
         g.setColor(col);
         g.fillRoundRect(15, size.height - BOTTOM - 5, ADAPTER_W, BOTTOM + 5, 5, 5);
         g.setColor(darkShadow);

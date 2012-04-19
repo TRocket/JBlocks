@@ -6,14 +6,12 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
-import org.jblocks.editor.AbstrBlock;
-import org.jblocks.editor.AbstrInput;
-import org.jblocks.editor.JBlockSequence;
-import org.jblocks.editor.JScriptPane;
 import org.jblocks.scriptengine.Block;
 
 /**
- *
+ * This class is for converting <code>AbstrBlock</code>s to executable code. <br />
+ * 
+ * @see org.jblocks.scriptengine
  * @author ZeroLuck
  */
 public class ScriptGrabber {
@@ -31,36 +29,37 @@ public class ScriptGrabber {
      */
     public static Block getCodeFromBlock(final AbstrBlock block, final Map<String, Block> blockLib) {
         Block code = null;
-        Block b = blockLib.get(block.getBlockSyntax());
+        final String syntax = block.getBlockSyntax();
+        final Block b = blockLib.get(syntax);
         if (b == null) {
-            throw new IllegalStateException("block for syntax '" + b + "' isn't available!");
+            throw new IllegalStateException("block for syntax '" + syntax + "' isn't available!");
         }
         int parameter = 0;
         for (Component c : block.getComponents()) {
             if (c instanceof AbstrInput) {
                 AbstrInput input = (AbstrInput) c;
                 JComponent comp = input.getInput();
-                if (comp == null) {
+                if (comp != null) {
                     if (comp instanceof JTextField) {
                         b.setParameter(parameter, ((JTextField) comp).getText());
                     } else if (comp instanceof AbstrBlock) {
                         b.setParameter(parameter, getCodeFromBlock((AbstrBlock) comp, blockLib));
-                    } else if (comp instanceof JBlockSequence) {
-                        JBlockSequence seq = (JBlockSequence) comp;
-                        AbstrBlock[] stack = JBlockSequence.getPuzzlePieces((Puzzle) seq.getStack(), PuzzleAdapter.TYPE_TOP);
-                        Block[] codeSeq = new Block[stack.length];
-                        for (int i = 0; i < codeSeq.length; i++) {
-                            codeSeq[i] = getCodeFromBlock(stack[i], blockLib);
-                        }
-                        b.setParameter(parameter, codeSeq);
                     } else {
                         System.out.println("Warning: ScriptGrabber: What to do with: \"" + c + "\"?");
                     }
                 }
                 parameter++;
+            } else if (c instanceof JBlockSequence) {
+                JBlockSequence seq = (JBlockSequence) c;
+                AbstrBlock[] stack = JBlockSequence.getPuzzlePieces((Puzzle) seq.getStack(), PuzzleAdapter.TYPE_TOP);
+                Block[] codeSeq = new Block[stack.length];
+                for (int i = 0; i < codeSeq.length; i++) {
+                    codeSeq[i] = getCodeFromBlock(stack[i], blockLib);
+                }
+                b.setParameter(parameter, codeSeq);
+                parameter++;
             }
         }
-
         return code;
     }
 

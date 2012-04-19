@@ -28,12 +28,16 @@ public class SpriterPainter {
         this.model = model;
     }
 
+    // has glitchs!?
     public void paintSprite(final Graphics2D g, final Sprite s) {
         final Composite compositeBackup = g.getComposite();
         final AffineTransform transformBackup = g.getTransform();
-        g.setComposite(
-                AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
-                s.getOpacity() / 100));
+        
+        if (s.getOpacity() < 100f) {
+            g.setComposite(
+                    AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                    s.getOpacity() / 100));
+        }
 
         final Image img = model.getImages().get(s.getImage());
         final int newW = (int) s.getWidth();
@@ -41,8 +45,8 @@ public class SpriterPainter {
         final int x = (int) s.getX();
         final int y = (int) s.getY();
 
-        g.rotate(Math.toRadians(s.getAngle()), x, y);
         g.translate(x, y);
+        g.rotate(Math.toRadians(s.getAngle()), img.getWidth(null) / 2, img.getHeight(null) / 2);
 
         g.drawImage(img, 0, 0, newW * (s.isxFlip() ? -1 : 1), newH * (s.isyFlip() ? -1 : 1), null);
 

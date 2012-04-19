@@ -6,10 +6,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.HashMap;
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -35,17 +32,7 @@ import org.jblocks.gui.JDragPane;
  * @author ZeroLuck
  */
 public class JBlockEditor extends JPanel {
-
-    // <global>
-    private static BufferedImage scriptpane;
-
-    static {
-        try {
-            scriptpane = ImageIO.read(JBlocks.class.getResourceAsStream("res/blockchooser.png"));
-        } catch (IOException ex) {
-            throw new java.lang.ExceptionInInitializerError(ex);
-        }
-    }
+    
     // <member>
     private JPanel ctgPanel;
     private JScriptPane pane;
@@ -77,7 +64,7 @@ public class JBlockEditor extends JPanel {
     }
 
     /**
-     * creates a block-editor with an <b>empty</b> category-chooser. <br />
+     * Creates a block-editor with an <b>empty</b> category-chooser. <br />
      * 
      * @see #addCategory(java.lang.String, java.awt.Color) 
      * @see #setScriptPane(org.jblocks.editor.JScriptPane) 
@@ -167,7 +154,7 @@ public class JBlockEditor extends JPanel {
         });
         JScriptPane p = new JScriptPane(false);
         p.setDragEnabled(false);
-        p.setScriptPaneImage(scriptpane);
+        p.setScriptPaneImage(JBlocks.getImage("blockchooser.png"));
         ctgs.put(name, new Category(name, p, c));
 
         if (firstCtg) {

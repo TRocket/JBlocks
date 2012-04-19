@@ -2,8 +2,6 @@ package org.jblocks.editor;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -19,11 +17,7 @@ public class BlockFactory {
     private static BufferedImage greenflag;
 
     static {
-        try {
-            greenflag = ImageIO.read(JBlocks.class.getResourceAsStream("res/goButton.gif"));
-        } catch (IOException ex) {
-            throw new java.lang.ExceptionInInitializerError(ex);
-        }
+        greenflag = JBlocks.getImage("goButton.gif");
     }
 
     private static void addFmt0(AbstrBlock block, String fmt) {

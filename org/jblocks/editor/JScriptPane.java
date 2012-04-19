@@ -51,15 +51,7 @@ import org.jblocks.JBlocks;
  */
 public class JScriptPane extends JPanel {
 
-    private static BufferedImage scriptpane;
-
-    static {
-        try {
-            scriptpane = ImageIO.read(JBlocks.class.getResourceAsStream("res/scriptpane.png"));
-        } catch (IOException ex) {
-            throw new java.lang.ExceptionInInitializerError(ex);
-        }
-    }
+    private static BufferedImage scriptpane = JBlocks.getImage("scriptpane.png");
     private static final int CLEANUP_LEFT = 10;
     private static final int CLEANUP_SPACE = 5;
     private static final int CLEANUP_TOP = 10;
@@ -282,7 +274,7 @@ public class JScriptPane extends JPanel {
                 return p;
             }
         }
-      //  return p;
+        //  return p;
         throw new IllegalStateException("the component has no JScriptPane parent!");
     }
 }

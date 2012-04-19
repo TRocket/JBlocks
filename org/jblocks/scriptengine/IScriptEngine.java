@@ -20,4 +20,15 @@ public interface IScriptEngine {
     public Map getGlobalVariables();
 
     public Block getDefaultBlock(Block.Default def);
+    
+    public void addListener(ScriptEngineListener listener);
+    
+    public void removeListener(ScriptEngineListener listener);
+
+    public static interface ScriptEngineListener {
+
+        public void finished(IScriptThread t, Throwable error);
+        
+        public void started(IScriptThread t);
+    };
 }

@@ -2,7 +2,6 @@ package org.jblocks;
 
 import javax.swing.JApplet;
 import org.jblocks.gui.JBlocksPane;
-import org.jblocks.gui.JDragPane;
 
 /**
  * 
@@ -25,9 +24,7 @@ public class JBlocksApplet extends JApplet {
             JBlocksLauncher.main(new String[]{});
         } else {
             JBlocksPane.setLaF();
-
-            JBlocksPane p = new JBlocksPane();
-            setContentPane(new JDragPane(p));
+            setContentPane(new JBlocks().getContentPane());
         }
     }
 }
