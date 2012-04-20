@@ -19,6 +19,24 @@ public class ScriptGrabber {
     private ScriptGrabber() {
         // don't let anyone make an instance of this class.
     }
+    
+    /**
+     * Creates code from a Script. <br />
+     * 
+     * @param hat the hat of the script
+     * @param blockLib the installed blocks
+     * @return the created code
+     */
+    public static Block[] getCodeFromScript(final AbstrBlock hat, final Map<String, Block> blockLib) {
+        AbstrBlock[] pieces = JBlockSequence.getPuzzlePieces(((Puzzle) hat), PuzzleAdapter.TYPE_DOWN);
+        Block[] b = new Block[pieces.length];
+        
+        for (int i = 0; i < b.length; i++) {
+            b[i] = getCodeFromBlock(pieces[i], blockLib);
+        }
+        
+        return b;
+    }
 
     /**
      * Creates code from an AbstrBlock. <br />
@@ -28,12 +46,13 @@ public class ScriptGrabber {
      * @return the created code
      */
     public static Block getCodeFromBlock(final AbstrBlock block, final Map<String, Block> blockLib) {
-        Block code = null;
         final String syntax = block.getBlockSyntax();
-        final Block b = blockLib.get(syntax);
+        Block b = blockLib.get(syntax);
         if (b == null) {
             throw new IllegalStateException("block for syntax '" + syntax + "' isn't available!");
         }
+        b = b.clone();
+        
         int parameter = 0;
         for (Component c : block.getComponents()) {
             if (c instanceof AbstrInput) {
@@ -43,7 +62,16 @@ public class ScriptGrabber {
                     if (comp instanceof JTextField) {
                         b.setParameter(parameter, ((JTextField) comp).getText());
                     } else if (comp instanceof AbstrBlock) {
-                        b.setParameter(parameter, getCodeFromBlock((AbstrBlock) comp, blockLib));
+                        AbstrBlock paramBlock = (AbstrBlock) comp;
+                        Block paramCode = getCodeFromBlock(paramBlock, blockLib);
+                        // this should be fixed:
+                        boolean doPreExec = !(syntax.equals("while %{b}%{br}%{s}"));
+
+                        if (doPreExec) {
+                            b.setParameter(parameter, paramCode);
+                        } else {
+                            b.setParameter(parameter, new Block[]{paramCode});
+                        }
                     } else {
                         System.out.println("Warning: ScriptGrabber: What to do with: \"" + c + "\"?");
                     }
@@ -60,7 +88,7 @@ public class ScriptGrabber {
                 parameter++;
             }
         }
-        return code;
+        return b;
     }
 
     /**

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -13,6 +14,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -178,8 +180,28 @@ public class JBlocksPane extends JDesktopPane {
         chScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         
         progress = new JProgressBar();
+        JPopupMenu menu = new JPopupMenu("Hello");
+        ActionListener stopScripts = new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                context.stopScripts();
+            }
+        };
+        menu.add("Stop all scripts").addActionListener(stopScripts);
+        progress.setComponentPopupMenu(menu);
+        
+        JPanel eastNorth = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        eastNorth.add(progress);
+        JButton startButton = new JButton(JBlocks.getIcon("play.png"));
+        eastNorth.add(startButton);
+        JButton stopButton = new JButton(JBlocks.getIcon("stop.png"));
+        stopButton.addActionListener(stopScripts);
+     
+        eastNorth.add(stopButton);        
+        
         east.add(chScroll, BorderLayout.CENTER);
-        east.add(progress, BorderLayout.SOUTH);
+        east.add(eastNorth, BorderLayout.NORTH);
         
         app.add(editor, BorderLayout.CENTER);
         app.add(east, BorderLayout.EAST);

@@ -1,7 +1,9 @@
 package org.jblocks.editor;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -37,19 +39,21 @@ class JHatBlock extends AbstrBlock implements Puzzle {
 
     @Override
     protected void paintBlockBorder(Graphics grp) {
-        Color col = getBackground();
-        Color dark = Color.BLACK;
-        Color shadow = col.darker();
-        Color darkShadow = shadow.darker();
+        final Color col = getBackground();
+        final Color dark = Color.BLACK;
+        final Color shadow = col.darker();
+        final Color darkShadow = shadow.darker();
+        final boolean highlight = getHighlight();
+        final Color highlightColor = getHighlightColor();
 
-        Graphics2D g = (Graphics2D) grp;
+        final Graphics2D g = (Graphics2D) grp;
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
-        Dimension size = getSize();
-        Rectangle clip = g.getClipBounds();
-        Stroke basic = g.getStroke();
+        final Dimension size = getSize();
+        final Rectangle clip = g.getClipBounds();
+        final Stroke backup = g.getStroke();
 
         // Draw TOP
         g.setClip(new Rectangle(0, 0, size.width, RND_Y).intersection(clip));
@@ -60,31 +64,50 @@ class JHatBlock extends AbstrBlock implements Puzzle {
         g.setPaint(new java.awt.GradientPaint(0, 0, shadow, 0, RND_Y, col));
         g.fillOval(0, 0, rndx, rndy);
 
-        g.setColor(dark);
-        g.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        if (highlight) {
+            g.setColor(highlightColor);
+        } else {
+            g.setColor(dark);
+        }
+
+        Stroke thick = new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+
+        g.setStroke(thick);
         g.drawOval(0, 1, rndx, rndy - 1);
         g.drawLine(rndx + 1, RND_Y - 2, size.width - 2, RND_Y - 2);
 
-        g.setStroke(new BasicStroke(1));
         g.setClip(clip);
 
         // draw LEFT and RIGHT
-        g.setColor(darkShadow);
+        if (!highlight) {
+            g.setStroke(backup);
+            g.setColor(darkShadow);
+        }
         g.drawLine(0, RND_Y, 0, size.height - BOTTOM);
 
-        g.setStroke(basic);
-        g.setColor(shadow);
+        if (!highlight) {
+            g.setColor(shadow);
+        }
         g.drawLine(size.width - 1, RND_Y, size.width - 1, size.height - BOTTOM);
 
         // draw BOTTOM
         g.setClip(new Rectangle(0, size.height - BOTTOM, size.width, BOTTOM).intersection(clip));
 
-        g.setColor(darkShadow);
+        if (!highlight) {
+            g.setColor(darkShadow);
+        }
         g.drawLine(0, size.height - BOTTOM, size.width, size.height - BOTTOM);
 
         g.setColor(col);
         g.fillRoundRect(15, size.height - BOTTOM - 6, ADAPTER_W, BOTTOM + 5, 5, 5);
-        g.setColor(darkShadow);
+
+        if (!highlight) {
+            g.setStroke(backup);
+            g.setColor(darkShadow);
+        } else {
+            g.setColor(highlightColor);
+        }
+
         g.drawRoundRect(15, size.height - BOTTOM - 6, ADAPTER_W, BOTTOM + 5, 5, 5);
 
         g.setClip(clip);

@@ -12,7 +12,7 @@ import org.jblocks.scriptengine.impl.DefaultScriptThread.StackElement;
 class DefaultBlocks {
 
     // <global>
-    static final NativeBlock FOR;                     // 0: sequence              1: count
+    static final NativeBlock FOR;                     // 0: count                 1: sequence
     static final NativeBlock RETURN;                  // 0: value to return
     static final NativeBlock WHILE;                   // 0: expression (sequence) 1: sequence
     static final NativeBlock IF;                      // 0: expression            1: sequence
@@ -75,8 +75,12 @@ class DefaultBlocks {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {
-                Block[] seq = (Block[]) params[0];
-                int cnt = (Integer) params[1];
+                if (params[0] == null || params[1] == null) {
+                    return null;
+                }
+
+                Block[] seq = (Block[]) params[1];
+                int cnt = toInt(params[0]);
                 Object offObj = params[2];
                 int off = 0;
                 if (offObj != null) {
@@ -91,8 +95,8 @@ class DefaultBlocks {
 
                 Block b = seq[off];
                 StackElement me = new StackElement(((StackElement) ctx).parent, this, empty, false, ((StackElement) ctx).global);
-                me.param[0] = seq;
-                me.param[1] = cnt;
+                me.param[1] = seq;
+                me.param[0] = cnt;
                 me.param[2] = off + 1;
                 StackElement cmd = new StackElement(me, b, b.getParameters(), true, ((StackElement) ctx).global);
                 if (cnt > 0) {
@@ -105,6 +109,7 @@ class DefaultBlocks {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {
+                System.out.println("return: " + params[0]);
                 Object val = params[0];
                 StackElement byob = ((StackElement) ctx);
                 while (!(byob.perform instanceof ByobBlock)) {
@@ -114,6 +119,7 @@ class DefaultBlocks {
                     byob.param[byob.off] = val;
                 }
                 byob.off = byob.commands.length;
+                ((StackElement) ctx).parent = byob;
                 return null;
             }
         };
@@ -127,7 +133,7 @@ class DefaultBlocks {
                 if (offObj != null) {
                     off = (Integer) offObj;
                 }
-                if (off >= seq.length || !(params[0] instanceof Boolean) || ((Boolean) params[0]) != Boolean.TRUE) {
+                if (off >= seq.length || !toBoolean(params[0])) {
                     return null;
                 }
                 Block b = seq[off];
@@ -147,7 +153,7 @@ class DefaultBlocks {
                 Block[] seq1 = (Block[]) params[1];
                 Block[] seq2 = (Block[]) params[2];
                 Block[] seq;
-                if (!(params[0] instanceof Boolean) || ((Boolean) params[0]) != Boolean.TRUE) {
+                if (!toBoolean(params[0])) {
                     seq = seq2;
                 } else {
                     seq = seq1;
@@ -175,6 +181,10 @@ class DefaultBlocks {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {
+                if (params[0] == null) {
+                    return null;
+                }
+
                 Block exp = ((Block[]) params[0])[0];
 
                 if (params[2] == null) {
@@ -202,12 +212,17 @@ class DefaultBlocks {
                             return null;
                         }
                     }
-                    Block b = seq[off];
                     StackElement me = new StackElement(((StackElement) ctx).parent, this, empty, false, ((StackElement) ctx).global);
                     me.param[0] = params[0];
                     me.param[1] = seq;
                     me.param[2] = true;
                     me.param[3] = off + 1;
+
+                    if (off >= seq.length) {
+                        ((StackElement) ctx).parent = me;
+                        return null;
+                    }
+                    Block b = seq[off];
                     StackElement cmd = new StackElement(me, b, b.getParameters(), true, ((StackElement) ctx).global);
 
                     ((StackElement) ctx).parent = cmd;
@@ -215,5 +230,17 @@ class DefaultBlocks {
                 return null;
             }
         };
+    }
+
+    private static boolean toBoolean(Object o) {
+        return o == null ? false : Boolean.parseBoolean(o + "");
+    }
+
+    private static int toInt(Object o) {
+        try {
+            return (Double.valueOf(("" + o).replace(',', '.'))).intValue();
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
     }
 }

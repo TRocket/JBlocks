@@ -1,5 +1,6 @@
 package org.jblocks.editor;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -9,6 +10,7 @@ import java.awt.Insets;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import org.jblocks.gui.JDragPane;
 
@@ -66,44 +68,6 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
         layoutPuzzle();
     }
 
- //   @Override
-    protected void paintBlockBorder2(Graphics grp) {
-        final Graphics2D g = (Graphics2D) grp;
-
-        final Color col = getBackground();
-        final Dimension size = getSize();
-        final int w = size.width;
-        final int h = size.height;
-
-        final Color shadow = col.darker();
-        final Color darkShadow = shadow.darker();
-
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-
-        g.setColor(col);
-        g.fillArc(0, 0, LEFT_RIGHT * 2, TOP * 2, 90, 90);
-        g.fillArc(w - LEFT_RIGHT * 2, 0, LEFT_RIGHT * 2, TOP * 2, 0, 90);
-        g.fillArc(w - LEFT_RIGHT * 2, h - TOP * 2, LEFT_RIGHT * 2, TOP * 2, 270, 90);
-        g.fillArc(0, h - TOP * 2, LEFT_RIGHT * 2, TOP * 2, 180, 90);
-
-        g.setColor(darkShadow);
-        g.drawArc(0, 0, LEFT_RIGHT * 2, TOP * 2, 90, 90);
-        g.drawArc(w - LEFT_RIGHT * 2, 0, LEFT_RIGHT * 2, TOP * 2, 0, 90);
-        g.drawArc(w - LEFT_RIGHT * 2, h - TOP * 2, LEFT_RIGHT * 2, TOP * 2, 270, 90);
-        g.drawArc(0, h - TOP * 2, LEFT_RIGHT * 2, TOP * 2, 180, 90);
-
-        g.setColor(col);
-        g.fillRect(0, TOP, LEFT_RIGHT, h - TOP - BOTTOM + 1);
-        g.fillRect(w - LEFT_RIGHT, TOP, LEFT_RIGHT + 1, h - TOP - BOTTOM + 1);
-
-
-        //   g.fillArc(h, h, h, h, h, h);
-
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_OFF);
-    }
-
     /**
      * 
      * {@inheritDoc}
@@ -119,6 +83,11 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
         final Color shadow = col.darker();
         final Color darkShadow = shadow.darker();
 
+        final boolean highlight = getHighlight();
+        final Color highlightColor = getHighlightColor();
+        final Stroke thick = new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+        final Stroke backup = g.getStroke();
+
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -127,31 +96,40 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
         g.setColor(col);
         g.fillRect(0, 0, 15, TOP);
         g.fillRect(15 + ADAPTER_W, 0, size.width, TOP);
-        g.setColor(shadow);
+        if (highlight) {
+            g.setColor(highlightColor);
+            g.setStroke(thick);
+        } else {
+            g.setColor(shadow);
+        }
         g.drawRoundRect(15, -10, 15, 10 + TOP, 5, 5);
         g.drawLine(0, 0, 15, 0);
         g.drawLine(15 + ADAPTER_W, 0, size.width - 2, 0);
 
         // draw LEFT and RIGHT
-        g.setColor(shadow);
         g.drawLine(0, 0, 0, size.height - BOTTOM);
 
-
-        g.setColor(darkShadow);
+        if (!highlight) {
+            g.setColor(darkShadow);
+        }
         g.drawLine(size.width - 1, 0, size.width - 1, size.height - BOTTOM);
 
 
         // draw BOTTOM
         g.setClip(clip.intersection(new Rectangle(0, size.height - BOTTOM, size.width, BOTTOM)));
 
-        g.setColor(darkShadow);
         g.drawLine(0, size.height - BOTTOM, size.width, size.height - BOTTOM);
 
         g.setColor(col);
         g.fillRoundRect(15, size.height - BOTTOM - 5, ADAPTER_W, BOTTOM + 5, 5, 5);
-        g.setColor(darkShadow);
+        if (highlight) {
+            g.setColor(highlightColor);
+        } else {
+            g.setColor(darkShadow);
+        }
         g.drawRoundRect(15, size.height - BOTTOM - 5, ADAPTER_W, BOTTOM + 4, 5, 5);
 
+        g.setStroke(backup);
         g.setClip(clip);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_OFF);

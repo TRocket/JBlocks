@@ -17,7 +17,7 @@ public class BlockFactory {
     private static BufferedImage greenflag;
 
     static {
-        greenflag = JBlocks.getImage("goButton.gif");
+        greenflag = JBlocks.getImage("greenFlag.png");
     }
 
     private static void addFmt0(AbstrBlock block, String fmt) {

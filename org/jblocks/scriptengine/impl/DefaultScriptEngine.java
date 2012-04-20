@@ -55,6 +55,7 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
     private void startThreadIfNecessary() {
         if (scriptThread == null || !scriptThread.isAlive()) {
             scriptThread = new Thread(this, "DefaultScriptEngine");
+            scriptThread.setPriority(1); // <- TEST
             scriptThread.start();
         }
     }

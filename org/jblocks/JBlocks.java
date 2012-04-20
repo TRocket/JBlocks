@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JProgressBar;
+import org.jblocks.editor.AbstrBlock;
 import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.JDragPane;
 import org.jblocks.scriptengine.Block;
@@ -36,10 +37,11 @@ import org.jblocks.scriptengine.NativeBlock;
  * @author ZeroLuck
  */
 public final class JBlocks {
-
+    
     private final JBlocksPane gui;
     private final JDragPane drag;
     private final Map<String, Block> blockLib;
+    private final Map<IScriptThread, AbstrBlock[]> blocksToReset;
     private IScriptEngine scriptEngine;
 
     /**
@@ -50,20 +52,27 @@ public final class JBlocks {
         gui = new JBlocksPane(this);
         drag = new JDragPane(gui);
         blockLib = new HashMap<String, Block>(200);
+        blocksToReset = new HashMap<IScriptThread, AbstrBlock[]>(100);
 
         // create the standard ScriptEngine...
         scriptEngine = new org.jblocks.scriptengine.impl.DefaultScriptEngine();
-
-        scriptEngine.addListener(new ScriptEngineListener() {
-
+        
+        ScriptEngineListener defaultListener = new ScriptEngineListener() {
+            
             @Override
             public void finished(IScriptThread t, Throwable error) {
                 if (scriptEngine.getThreads().length == 0) {
                     JProgressBar prg = gui.getProgress();
                     prg.setIndeterminate(false);
                 }
+                AbstrBlock[] blocks = blocksToReset.get(t);
+                if (blocks != null) {
+                    for (AbstrBlock b : blocks) {
+                        b.setHighlight(false);
+                    }
+                }
             }
-
+            
             @Override
             public void started(IScriptThread t) {
                 JProgressBar prg = gui.getProgress();
@@ -71,8 +80,9 @@ public final class JBlocks {
                     prg.setIndeterminate(true);
                 }
             }
-        });
-
+        };
+        
+        scriptEngine.addListener(defaultListener);
         initDefaultBlocks();
     }
 
@@ -89,15 +99,22 @@ public final class JBlocks {
         blockLib.put("if %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.IF));
         blockLib.put("if %{b}%{br}%{s}%{br}else%{s}", scriptEngine.getDefaultBlock(Default.IF_ELSE));
         blockLib.put("repeat %{r}%{br}%{s}", scriptEngine.getDefaultBlock(Default.FOR));
+        blockLib.put("When %{gf} clicked", new NativeBlock(0) {
+            
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                return null;
+            }
+        });
         blockLib.put("true", new NativeBlock(0) {
-
+            
             @Override
             public Object evaluate(Object ctx, Object... param) {
                 return true;
             }
         });
         blockLib.put("false", new NativeBlock(0) {
-
+            
             @Override
             public Object evaluate(Object ctx, Object... param) {
                 return false;
@@ -234,5 +251,25 @@ public final class JBlocks {
             cont = cont.getParent();
         }
         return null;
+    }
+
+    /**
+     * Stops all threads of the current ScriptEngine. <br />
+     * <i>This method is synchronized.</i>
+     */
+    public synchronized void stopScripts() {
+        for (IScriptThread t : scriptEngine.getThreads()) {
+            t.stop();
+        }
+    }
+
+    /**
+     * This will reset the highlight of the specified block <br />
+     * when the script is finished. <br />
+     * 
+     * @param thread the thread.
+     */
+    public void addHighlight(IScriptThread thread, AbstrBlock[] blocks) {
+        blocksToReset.put(thread, blocks);
     }
 }

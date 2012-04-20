@@ -3,7 +3,6 @@ package org.jblocks;
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import org.jblocks.gui.JBlocksPane;
-import org.jblocks.gui.JDragPane;
 import org.jblocks.gui.Splash;
 
 /**

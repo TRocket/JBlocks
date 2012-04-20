@@ -4,6 +4,7 @@
  */
 package org.jblocks.editor;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -13,6 +14,7 @@ import java.awt.Insets;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 
 /**
@@ -52,41 +54,57 @@ class JCapBlock extends AbstrBlock implements Puzzle {
      */
     @Override
     public void paintBlockBorder(Graphics grp) {
-        Graphics2D g = (Graphics2D) grp;
+        final Graphics2D g = (Graphics2D) grp;
 
-        Color col = getBackground();
-        Rectangle clip = g.getClipBounds();
-        Dimension size = getSize();
+        final Color col = getBackground();
+        final Rectangle clip = g.getClipBounds();
+        final Dimension size = getSize();
 
-        Color shadow = col.darker();
-        Color darkShadow = shadow.darker();
+        final Color shadow = col.darker();
+        final Color darkShadow = shadow.darker();
+
+        final boolean highlight = getHighlight();
+        final Color highlightColor = getHighlightColor();
+        final Stroke thick = new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+        final Stroke backup = g.getStroke();
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-
 
         // TOP
         g.setColor(col);
         g.fillRect(0, 0, 15, TOP);
         g.fillRect(15 + ADAPTER_W, 0, size.width, TOP);
-        g.setColor(shadow);
+        if (highlight) {
+            g.setColor(highlightColor);
+            g.setStroke(thick);
+        } else {
+            g.setColor(shadow);
+        }
         g.drawRoundRect(15, -10, 15, 10 + TOP, 5, 5);
         g.drawLine(0, 0, 15, 0);
         g.drawLine(15 + ADAPTER_W, 0, size.width - 2, 0);
 
         // draw LEFT and RIGHT
-        g.setColor(shadow);
+        if (!highlight) {
+            g.setColor(shadow);
+        }
         g.drawLine(0, 0, 0, size.height - BOTTOM);
 
-        g.setColor(darkShadow);
+        if (!highlight) {
+            g.setColor(darkShadow);
+        }
         g.drawLine(size.width - 1, 0, size.width - 1, size.height - BOTTOM);
 
         // draw BOTTOM
-        g.setClip(0, size.height - BOTTOM, size.width, BOTTOM);
 
-        g.setColor(darkShadow);
+        if (!highlight) {
+            g.setColor(darkShadow);
+        }
+
         g.drawLine(0, size.height - BOTTOM, size.width, size.height - BOTTOM);
 
+        g.setStroke(backup);
         g.setClip(clip);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_OFF);

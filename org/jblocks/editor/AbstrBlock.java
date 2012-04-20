@@ -27,7 +27,7 @@ import org.jblocks.scriptengine.IScriptEngine;
 public abstract class AbstrBlock extends JComponent {
 
     private boolean draggable = true;
-
+    private boolean highlight = false;
 
     public AbstrBlock() {
         this.setLayout(null);
@@ -170,6 +170,43 @@ public abstract class AbstrBlock extends JComponent {
         h += border.top + border.bottom;
         setPreferredSize(new Dimension(w, h));
 
+    }
+
+    /**
+     * Enables/Disables the highlighting of this block. <br />
+     * This will call <code>repaint()</code>.
+     * 
+     * @see #getHighlight() 
+     * @param b the new highligth status
+     */
+    public void setHighlight(boolean b) {
+        if (highlight == b) {
+            return;
+        }
+
+        highlight = b;
+        repaint();
+    }
+
+    /**
+     * Returns the highlight status of this block. <br />
+     * @see #setHighlight(boolean) 
+     */
+    public boolean getHighlight() {
+        return highlight;
+    }
+
+    private static final Color HIGHLIGHT_COLOR = new Color(0, 0xff, 0, 0xB0);
+    
+    /**
+     * Returns the highlight-color. <br />
+     * This method should be called from the {@link #paintBlockBorder(java.awt.Graphics) } method
+     * in order to draw the highlight. <br />
+     * 
+     * @see #setHighlight(boolean) 
+     */
+    protected Color getHighlightColor() {
+        return HIGHLIGHT_COLOR;
     }
 
     /**
@@ -385,11 +422,22 @@ public abstract class AbstrBlock extends JComponent {
         JBlocks context = JBlocks.getContextForComponent(this);
         if (context != null) {
             try {
-                Block b = ScriptGrabber.getCodeFromBlock(this, context.getInstalledBlocks());
                 IScriptEngine eng = context.getScriptEngine();
-                eng.execute(eng.compile(new Block[]{b}));
+                if (!(this instanceof Puzzle)) {
+                    Block b = ScriptGrabber.getCodeFromBlock(this, context.getInstalledBlocks());
+                    context.addHighlight(eng.execute(eng.compile(new Block[]{b})), new AbstrBlock[]{this});
+                    setHighlight(true);
+                } else {
+                    Block[] b = ScriptGrabber.getCodeFromScript(this, context.getInstalledBlocks());
+                    AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) this, PuzzleAdapter.TYPE_DOWN);
+                    for (AbstrBlock toHighlight : blocks) {
+                        toHighlight.setHighlight(true);
+                    }
+                    context.addHighlight(eng.execute(eng.compile(b)), blocks);
+                }
             } catch (RuntimeException ex) {
-                System.out.println("couldn't run: " + ex.getMessage());
+                // fixme:
+                System.out.println("couldn't run: " + ex);
             }
         }
     }
