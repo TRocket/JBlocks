@@ -124,6 +124,17 @@ public class BlockTypeChooser extends JPanel {
         center.add(centerFlow, BorderLayout.CENTER);
 
         blockName = new JTextField(15);
+        blockName.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                if (blockName.getText().trim().isEmpty()) {
+                    cancel();
+                    return;
+                }
+                finished();
+            }
+        });
 
         center.add(blockName, BorderLayout.SOUTH);
         add(center, BorderLayout.CENTER);

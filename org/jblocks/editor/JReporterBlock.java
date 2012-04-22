@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
@@ -33,11 +34,11 @@ class JReporterBlock extends AbstrBlock {
         g.fillRoundRect(0, 0, size.width, size.height, size.height / 2, size.height / 2);
 
         g.setColor(Colors.bright(col, 1.15f));
-        g.setClip(0, 0, size.width, size.height / 2);
+        g.setClip(new Rectangle(0, 0, size.width, size.height / 2).intersection(clip.getBounds()));
         g.drawRoundRect(0, 0, size.width - 1, size.height - 1, size.height / 2, size.height / 2);
 
         g.setColor(Colors.bright(col, 0.85f));
-        g.setClip(0, size.height / 2, size.width, size.height / 2);
+        g.setClip(new Rectangle(0, size.height / 2, size.width, size.height / 2).intersection(clip.getBounds()));
         g.drawRoundRect(0, 0, size.width - 1, size.height - 1, size.height / 2, size.height / 2);
 
         g.setClip(clip);

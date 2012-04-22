@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JProgressBar;
 import org.jblocks.editor.AbstrBlock;
+import org.jblocks.editor.JBlockEditor;
 import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.JDragPane;
 import org.jblocks.scriptengine.Block;
@@ -170,6 +171,15 @@ public final class JBlocks {
         blockLib.remove(spec);
     }
 
+    /**
+     * Returns the JBlockEditor of the GUI. <br />
+     * 
+     * @see JBlocksPane#getEditor()
+     */
+    public JBlockEditor getEditor() {
+        return gui.getEditor();
+    }
+    
     /**
      * Returns all installed blocks. <br />
      * The returned Map<String, Block> will be unmodifiable. <br />

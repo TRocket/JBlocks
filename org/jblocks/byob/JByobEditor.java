@@ -7,6 +7,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
@@ -21,13 +22,23 @@ import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import org.jblocks.JBlocks;
 import org.jblocks.editor.AbstrBlock;
 import org.jblocks.editor.BlockFactory;
+import org.jblocks.editor.JBlockEditor;
+import org.jblocks.editor.JBlockSequence;
 import org.jblocks.editor.JScriptPane;
 import org.jblocks.editor.JVariableInput;
+import org.jblocks.editor.Puzzle;
+import org.jblocks.editor.PuzzleAdapter;
+import org.jblocks.editor.ScriptGrabber;
+import org.jblocks.gui.JBlocksPane;
+import org.jblocks.scriptengine.Block;
+import org.jblocks.scriptengine.ByobBlock;
 
 /**
  *
@@ -53,7 +64,7 @@ public class JByobEditor extends JPanel {
         /**
          * Called when the "OK" button was pressed. <br />
          */
-        public void finished(String syntax, String category);
+        public void finished(String syntax, String category, AbstrBlock sctipts);
     }
 
     /**
@@ -141,7 +152,7 @@ public class JByobEditor extends JPanel {
     }
 
     private void finished() {
-        fireFinishEvent("hello", category);
+        fireFinishEvent(category);
     }
 
     private void fireCancelEvent() {
@@ -248,9 +259,25 @@ public class JByobEditor extends JPanel {
         return p;
     }
 
-    private void fireFinishEvent(final String syntax, final String category) {
+    private void fireFinishEvent(final String category) {
+
+        StringBuilder syntax = new StringBuilder();
+        for (Component c : block.getComponents()) {
+            if (c instanceof JLabel) {
+                syntax.append(((JLabel) c).getText());
+            } else if (c instanceof JVariableInput) {
+                syntax.append(BlockFactory.createInput("reporter"));
+            }
+        }
+        AbstrBlock[] pieces = JBlockSequence.getPuzzlePieces((Puzzle) hat, PuzzleAdapter.TYPE_DOWN);
+        if (pieces.length <= 1) {
+            Toolkit.getDefaultToolkit().beep();
+            fireCancelEvent();
+            return;
+        }
+        hat.setBlockSyntax(syntax.toString());
         for (ByobEditorListener m : listeners) {
-            m.finished(syntax, category);
+            m.finished(syntax.toString(), category, pieces[1]);
         }
     }
 
@@ -281,7 +308,7 @@ public class JByobEditor extends JPanel {
         if (editorIcon != null) {
             frm.setFrameIcon(editorIcon);
         }
-        JByobEditor edt = new JByobEditor(type, text, category, c, editorIcon);
+        final JByobEditor edt = new JByobEditor(type, text, category, c, editorIcon);
         edt.addByobEditorListener(new ByobEditorListener() {
 
             @Override
@@ -290,7 +317,22 @@ public class JByobEditor extends JPanel {
             }
 
             @Override
-            public void finished(String syntax, String category) {
+            public void finished(final String syntax, final String category, final AbstrBlock script) {
+                try {
+                    Block[] code = ScriptGrabber.getCodeFromScript(
+                            script, JBlocks.getContextForComponent(edt).getInstalledBlocks());
+
+                    JBlocks ctx = JBlocks.getContextForComponent(edt);
+                    if (ctx.getInstalledBlocks().containsKey(syntax)) {
+                        JOptionPane.showInternalMessageDialog(edt, "A block with the syntax '" + syntax + "' does already exists!");
+                    } else {
+                        ctx.installBlock(syntax, new ByobBlock(count(syntax, '%'), code));
+                        JBlockEditor pane = ctx.getEditor();
+                        pane.addBlock(category, BlockFactory.createBlock(edt.block.getBlockType(), syntax));
+                    }
+                } catch (IllegalStateException ex) {
+                    JOptionPane.showInternalMessageDialog(edt, "Couldn't create the block: \n" + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 frm.dispose();
             }
         });
@@ -308,6 +350,17 @@ public class JByobEditor extends JPanel {
             frm.setSelected(true);
         } catch (java.beans.PropertyVetoException e) {
         }
+    }
+
+    private static int count(String s, char c) {
+        int cnt = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == c) {
+                cnt++;
+            }
+        }
+
+        return cnt;
     }
 
     /**

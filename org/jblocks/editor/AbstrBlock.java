@@ -354,7 +354,7 @@ public abstract class AbstrBlock extends JComponent {
      * @see #setBlockSyntax(java.lang.String) 
      * @param t - the type for this block.
      */
-    protected void setBlockType(String t) {
+    public void setBlockType(String t) {
         type = t;
     }
 
@@ -363,7 +363,7 @@ public abstract class AbstrBlock extends JComponent {
      * If the type wasn't set with {@link #setBlockType(java.lang.String) } this 
      * method returns null. <br />
      */
-    protected String getBlockType() {
+    public String getBlockType() {
         return type;
     }
 
@@ -375,7 +375,7 @@ public abstract class AbstrBlock extends JComponent {
      * @see #getBlockSyntax() 
      * @param s - the syntax for this block.
      */
-    protected void setBlockSyntax(String s) {
+    public void setBlockSyntax(String s) {
         bspec = s;
     }
 
@@ -402,7 +402,7 @@ public abstract class AbstrBlock extends JComponent {
      * If the syntax wasn't set with {@link #setBlockSyntax(java.lang.String) } 
      * this method returns null. <br />
      */
-    protected String getBlockSyntax() {
+    public String getBlockSyntax() {
         return bspec;
     }
 

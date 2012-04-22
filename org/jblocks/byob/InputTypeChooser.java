@@ -128,7 +128,7 @@ class InputTypeChooser extends JPanel {
             }
         });
 
-        OK.addActionListener(new ActionListener() {
+        ActionListener OKListener = new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -151,7 +151,9 @@ class InputTypeChooser extends JPanel {
                     m.finished(type, label);
                 }
             }
-        });
+        };
+        OK.addActionListener(OKListener);
+        inputLabel.addActionListener(OKListener);
 
         add(north, BorderLayout.NORTH);
         add(center, BorderLayout.CENTER);

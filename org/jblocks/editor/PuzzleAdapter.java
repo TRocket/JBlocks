@@ -8,7 +8,7 @@ import java.awt.Rectangle;
  * 
  * @author ZeroLuck
  */
-class PuzzleAdapter {
+public class PuzzleAdapter {
 
     // <global>
     public static final int TYPE_TOP = 0;

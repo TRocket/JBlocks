@@ -8,11 +8,12 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import javax.swing.ImageIcon;
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
@@ -158,7 +159,7 @@ public class JBlocksPane extends JDesktopPane {
         tools.add(openSound);
 
         JButton openByob = new JButton(JBlocks.getIcon("block-editor.png"));
-        openByob.setToolTipText("Open BYOB-Editor.");
+        openByob.setToolTipText("Make a block");
         openByob.addActionListener(new ActionListener() {
 
             @Override
@@ -193,11 +194,11 @@ public class JBlocksPane extends JDesktopPane {
         
         JPanel eastNorth = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         eastNorth.add(progress);
-        JButton startButton = new JButton(JBlocks.getIcon("play.png"));
+        AbstractButton startButton = new JImageButton(JBlocks.getImage("play.png"));
         eastNorth.add(startButton);
-        JButton stopButton = new JButton(JBlocks.getIcon("stop.png"));
+        AbstractButton stopButton = new JImageButton(JBlocks.getImage("stop.png"));
         stopButton.addActionListener(stopScripts);
-     
+       
         eastNorth.add(stopButton);        
         
         east.add(chScroll, BorderLayout.CENTER);
@@ -228,7 +229,9 @@ public class JBlocksPane extends JDesktopPane {
         JBlockEditor edt = new JBlockEditor();
         
         // standard blocks
-        edt.addCategory("Control", new Color(0xD6900A));
+        
+        edt.addCategory("Control", new Color(0xD6900A + 0x111111));
+       // edt.addCategory("Control", new Color(0xD6900A));
         edt.addBlock("Control", BlockFactory.createBlock("hat", "When %{gf} clicked"));
         edt.addBlock("Control", BlockFactory.createBlock("cap", "return %{r}"));
         edt.addBlock("Control", BlockFactory.createBlock("command", "while %{b}%{br}%{s}"));
@@ -239,7 +242,7 @@ public class JBlocksPane extends JDesktopPane {
         
         edt.addCategory("Motion", new Color(0xff4a6cd6));
         edt.addCategory("Operators", new Color(0xff62c213));
-        edt.addCategory("Variables", Color.RED);
+        edt.addCategory("Variables", new Color(0xf3761d));
         edt.addCategory("Sprites", Color.MAGENTA.darker());
         edt.addCategory("IO & Network", Color.CYAN);
         edt.addCategory("GUI & System", new Color(0xffD0D000));
@@ -253,6 +256,11 @@ public class JBlocksPane extends JDesktopPane {
         
         edt.addBlock("Operators", BlockFactory.createBlock("boolean", "true"));
         edt.addBlock("Operators", BlockFactory.createBlock("boolean", "false"));
+        
+        edt.addComponent("Variables", new JButton("Make a variable"));
+        edt.addComponent("Variables", new JButton("Delete a variable"));
+        
+        edt.addBlock("Variables", BlockFactory.createBlock("reporter", "test-variable"));
         
         edt.cleanup();
         return edt;
@@ -311,5 +319,13 @@ public class JBlocksPane extends JDesktopPane {
             // we don't want that our application crashs just because of this LaF.
             // (older Java versions may not support the nimbus LaF.)
         }
+    }
+
+    /**
+     * Returns the JBlockEditor of this JBlocksPane. <br />
+     * @see org.jblocks.JBlocks#getEditor() 
+     */
+    public JBlockEditor getEditor() {
+        return editor;
     }
 }

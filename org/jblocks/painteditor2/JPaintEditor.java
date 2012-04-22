@@ -8,13 +8,17 @@ import java.awt.Composite;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -23,11 +27,16 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
+import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 import org.jblocks.JBlocks;
 import org.jblocks.gui.JSmallColorChooser;
 import org.jblocks.gui.JZoomChooser;
@@ -90,6 +99,7 @@ public final class JPaintEditor extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
+                openImageFileChooser();
             }
         });
         tools.add(open);
@@ -282,7 +292,7 @@ public final class JPaintEditor extends JPanel {
 
         add(bottom, BorderLayout.SOUTH);
     }
-    
+
     /**
      * Returns the desktop pane on which this JPaintEditor is, or null <br />
      */
@@ -295,6 +305,96 @@ public final class JPaintEditor extends JPanel {
             parent = parent.getParent();
         }
         return null;
+    }
+    private JFileChooser chooser;
+    private ActionListener currentListener;
+
+    private void openImageFileChooser() {
+        synchronized (this) {
+            if (chooser == null) {
+                chooser = new JFileChooser();
+                final String[] suffix = ImageIO.getReaderFileSuffixes();
+                chooser.setFileFilter(new FileFilter() {
+
+                    @Override
+                    public boolean accept(File file) {
+                        if (file.isDirectory()) {
+                            return true;
+                        }
+                        String name = file.getName().toLowerCase();
+                        for (String s : suffix) {
+                            if (name.endsWith("." + s.toLowerCase())) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        StringBuilder sb = new StringBuilder("Images: ");
+                        boolean first = true;
+                        for (String s : suffix) {
+                            if (!first) {
+                                sb.append(", ");
+                            }
+                            sb.append(s);
+                            first = false;
+                        }
+                        return sb.toString();
+                    }
+                });
+            }
+        }
+        final JDesktopPane desktop = getDesktop();
+        final JInternalFrame frm = new JInternalFrame("Select a image file...");
+        frm.setClosable(true);
+        frm.setLayout(new BorderLayout());
+        frm.add(chooser, BorderLayout.CENTER);
+        frm.pack();
+
+        frm.setVisible(true);
+        Point loc = SwingUtilities.convertPoint(this, getLocation(), desktop);
+        frm.setLocation(loc.x + getWidth() / 2 - frm.getWidth() / 2,
+                loc.y + getHeight() / 2 - frm.getHeight() / 2);
+
+        desktop.add(frm, 0);
+        frm.toFront();
+
+        if (currentListener != null) {
+            chooser.removeActionListener(currentListener);
+        }
+
+        currentListener = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                String cmd = ae.getActionCommand();
+                if (cmd != null) {
+                    if (cmd.equals(JFileChooser.CANCEL_SELECTION)) {
+                        frm.dispose();
+                    } else if (cmd.equals(JFileChooser.APPROVE_SELECTION)) {
+                        open(chooser.getSelectedFile());
+                        frm.dispose();
+                    }
+                }
+            }
+        };
+        chooser.addActionListener(currentListener);
+    }
+
+    private void open(File f) {
+        try {
+            BufferedImage img = ImageIO.read(f);
+            if (img == null) {
+                throw new IOException("The image couldn't be read! (no decoder available)");
+            }
+
+            setTool(new ImageTool(this, img));
+
+        } catch (IOException io) {
+            JOptionPane.showInternalMessageDialog(this, "Error while opening image:\n" + io, "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**

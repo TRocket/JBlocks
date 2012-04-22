@@ -115,9 +115,12 @@ class DefaultBlocks {
                 while (!(byob.perform instanceof ByobBlock)) {
                     byob = byob.parent;
                 }
-                if (byob.doParam) {
-                    byob.param[byob.off] = val;
+                if (byob.parent != null) {
+                    if (byob.parent.doParam) {
+                        byob.parent.param[byob.parent.off - 1] = val;
+                    }
                 }
+
                 byob.off = byob.commands.length;
                 ((StackElement) ctx).parent = byob;
                 return null;

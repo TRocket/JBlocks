@@ -18,7 +18,7 @@ import javax.swing.JComponent;
  *
  * @author ZeroLuck
  */
-class JBlockSequence extends JComponent {
+public class JBlockSequence extends JComponent {
 
     // <global>
     private static final int ADAPTER_W = 15;
@@ -75,7 +75,7 @@ class JBlockSequence extends JComponent {
                     }
                 }
             }
-            if (capEnd) {
+            if (!capEnd) {
                 ymax += lastp;
             }
             dim = new Dimension(Math.max(75, xmax + 10), ymax);
@@ -286,7 +286,7 @@ class JBlockSequence extends JComponent {
         return false;
     }
 
-    static AbstrBlock[] getPuzzlePieces(Puzzle p, int t) {
+    public static AbstrBlock[] getPuzzlePieces(Puzzle p, int t) {
         if (p == null) {
             return new AbstrBlock[0];
         }
