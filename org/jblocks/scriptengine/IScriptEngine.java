@@ -1,6 +1,5 @@
 package org.jblocks.scriptengine;
 
-import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -8,8 +7,6 @@ import java.util.Map;
  * @author ZeroLuck
  */
 public interface IScriptEngine {
-
-    public Block load(InputStream in);
 
     public IScript compile(Block[] blocks);
 

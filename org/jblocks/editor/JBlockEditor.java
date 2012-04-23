@@ -164,25 +164,24 @@ public class JBlockEditor extends JPanel {
     }
 
     /**
-     * Adds a new block to a category. <br />
+     * Adds a new block to the JBlockEditor. <br />
      * 
-     * 
-     * @param name - the name of the category
-     * @param b - the block
+     * @throws NullPointerException if 'b' has no BlockModel
+     * @param b - the block model
      */
-    public void addBlock(String name, final AbstrBlock b) {
-        final Category c = ctgs.get(name);
+    public void addBlock(final AbstrBlock b) {
+        final BlockModel model = b.getModel();
+        final Category c = ctgs.get(model.getCategory());
+        
         if (c != null) {
             b.setBackground(c.color);
             b.addMouseListener(new MouseAdapter() {
 
                 @Override
                 public void mousePressed(MouseEvent evt) {
-                    String syntax = b.getBlockSyntax();
-                    String type = b.getBlockType();
-                    if (syntax != null) {
+                    if (model != null) {
                         try {
-                            AbstrBlock block = BlockFactory.createBlock(type, syntax);
+                            AbstrBlock block = BlockFactory.createBlock(model);
                             block.setBackground(b.getBackground());
                             block.setLocation(b.getLocation());
                             Drag.drag(JDragPane.getDragPane(JBlockEditor.this), c.blocks, evt.getPoint(), block);

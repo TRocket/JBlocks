@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.jblocks.editor.AbstrBlock;
 import org.jblocks.editor.BlockFactory;
+import org.jblocks.editor.BlockModel;
 import org.jblocks.gui.JCategoryChooser;
 import org.jblocks.gui.JBlocksPane;
 
@@ -33,15 +34,15 @@ public class BlockTypeChooser extends JPanel {
     public static String TYPE_COMMAND = "command";
     public static String TYPE_BOOLEAN = "boolean";
     // <member>
-    private JCategoryChooser categories;
-    private AbstrBlock command;
-    private AbstrBlock reporter;
-    private AbstrBlock bool;
+    private final JCategoryChooser categories;
+    private final AbstrBlock command;
+    private final AbstrBlock reporter;
+    private final AbstrBlock bool;
     private Color currColor;
     private AbstrBlock selected;
     private String currCategory;
-    private JTextField blockName;
-    private List<BlockTypeChooserListener> listeners;
+    private final JTextField blockName;
+    private final List<BlockTypeChooserListener> listeners;
 
     public static interface BlockTypeChooserListener {
 
@@ -67,9 +68,9 @@ public class BlockTypeChooser extends JPanel {
         super(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         categories = new JCategoryChooser();
-        command = BlockFactory.createBlock("command", "command");
-        reporter = BlockFactory.createBlock("reporter", "reporter");
-        bool = BlockFactory.createBlock("boolean", "boolean");
+        command = BlockFactory.createBlock(BlockModel.createPreviewModel("command", "command"));
+        reporter = BlockFactory.createBlock(BlockModel.createPreviewModel("reporter", "reporter"));
+        bool = BlockFactory.createBlock(BlockModel.createPreviewModel("boolean", "boolean"));
         selected = command;
         listeners = new ArrayList<BlockTypeChooserListener>();
 
@@ -93,15 +94,14 @@ public class BlockTypeChooser extends JPanel {
 
         JPanel north = new JPanel(new FlowLayout());
         // <test>
-        addCategory("Control", new Color(0xD6900A));
+        addCategory("Control", new Color(0xD6900A + 0x111111));
         addCategory("Motion", new Color(0xff4a6cd6));
         addCategory("Operators", new Color(0xff62c213));
-        addCategory("Lists", Color.RED);
-
-        addCategory("Touching", Color.CYAN);
-        addCategory("Pen", Color.GREEN.darker());
+        addCategory("Variables", new Color(0xf3761d));
+        addCategory("Sprites", Color.MAGENTA.darker());
+        addCategory("IO & Network", Color.CYAN);
+        addCategory("GUI & System", new Color(0xffD0D000));
         addCategory("Sound", Color.MAGENTA);
-        addCategory("Looking", Color.MAGENTA.darker());
 
         currColor = new Color(0xD6900A);
         currCategory = "Control";

@@ -24,6 +24,7 @@ public class JBlocksLauncher {
     public static void main(String[] args) {
         // TODO run JBlocks
         Splash splash = new Splash();
+        splash.setAlwaysOnTop(true);
         splash.setText("JBlocks " + VERSION + " is starting...");
         splash.setVisible(true);
         
@@ -35,7 +36,7 @@ public class JBlocksLauncher {
         frm.setSize(1000, 600);
         frm.setLocationByPlatform(true);
         frm.setLayout(new BorderLayout());
-
+        
         frm.add(new JBlocks().getContentPane(), BorderLayout.CENTER);
 
         frm.setVisible(true);

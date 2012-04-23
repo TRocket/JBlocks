@@ -27,12 +27,12 @@ public class ScriptGrabber {
      * @param blockLib the installed blocks
      * @return the created code
      */
-    public static Block[] getCodeFromScript(final AbstrBlock hat, final Map<String, Block> blockLib) {
+    public static Block[] getCodeFromScript(final AbstrBlock hat) {
         AbstrBlock[] pieces = JBlockSequence.getPuzzlePieces(((Puzzle) hat), PuzzleAdapter.TYPE_DOWN);
         Block[] b = new Block[pieces.length];
         
         for (int i = 0; i < b.length; i++) {
-            b[i] = getCodeFromBlock(pieces[i], blockLib);
+            b[i] = getCodeFromBlock(pieces[i]);
         }
         
         return b;
@@ -42,14 +42,15 @@ public class ScriptGrabber {
      * Creates code from an AbstrBlock. <br />
      * 
      * @param block the AbstrBlock from which to grab the code
-     * @param blockLib the installed blocks
      * @return the created code
      */
-    public static Block getCodeFromBlock(final AbstrBlock block, final Map<String, Block> blockLib) {
-        final String syntax = block.getBlockSyntax();
-        Block b = blockLib.get(syntax);
+    public static Block getCodeFromBlock(final AbstrBlock block) {
+        final BlockModel model = block.getModel();
+        
+        final String syntax = model.getSyntax();
+        Block b = model.getCode();
         if (b == null) {
-            throw new IllegalStateException("block for syntax '" + syntax + "' isn't available!");
+            throw new IllegalStateException("block for syntax '" + syntax + "' has no code!");
         }
         b = b.clone();
         
@@ -63,7 +64,7 @@ public class ScriptGrabber {
                         b.setParameter(parameter, ((JTextField) comp).getText());
                     } else if (comp instanceof AbstrBlock) {
                         AbstrBlock paramBlock = (AbstrBlock) comp;
-                        Block paramCode = getCodeFromBlock(paramBlock, blockLib);
+                        Block paramCode = getCodeFromBlock(paramBlock);
                         // this should be fixed:
                         boolean doPreExec = !(syntax.equals("while %{b}%{br}%{s}"));
 
@@ -82,7 +83,7 @@ public class ScriptGrabber {
                 AbstrBlock[] stack = JBlockSequence.getPuzzlePieces((Puzzle) seq.getStack(), PuzzleAdapter.TYPE_TOP);
                 Block[] codeSeq = new Block[stack.length];
                 for (int i = 0; i < codeSeq.length; i++) {
-                    codeSeq[i] = getCodeFromBlock(stack[i], blockLib);
+                    codeSeq[i] = getCodeFromBlock(stack[i]);
                 }
                 b.setParameter(parameter, codeSeq);
                 parameter++;

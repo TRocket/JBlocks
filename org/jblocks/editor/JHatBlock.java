@@ -32,8 +32,12 @@ class JHatBlock extends AbstrBlock implements Puzzle {
     private static final int ADAPTER_W = 15;
     // <member>
     private PuzzleAdapter underMe;
-
-    public JHatBlock() {
+    
+    /**
+     * See {@link AbstrBlock#AbstrBlock(org.jblocks.editor.BlockModel) }
+     */
+    public JHatBlock(BlockModel model) {
+        super(model);
         underMe = new PuzzleAdapter(this, PuzzleAdapter.TYPE_DOWN);
     }
 

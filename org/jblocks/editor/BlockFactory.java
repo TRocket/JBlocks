@@ -20,6 +20,10 @@ public class BlockFactory {
         greenflag = JBlocks.getImage("greenFlag.png");
     }
 
+    private BlockFactory() {
+        // don't let anyone make an instance of this class
+    }
+
     private static void addFmt0(AbstrBlock block, String fmt) {
         String[] s = fmt.split(";");
         if (s.length < 1) {
@@ -57,77 +61,97 @@ public class BlockFactory {
     public static final String TYPE_REPORTER_BLOCK = "reporter";
     public static final String TYPE_HAT_BLOCK = "hat";
 
+    public static String enquote(String s) {
+        return s.replace("%", "%%");
+    }
+
     /**
      * 
      * Creates a block from a String. <br />
      * Format: <br />
-     *  - %{r}                  : a reporter/boolean/text input. <br />
-     *  - %{b}                  : a boolean input. <br />
-     *  - %{s}                  : a sequence.
-     *  - %{br}                 : a new line.
-     *  - %{gf}                 : a green flag icon. <br />
-     *  - %{combo;ITEM_1}       : a combo box. <br />
-     *  - %{var;NAME}           : a variable. <br /> 
-     * <br />
+     * <ul>
+     *  <li> <b>%{r}</b>                  : a reporter/boolean/text input. </li>
+     *  <li> <b>%{b}</b>                  : a boolean input. </li>
+     *  <li> <b>%{s}</b>                  : a sequence. </li>
+     *  <li> <b>%{br}</b>                 : a new line. </li>
+     *  <li> <b>%{gf}</b>                 : a green flag icon. </li>
+     *  <li> <b>%{combo;ITEM_1}</b>       : a combo box. </li>
+     *  <li> <b>%{var;NAME}</b>           : a variable. </li> 
+     *  <li> <b>%%</b>                    : a '%' letter. </li>
+     * </ul>
      * 
      * @throws IllegalArgumentException - if the type isn't available.
-     * @param type "control", "cap", "reporter", "boolean" or "hat"
-     * @param bs the format for the block label
+     * @param model the model for the new block
      * @return the created block
      */
-    public static AbstrBlock createBlock(String type, String bs) {
+    public static AbstrBlock createBlock(final BlockModel model) {
+        final String type = model.getType();
+        final String syntax = model.getSyntax();
+
         AbstrBlock block = null;
         if (type.equals("hat")) {
-            block = new JHatBlock();
+            block = new JHatBlock(model);
         } else if (type.equals("command")) {
-            block = new JCommandBlock();
+            block = new JCommandBlock(model);
         } else if (type.equals("boolean")) {
-            block = new JBooleanBlock();
+            block = new JBooleanBlock(model);
         } else if (type.equals("reporter")) {
-            block = new JReporterBlock();
+            block = new JReporterBlock(model);
         } else if (type.equals("cap")) {
-            block = new JCapBlock();
+            block = new JCapBlock(model);
         }
         if (block == null) {
             throw new IllegalArgumentException("\"" + type + "\" isn't a available block type.");
         }
         final Color textColor = Color.BLACK;
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder currentLabel = new StringBuilder();
+        final int len = syntax.length();
         int off = 0;
-        int len = bs.length();
         while (off < len) {
-            char c = bs.charAt(off++);
+            final char c = syntax.charAt(off++);
+            final char c2;
+            if (off < len) {
+                c2 = syntax.charAt(off);
+            } else {
+                c2 = 0;
+            }
             if (c == '%') {
-                String str = sb.toString();
-                if (!str.trim().isEmpty()) {
-                    JLabel lab = new JLabel(str);
-                    lab.setForeground(textColor);
-                    block.add(lab);
-                }
-                sb.delete(0, sb.length());
-                if (bs.charAt(off++) != '{') {
-                    throw new IllegalArgumentException("format problem at char " + off + "!");
-                }
-                StringBuilder fmt = new StringBuilder();
-                while (bs.charAt(off) != '}') {
-                    fmt.append(bs.charAt(off));
+                if (c2 == '%') {
+                    currentLabel.append('%');
+                    off++;
+                } else {
+                    final String label = currentLabel.toString();
+                    if (!label.trim().isEmpty()) {
+                        final JLabel lab = new JLabel(label);
+                        lab.setForeground(textColor);
+                        block.add(lab);
+                    }
+                    currentLabel.delete(0, currentLabel.length());
+
+                    if (syntax.charAt(off++) != '{') {
+                        throw new IllegalArgumentException("format problem at char " + off + "!");
+                    }
+                    final StringBuilder fmt = new StringBuilder();
+                    while (syntax.charAt(off) != '}') {
+                        fmt.append(syntax.charAt(off++));
+                    }
+                    final String fmtString = fmt.toString();
+
+                    addFmt0(block, fmtString);
+
                     off++;
                 }
-                addFmt0(block, fmt.toString());
-                off++;
             } else {
-                sb.append(c);
+                currentLabel.append(c);
             }
         }
-        String str = sb.toString();
+        final String str = currentLabel.toString();
         if (!str.trim().isEmpty()) {
             JLabel lab = new JLabel(str);
             lab.setForeground(textColor);
             block.add(lab);
         }
 
-        block.setBlockType(type);
-        block.setBlockSyntax(bs);
         return block;
     }
     public static final String TYPE_REPORTER_INPUT = "reporter";
@@ -161,6 +185,18 @@ public class BlockFactory {
         } else {
             throw new IllegalArgumentException("\"" + type + "\" isn't a available input type.");
         }
+    }
+
+    /**
+     * Creates a new preview block. <br />
+     * The preview block will have an {@link BlockModel#createPreviewModel(java.lang.String, java.lang.String) } BlockModel. <br />
+     * 
+     * @param type the type of the block
+     * @param syntax the syntax of the block
+     * @return the created block
+     */
+    public static AbstrBlock createBlock(String type, String syntax) {
+        return createBlock(BlockModel.createPreviewModel(type, syntax));
     }
 
     /**

@@ -28,8 +28,11 @@ public abstract class AbstrBlock extends JComponent {
 
     private boolean draggable = true;
     private boolean highlight = false;
+    private BlockModel model;
 
-    public AbstrBlock() {
+    public AbstrBlock(BlockModel model) {
+        this.model = model;
+
         this.setLayout(null);
         this.setOpaque(false);
         this.setBackground(new Color(0xD6900A)); // <- TEST
@@ -195,9 +198,8 @@ public abstract class AbstrBlock extends JComponent {
     public boolean getHighlight() {
         return highlight;
     }
-
     private static final Color HIGHLIGHT_COLOR = new Color(0, 0xff, 0, 0xB0);
-    
+
     /**
      * Returns the highlight-color. <br />
      * This method should be called from the {@link #paintBlockBorder(java.awt.Graphics) } method
@@ -342,41 +344,34 @@ public abstract class AbstrBlock extends JComponent {
             }
         }
     }
-    // <member>
-    private String bspec;
-    private String type;
 
     /**
-     * Sets the type of the block. <br />
-     * This doesn't changes anything of the block itself, but <br />
-     * it can be used to identify this block. <br />
+     * Sets the model of this block.
+     * <ul>
+     *     <li>The model can be shared between more than one <code>AbstrBlock</code>. </li>
+     *     <li>An <code>IllegalArgumentException</code> will be thrown if 
+     *          <code>model</code> is <code>null</code></li>
+     * </ul>
      * 
-     * @see #setBlockSyntax(java.lang.String) 
-     * @param t - the type for this block.
+     * @throws IllegalArgumentException
+     * @param model the model which this block should use
      */
-    public void setBlockType(String t) {
-        type = t;
+    public void setModel(BlockModel model) {
+        this.model = model;
     }
 
     /**
-     * Returns the type of the block. <br />
-     * If the type wasn't set with {@link #setBlockType(java.lang.String) } this 
-     * method returns null. <br />
-     */
-    public String getBlockType() {
-        return type;
-    }
-
-    /**
-     * Sets the syntax of this block. <br />
-     * This doesn't changes anythink of the block itself, but <br />
-     * it can be used to identify this block. <br />
+     * Returns the model of this block.
+     * <ul>
+     *     <li>The model can be shared between more than one block</li>
+     *     <li>This method <i>won't</i> return <code>null</code></li>
+     * </ul>
      * 
-     * @see #getBlockSyntax() 
-     * @param s - the syntax for this block.
+     * @see #setModel(org.jblocks.editor.BlockModel) 
+     * @return the block's model
      */
-    public void setBlockSyntax(String s) {
-        bspec = s;
+    public BlockModel getModel() {
+        return model;
     }
 
     /**
@@ -398,15 +393,6 @@ public abstract class AbstrBlock extends JComponent {
     }
 
     /**
-     * Returns the syntax of this block. <br />
-     * If the syntax wasn't set with {@link #setBlockSyntax(java.lang.String) } 
-     * this method returns null. <br />
-     */
-    public String getBlockSyntax() {
-        return bspec;
-    }
-
-    /**
      * Tries to execute the block. <br />
      * The block has to exist.
      * {@link #getBlockSyntax()} is used to identify the block. <br />
@@ -415,20 +401,16 @@ public abstract class AbstrBlock extends JComponent {
      * @see org.jblocks.scriptengine.IScriptEngine
      */
     protected void tryToExecute() {
-        if (bspec == null) {
-            System.out.println("no block spec");
-            return;
-        }
         JBlocks context = JBlocks.getContextForComponent(this);
         if (context != null) {
             try {
                 IScriptEngine eng = context.getScriptEngine();
                 if (!(this instanceof Puzzle)) {
-                    Block b = ScriptGrabber.getCodeFromBlock(this, context.getInstalledBlocks());
+                    Block b = ScriptGrabber.getCodeFromBlock(this);
                     context.addHighlight(eng.execute(eng.compile(new Block[]{b})), new AbstrBlock[]{this});
                     setHighlight(true);
                 } else {
-                    Block[] b = ScriptGrabber.getCodeFromScript(this, context.getInstalledBlocks());
+                    Block[] b = ScriptGrabber.getCodeFromScript(this);
                     AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) this, PuzzleAdapter.TYPE_DOWN);
                     for (AbstrBlock toHighlight : blocks) {
                         toHighlight.setHighlight(true);

@@ -29,7 +29,12 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
     private PuzzleAdapter overMe;
     private PuzzleAdapter underMe;
 
-    public JCommandBlock() {
+    /**
+     * See {@link AbstrBlock#AbstrBlock(org.jblocks.editor.BlockModel) }
+     */
+    public JCommandBlock(BlockModel model) {
+        super(model);
+
         underMe = new PuzzleAdapter(this, PuzzleAdapter.TYPE_DOWN);
         overMe = new PuzzleAdapter(this, PuzzleAdapter.TYPE_TOP);
     }

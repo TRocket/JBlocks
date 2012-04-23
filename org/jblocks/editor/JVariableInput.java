@@ -25,9 +25,8 @@ public class JVariableInput extends AbstrInput {
     private JLabel variableText;
 
     public JVariableInput(String name) {
-        variable = new JReporterBlock();
-        variableText = new JLabel(name);
-        variable.add(variableText);
+        final BlockModel model = BlockModel.createModel("reporter", null, name);
+        variable = (JReporterBlock) BlockFactory.createBlock(model);
         variable.setDraggable(false);
         variable.setBackground(new Color(0xf3761d));
 
@@ -35,8 +34,7 @@ public class JVariableInput extends AbstrInput {
 
             @Override
             public void mousePressed(MouseEvent evt) {
-                AbstrBlock clone = new JReporterBlock();
-                clone.add(new JLabel(getText()));
+                AbstrBlock clone = new JReporterBlock(model);
                 clone.setLocation(variable.getLocation());
                 clone.setBackground(variable.getBackground());
                 Drag.drag(JDragPane.getDragPane(JVariableInput.this), JVariableInput.this, evt.getPoint(), clone);

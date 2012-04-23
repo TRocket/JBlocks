@@ -31,7 +31,11 @@ class JCapBlock extends AbstrBlock implements Puzzle {
     // <member>
     private PuzzleAdapter overMe;
 
-    public JCapBlock() {
+    /**
+     * See {@link AbstrBlock#AbstrBlock(org.jblocks.editor.BlockModel) }
+     */
+    public JCapBlock(BlockModel model) {
+        super(model);
         overMe = new PuzzleAdapter(this, PuzzleAdapter.TYPE_TOP);
     }
 

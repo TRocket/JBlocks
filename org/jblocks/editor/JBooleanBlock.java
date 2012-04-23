@@ -16,6 +16,13 @@ import java.awt.Shape;
  */
 class JBooleanBlock extends JReporterBlock {
 
+    /**
+     * See {@link AbstrBlock#AbstrBlock(org.jblocks.editor.BlockModel) }
+     */
+    public JBooleanBlock(BlockModel model) {
+        super(model);
+    }
+
     private static Polygon getPlg(Dimension size) {
         Polygon plg = new Polygon();
 
@@ -30,7 +37,7 @@ class JBooleanBlock extends JReporterBlock {
     }
 
     @Override
-    protected void paintBlockBorder(Graphics grp) {        
+    protected void paintBlockBorder(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

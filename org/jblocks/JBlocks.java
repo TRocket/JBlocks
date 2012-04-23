@@ -12,6 +12,8 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JProgressBar;
 import org.jblocks.editor.AbstrBlock;
+import org.jblocks.editor.BlockFactory;
+import org.jblocks.editor.BlockModel;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.JDragPane;
@@ -38,10 +40,10 @@ import org.jblocks.scriptengine.NativeBlock;
  * @author ZeroLuck
  */
 public final class JBlocks {
-    
+
     private final JBlocksPane gui;
     private final JDragPane drag;
-    private final Map<String, Block> blockLib;
+    private final Map<Long, BlockModel> blockLib;
     private final Map<IScriptThread, AbstrBlock[]> blocksToReset;
     private IScriptEngine scriptEngine;
 
@@ -52,14 +54,14 @@ public final class JBlocks {
     public JBlocks() {
         gui = new JBlocksPane(this);
         drag = new JDragPane(gui);
-        blockLib = new HashMap<String, Block>(200);
+        blockLib = new HashMap<Long, BlockModel>(200);
         blocksToReset = new HashMap<IScriptThread, AbstrBlock[]>(100);
 
         // create the standard ScriptEngine...
         scriptEngine = new org.jblocks.scriptengine.impl.DefaultScriptEngine();
-        
+
         ScriptEngineListener defaultListener = new ScriptEngineListener() {
-            
+
             @Override
             public void finished(IScriptThread t, Throwable error) {
                 if (scriptEngine.getThreads().length == 0) {
@@ -73,7 +75,7 @@ public final class JBlocks {
                     }
                 }
             }
-            
+
             @Override
             public void started(IScriptThread t) {
                 JProgressBar prg = gui.getProgress();
@@ -82,7 +84,7 @@ public final class JBlocks {
                 }
             }
         };
-        
+
         scriptEngine.addListener(defaultListener);
         initDefaultBlocks();
     }
@@ -92,35 +94,32 @@ public final class JBlocks {
      * (the blocks will be installed) <br />
      */
     private void initDefaultBlocks() {
-        // this may be changed in future:
-        // the block-spec shouldn't be the key for the blocks...
+        installBlock(BlockModel.createModel("hat", "Control", "When %{gf} clicked", new NativeBlock(0) {
 
-        blockLib.put("return %{r}", scriptEngine.getDefaultBlock(Default.RETURN));
-        blockLib.put("while %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.WHILE));
-        blockLib.put("if %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.IF));
-        blockLib.put("if %{b}%{br}%{s}%{br}else%{s}", scriptEngine.getDefaultBlock(Default.IF_ELSE));
-        blockLib.put("repeat %{r}%{br}%{s}", scriptEngine.getDefaultBlock(Default.FOR));
-        blockLib.put("When %{gf} clicked", new NativeBlock(0) {
-            
             @Override
             public Object evaluate(Object ctx, Object... param) {
                 return null;
             }
-        });
-        blockLib.put("true", new NativeBlock(0) {
-            
+        }));
+        installBlock(BlockModel.createModel("boolean", "Operators", "true", new NativeBlock(0) {
+
             @Override
             public Object evaluate(Object ctx, Object... param) {
                 return true;
             }
-        });
-        blockLib.put("false", new NativeBlock(0) {
-            
+        }));
+        installBlock(BlockModel.createModel("boolean", "Operators", "false", new NativeBlock(0) {
+
             @Override
             public Object evaluate(Object ctx, Object... param) {
                 return false;
             }
-        });
+        }));
+        installBlock(BlockModel.createModel("command", "Control", "return %{r}", scriptEngine.getDefaultBlock(Default.RETURN)));
+        installBlock(BlockModel.createModel("command", "Control", "while %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.WHILE)));
+        installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.IF)));
+        installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}%{br}else%{s}", scriptEngine.getDefaultBlock(Default.IF_ELSE)));
+        installBlock(BlockModel.createModel("command", "Control", "repeat %{r}%{br}%{s}", scriptEngine.getDefaultBlock(Default.FOR)));
     }
 
     /**
@@ -144,20 +143,26 @@ public final class JBlocks {
 
     /**
      * Adds the specified block to JBlocks. <br />
-     * The JBlockEditor will contain the block after this. <br />
+     * The JBlockEditor will contain the block after this, too. <br />
      * <p />
-     * If the block does already exists (or the block-spec)
-     * the old block will be uninstalled. <br />
+     * If the block does already exists,
+     * the old block will be uninstalled first. <br />
      * 
+     * @throws IllegalArgumentException if the BlockModel hasn't an ID
      * @see #uninstallBlock(java.lang.String) 
-     * @param spec the spec of the block to install
-     * @param b the block
+     * @param model the block
      */
-    public void installBlock(String spec, Block b) {
-        if (blockLib.containsKey(spec)) {
-            uninstallBlock(spec);
+    public void installBlock(final BlockModel model) {
+        long id = model.getID();
+        if (id == BlockModel.NOT_AN_ID) {
+            throw new IllegalArgumentException("the BlockModel hasn't an ID");
         }
-        blockLib.put(spec, b);
+        if (blockLib.containsKey(id)) {
+            uninstallBlock(model);
+        }
+        blockLib.put(id, model);
+        JBlockEditor editor = getEditor();
+        editor.addBlock(BlockFactory.createBlock(model));
     }
 
     /**
@@ -167,8 +172,11 @@ public final class JBlocks {
      * @see #installBlock(java.lang.String, org.jblocks.scriptengine.Block) 
      * @param spec the spec of the block to uninstall
      */
-    public void uninstallBlock(String spec) {
-        blockLib.remove(spec);
+    public void uninstallBlock(BlockModel model) {
+        blockLib.remove(model.getID());
+        JBlockEditor editor = getEditor();
+        // TODO remove block from JBlockEditor
+        // editor.removeBlock(model);
     }
 
     /**
@@ -179,15 +187,15 @@ public final class JBlocks {
     public JBlockEditor getEditor() {
         return gui.getEditor();
     }
-    
+
     /**
      * Returns all installed blocks. <br />
-     * The returned Map<String, Block> will be unmodifiable. <br />
+     * The returned <code>Map</code> will be unmodifiable. <br />
      * 
      * @see #installBlock(java.lang.String, org.jblocks.scriptengine.Block) 
      * @see #uninstallBlock(java.lang.String) 
      */
-    public Map<String, Block> getInstalledBlocks() {
+    public Map<Long, BlockModel> getInstalledBlocks() {
         return Collections.unmodifiableMap(blockLib);
     }
     /*

@@ -19,6 +19,13 @@ import java.awt.geom.RoundRectangle2D;
  */
 class JReporterBlock extends AbstrBlock {
 
+    /**
+     * See {@link AbstrBlock#AbstrBlock(org.jblocks.editor.BlockModel) }
+     */
+    public JReporterBlock(BlockModel model) {
+        super(model);
+    }
+    
      @Override
     protected void paintBlockBorder(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;

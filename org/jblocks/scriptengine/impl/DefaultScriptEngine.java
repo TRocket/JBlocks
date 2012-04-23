@@ -41,12 +41,7 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
         globalVariables = new java.util.HashMap(100);
         listeners = new ArrayList<ScriptEngineListener>(1);
     }
-
-    @Override
-    public Block load(InputStream in) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+    
     @Override
     public IScript compile(Block[] blocks) {
         return new DefaultScript(blocks);
