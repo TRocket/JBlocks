@@ -3,10 +3,13 @@ package org.jblocks.editor;
 import org.jblocks.gui.JCategoryChooser;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -32,7 +35,7 @@ import org.jblocks.gui.JDragPane;
  * @author ZeroLuck
  */
 public class JBlockEditor extends JPanel {
-    
+
     // <member>
     private JPanel ctgPanel;
     private JScriptPane pane;
@@ -54,10 +57,23 @@ public class JBlockEditor extends JPanel {
             this.color = c;
         }
 
+        /**
+         * Returns the color of this <code>Category</code>. <br />
+         */
         public Color getColor() {
             return color;
         }
 
+        /**
+         * Returns the blocks of this <code>Category.</code>. <br /> 
+         */
+        public JScriptPane getBlocks() {
+            return blocks;
+        }
+
+        /**
+         * Returns the name of this <code>Category</code>. <br /> 
+         */
         public String getName() {
             return name;
         }
@@ -131,7 +147,6 @@ public class JBlockEditor extends JPanel {
             ctgPanel.validate();
         }
     }
-    private boolean firstCtg = true;
 
     /**
      * Adds a new category to the block-chooser. <br />
@@ -144,7 +159,7 @@ public class JBlockEditor extends JPanel {
         if (ctgs.containsKey(name)) {
             return;
         }
-        JComponent comp = chooser.addCategory(name, c);
+        final JComponent comp = chooser.addCategory(name, c);
         comp.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -152,14 +167,14 @@ public class JBlockEditor extends JPanel {
                 switchCategory(name);
             }
         });
-        JScriptPane p = new JScriptPane(false);
+        final JScriptPane p = new JScriptPane(false);
         p.setDragEnabled(false);
         p.setScriptPaneImage(JBlocks.getImage("blockchooser.png"));
+        final boolean first = ctgs.isEmpty();
         ctgs.put(name, new Category(name, p, c));
 
-        if (firstCtg) {
+        if (first) {
             switchCategory(name);
-            firstCtg = false;
         }
     }
 
@@ -172,7 +187,7 @@ public class JBlockEditor extends JPanel {
     public void addBlock(final AbstrBlock b) {
         final BlockModel model = b.getModel();
         final Category c = ctgs.get(model.getCategory());
-        
+
         if (c != null) {
             b.setBackground(c.color);
             b.addMouseListener(new MouseAdapter() {
@@ -199,6 +214,27 @@ public class JBlockEditor extends JPanel {
     }
 
     /**
+     * Removes all blocks with the specified <code>ID</code> <br />
+     * 
+     * @param ID the ID of the block
+     */
+    public void removeBlock(final long ID) {
+        for (final Category c : getCategories()) {
+            final JScriptPane scripts = c.getBlocks();
+            for (final Component comp : scripts.getComponents()) {
+                if (comp instanceof AbstrBlock) {
+                    final AbstrBlock block = (AbstrBlock) comp;
+                    final BlockModel model = block.getModel();
+                    if (model.getID() == ID) {
+                        scripts.remove(block);
+                        scripts.cleanup();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Adds a new JComponent to the category 'name'.
      * 
      * @param name - the name of the category
@@ -212,7 +248,16 @@ public class JBlockEditor extends JPanel {
     }
 
     /**
-     * @param name - the name of the category.
+     * Returns all categories. <br />
+     * 
+     * @see #addCategory(java.lang.String, java.awt.Color) 
+     */
+    public Collection<Category> getCategories() {
+        return ctgs.values();
+    }
+
+    /**
+     * @param name the name of the category.
      * @return the category with the specified name or null. 
      */
     public Category getCategory(String name) {
@@ -220,8 +265,7 @@ public class JBlockEditor extends JPanel {
     }
 
     /**
-     * 
-     * @return - the current script-pane.
+     * @return the current script-pane.
      */
     public JScriptPane getScriptPane() {
         return pane;

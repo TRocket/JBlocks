@@ -12,7 +12,7 @@ import org.jblocks.scriptengine.IScriptThread;
  */
 public class DefaultScriptThread implements IScriptThread {
 
-    private boolean stopRequest = false;
+    private volatile boolean stopRequest = false;
     private StackElement stack;
     private final Map<String, Object> globalVariables;
 

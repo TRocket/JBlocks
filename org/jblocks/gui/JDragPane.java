@@ -112,7 +112,7 @@ public class JDragPane extends JPanel {
         }
         return p;
     }
-
+    
     /**
      * Sets the JDragPane's curent drag. <br />
      * 
@@ -129,7 +129,7 @@ public class JDragPane extends JPanel {
         if (drag != null) {
             return;
         }
-
+        
         Point loc = getLocationOnDragPane(cont);
         loc.translate(relLocation.x, relLocation.y);
 
@@ -140,7 +140,7 @@ public class JDragPane extends JPanel {
         add(c, 0);
         c.setLocation(loc);
         c.setSize(c.getPreferredSize());
-
+        
         final MouseMotionListener motion = new MouseMotionListener() {
 
             @Override
@@ -160,6 +160,7 @@ public class JDragPane extends JPanel {
                 stopDrag(motion, this, handler);
             }
         };
+        glassPane.addMouseListener(mouse);
         drag.addMouseMotionListener(motion);
         drag.addMouseListener(mouse);
         doLayout();
@@ -168,6 +169,7 @@ public class JDragPane extends JPanel {
     private void stopDrag(MouseMotionListener motion, MouseListener mouse, DragFinishedHandler handler) {
         drag.removeMouseMotionListener(motion);
         drag.removeMouseListener(mouse);
+        glassPane.removeMouseListener(mouse);
         Point p = drag.getLocation();
         remove(drag);
         remove(glassPane);

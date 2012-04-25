@@ -66,7 +66,7 @@ class JBooleanInput extends AbstrInput {
 
         Polygon plg = getPlg(size);
 
-        g.setColor(Colors.bright(col, 1.1F));
+        g.setColor(Colors.bright(col, 1.2F));
         g.fillPolygon(plg);
 
         g.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));

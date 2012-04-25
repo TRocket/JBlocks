@@ -8,12 +8,14 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
@@ -29,6 +31,9 @@ import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.BlockModel;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.painteditor2.JPaintEditor;
+import org.jblocks.scriptengine.Block;
+import org.jblocks.scriptengine.Block.Default;
+import org.jblocks.scriptengine.IScriptEngine;
 import org.jblocks.soundeditor.JSoundEditor;
 
 /**
@@ -245,7 +250,7 @@ public class JBlocksPane extends JDesktopPane {
     }
 
     private JBlockEditor createBlockEditor() {
-        JBlockEditor edt = new JBlockEditor();
+        final JBlockEditor edt = new JBlockEditor();
 
         // standard categories
 
@@ -257,11 +262,86 @@ public class JBlocksPane extends JDesktopPane {
         edt.addCategory("IO & Network", Color.CYAN);
         edt.addCategory("GUI & System", new Color(0xffD0D000));
         edt.addCategory("Sound", Color.MAGENTA);
-        edt.addComponent("Variables", new JButton("Make a variable"));
-        edt.addComponent("Variables", new JButton("Delete a variable"));
 
+        // standard components
+        final JButton makeVariable = new JButton("Make a variable");
+        final JButton deleteVariable = new JButton("Delete a variable");
+
+        deleteVariable.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                final JPopupMenu menu = new JPopupMenu("Variablen");
+                menu.setBorder(javax.swing.BorderFactory.createTitledBorder("Variable?"));
+                int count = 0;
+                final Map global = context.getScriptEngine().getGlobalVariables();
+                for (final Object key : global.keySet()) {
+                    if (key instanceof String) {
+                        menu.add((String) key).addActionListener(new ActionListener() {
+
+                            @Override
+                            public void actionPerformed(ActionEvent ae) {
+                                removeVariable((String) key);
+                            }
+                        });
+                        count++;
+                    }
+                }
+                if (count > 0) {
+                    menu.show(deleteVariable, 10, 10);
+                }
+            }
+        });
+        makeVariable.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                final Map global = context.getScriptEngine().getGlobalVariables();
+                final String name = JOptionPane.showInternalInputDialog(JBlocksPane.this, "Variable name?", "Create a variable",
+                        JOptionPane.PLAIN_MESSAGE);
+                if (name != null && !global.containsKey(name)) {
+                    addVariable(name);
+                }
+            }
+        });
+
+        edt.addComponent("Variables", makeVariable);
+        edt.addComponent("Variables", deleteVariable);
+
+        // layout the editor
         edt.cleanup();
         return edt;
+    }
+    
+    private void removeVariable(final String name) {
+        final IScriptEngine engine = context.getScriptEngine();
+        final Map variables = engine.getGlobalVariables();
+        final Map<Long, BlockModel> blocks = context.getInstalledBlocks();
+        final Block READ_GLOBAL_VAR = engine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE).clone();
+        
+        for (final BlockModel model : blocks.values()) {
+            final String content = model.getContent();
+            final Block code = model.getCode();
+            if (content != null && code != null && code.equals(READ_GLOBAL_VAR) && content.equals(name)) {
+                context.uninstallBlock(model);
+                break;
+            }
+        }
+        
+        variables.remove(name);
+        repaint();
+    }
+
+    private void addVariable(String name) {
+        final IScriptEngine engine = context.getScriptEngine();
+        final Block readVar = engine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE).clone();
+        readVar.setParameter(0, name);
+
+        final BlockModel var = BlockModel.createModel("reporter", "Variables", BlockFactory.enquote(name), readVar);
+        var.setContent(name);
+        context.installBlock(var);
+
+        engine.getGlobalVariables().put(name, 0);
     }
 
     private static JBlocksPane getJBlocksPane(Component c) {

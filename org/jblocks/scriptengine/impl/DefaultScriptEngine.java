@@ -4,7 +4,7 @@
  */
 package org.jblocks.scriptengine.impl;
 
-import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,10 +73,10 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
         }
     }
 
-    private void printStackTrace(StackElement elm) {
-        System.err.println("\t--- stack ---");
+    private void printStackTrace(StackElement elm, PrintStream str) {
+        str.println("\t--- stack ---");
         while (elm != null) {
-            System.err.println("\tat StackElement [doParam: " + elm.doParam + ", off: " + elm.off + " block: " + elm.perform + "]"
+            str.println("\tat StackElement [doParam: " + elm.doParam + ", off: " + elm.off + " block: " + elm.perform + "]"
                     + ", param: " + Arrays.toString(elm.param));
 
             elm = elm.parent;
@@ -88,19 +88,23 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
         while (true) {
             synchronized (threads) {
                 DefaultScriptThread thread = threads.peek();
+                // no thread to execute?
                 if (thread == null) {
                     return;
                 }
                 for (int i = 0; i < 10; i++) {
                     try {
+                        // thread.step() returns true if the thread is finished
                         if (thread.step()) {
+                            // the thread is finished: stop the thread
                             threads.remove();
                             fireFinishedEvent(thread, null);
                             break;
                         }
                     } catch (Throwable t) {
                         t.printStackTrace(System.err);
-                        printStackTrace(thread.getStack());
+                        printStackTrace(thread.getStack(), System.err);
+
                         threads.remove();
                         fireFinishedEvent(thread, t);
                         break;

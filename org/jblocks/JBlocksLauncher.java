@@ -3,6 +3,7 @@ package org.jblocks;
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import org.jblocks.gui.JBlocksPane;
+import org.jblocks.gui.Repainter;
 import org.jblocks.gui.Splash;
 
 /**
@@ -22,6 +23,7 @@ public class JBlocksLauncher {
      * @param args the command line args
      */
     public static void main(String[] args) {
+        Repainter.install();
         // TODO run JBlocks
         Splash splash = new Splash();
         splash.setAlwaysOnTop(true);

@@ -89,7 +89,7 @@ class InputTypeChooser extends JPanel {
 
         north.add(northBottom);
 
-
+        
         JRadioButton textInput = new JRadioButton("Reporter / Text", true);
         textInput.setActionCommand(BlockFactory.TYPE_REPORTER_AND_TEXT_INPUT);
         JRadioButton booleanInput = new JRadioButton("Boolean");
@@ -98,17 +98,21 @@ class InputTypeChooser extends JPanel {
         sequenceInput.setActionCommand(BlockFactory.TYPE_SEQUENCE_INPUT);
         JRadioButton reporterInput = new JRadioButton("Reporter");
         reporterInput.setActionCommand(BlockFactory.TYPE_REPORTER_INPUT);
+        JRadioButton variableInput = new JRadioButton("Variable");
+        variableInput.setActionCommand(BlockFactory.TYPE_VARIABLE_INPUT);
 
         final ButtonGroup centerGroup = new ButtonGroup();
         centerGroup.add(textInput);
         centerGroup.add(booleanInput);
         centerGroup.add(sequenceInput);
         centerGroup.add(reporterInput);
+        centerGroup.add(variableInput);
 
         centerNorth.add(textInput);
         centerNorth.add(booleanInput);
         centerNorth.add(sequenceInput);
         centerNorth.add(reporterInput);
+        centerNorth.add(variableInput);
 
 
         center.setBorder(BorderFactory.createTitledBorder("Input type / Shape of slot"));

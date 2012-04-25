@@ -2,6 +2,7 @@ package org.jblocks.editor;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -54,7 +55,7 @@ class JReporterInput extends AbstrInput {
         Color col = getBackground();
         Stroke basic = g.getStroke();
 
-        g.setColor(Colors.bright(col, 1.3F));
+        g.setColor(Colors.bright(col, 1.2F));
         g.fillRoundRect(0, 0, size.width, size.height, size.height / 2, size.height / 2);
 
         g.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.CAP_ROUND));
@@ -127,6 +128,17 @@ class JReporterInput extends AbstrInput {
      */
     public int getType() {
         return type;
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        Component inp = getInput();
+        JScriptPane pane = getScriptPane();
+        if (inp instanceof JTextField) {
+            JTextField txt = (JTextField) inp;
+            txt.setEditable(!(pane == null || !pane.isDragEnabled()));
+        }
     }
 
     /**

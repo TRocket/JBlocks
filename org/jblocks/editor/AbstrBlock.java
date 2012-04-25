@@ -198,7 +198,7 @@ public abstract class AbstrBlock extends JComponent {
     public boolean getHighlight() {
         return highlight;
     }
-    private static final Color HIGHLIGHT_COLOR = new Color(0, 0xff, 0, 0xB0);
+    private static final Color HIGHLIGHT_COLOR = Color.WHITE;
 
     /**
      * Returns the highlight-color. <br />

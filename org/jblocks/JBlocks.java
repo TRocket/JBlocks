@@ -115,11 +115,14 @@ public final class JBlocks {
                 return false;
             }
         }));
-        installBlock(BlockModel.createModel("command", "Control", "return %{r}", scriptEngine.getDefaultBlock(Default.RETURN)));
+        installBlock(BlockModel.createModel("cap", "Control", "return %{t}", scriptEngine.getDefaultBlock(Default.RETURN)));
         installBlock(BlockModel.createModel("command", "Control", "while %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.WHILE)));
         installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.IF)));
         installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}%{br}else%{s}", scriptEngine.getDefaultBlock(Default.IF_ELSE)));
-        installBlock(BlockModel.createModel("command", "Control", "repeat %{r}%{br}%{s}", scriptEngine.getDefaultBlock(Default.FOR)));
+        installBlock(BlockModel.createModel("command", "Control", "repeat %{t}%{br}%{s}", scriptEngine.getDefaultBlock(Default.FOR)));
+       
+        // TODO %{v} for variable choose combo-box
+        installBlock(BlockModel.createModel("command", "Variables", "set %{v} to %{t}", scriptEngine.getDefaultBlock(Default.WRITE_GLOBAL_VARIABLE)));
     }
 
     /**
@@ -173,10 +176,10 @@ public final class JBlocks {
      * @param spec the spec of the block to uninstall
      */
     public void uninstallBlock(BlockModel model) {
-        blockLib.remove(model.getID());
-        JBlockEditor editor = getEditor();
-        // TODO remove block from JBlockEditor
-        // editor.removeBlock(model);
+        final long ID = model.getID();
+        final JBlockEditor editor = getEditor();
+        blockLib.remove(ID);
+        editor.removeBlock(ID);
     }
 
     /**

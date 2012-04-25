@@ -76,6 +76,14 @@ public class JImageButton extends AbstractButton {
      * {@inheritDoc}
      */
     @Override
+    public Dimension getMaximumSize() {
+        return getPreferredSize();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void paintComponent(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
         if (model.isPressed() && model.isEnabled()) {

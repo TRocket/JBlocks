@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
+import org.jblocks.editor.JVariableInput.VariableChooser;
 import org.jblocks.scriptengine.Block;
 
 /**
@@ -62,6 +63,8 @@ public class ScriptGrabber {
                 if (comp != null) {
                     if (comp instanceof JTextField) {
                         b.setParameter(parameter, ((JTextField) comp).getText());
+                    } else if (comp instanceof VariableChooser) {
+                        b.setParameter(parameter, ((VariableChooser) comp).getValue());
                     } else if (comp instanceof AbstrBlock) {
                         AbstrBlock paramBlock = (AbstrBlock) comp;
                         Block paramCode = getCodeFromBlock(paramBlock);

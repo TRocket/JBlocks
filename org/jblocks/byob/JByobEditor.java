@@ -32,7 +32,7 @@ import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.BlockModel;
 import org.jblocks.editor.JBlockSequence;
 import org.jblocks.editor.JScriptPane;
-import org.jblocks.editor.JVariableInput;
+import org.jblocks.editor.JScriptVariableInput;
 import org.jblocks.editor.Puzzle;
 import org.jblocks.editor.PuzzleAdapter;
 import org.jblocks.editor.ScriptGrabber;
@@ -51,7 +51,7 @@ public class JByobEditor extends JPanel {
     private final AbstrBlock block;
     private final List<ByobEditorListener> listeners;
     private final Icon editorIcon;
-
+    
     public static interface ByobEditorListener {
 
         /**
@@ -73,30 +73,30 @@ public class JByobEditor extends JPanel {
      */
     protected JByobEditor(final String type, final String startLabel,
             final String category, Color c, Icon icn) {
-
+        
         super(new BorderLayout());
         this.listeners = new ArrayList<ByobEditorListener>();
         this.script = new JScriptPane();
         this.editorIcon = icn;
         this.script.setComponentPopupMenu(null);
-
+        
         add(script, BorderLayout.CENTER);
-
+        
         final JPanel south = new JPanel();
         south.setLayout(new FlowLayout(FlowLayout.RIGHT));
         final JButton cancel = new JButton("Cancel");
         cancel.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent ae) {
                 fireCancelEvent();
             }
         });
         south.add(cancel);
-
+        
         final JButton OK = new JButton("OK");
         OK.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent ae) {
                 finished();
@@ -104,7 +104,7 @@ public class JByobEditor extends JPanel {
         });
         south.add(OK);
         add(south, BorderLayout.SOUTH);
-
+        
         hat = BlockFactory.createBlock("hat", "");
         block = BlockFactory.createBlock(BlockModel.createModel(type, category, ""));
         block.add(createInput(InputTypeChooser.TYPE_TEXT, startLabel));
@@ -113,23 +113,40 @@ public class JByobEditor extends JPanel {
         hat.setDraggable(false);
         block.setDraggable(false);
         hat.add(block);
-
+        
         script.add(hat);
         script.cleanup();
-
+        
         block.addContainerListener(new ContainerListener() {
-
+            
             @Override
             public void componentAdded(ContainerEvent ce) {
+                varCheck();
             }
-
+            
             @Override
             public void componentRemoved(ContainerEvent ce) {
                 plusCheck();
+                varCheck();
             }
         });
     }
-
+    
+    private void varCheck() {
+        int var = 0;
+        for (Component c : block.getComponents()) {
+            if (c instanceof JScriptVariableInput) {
+                JScriptVariableInput inp = (JScriptVariableInput) c;
+                AbstrBlock b = (AbstrBlock) inp.getInput();
+                BlockModel model = b.getModel();
+                Block readVariable = JBlocks.getContextForComponent(b).getScriptEngine().getDefaultBlock(Block.Default.READ_PARAM_VARIABLE).clone();
+                readVariable.setParameter(0, var);
+                model.setCode(readVariable);
+                var++;
+            }
+        }
+    }
+    
     private void plusCheck() {
         Plus last = null;
         for (Component c : block.getComponents()) {
@@ -152,11 +169,11 @@ public class JByobEditor extends JPanel {
     public Dimension getPreferredSize() {
         return new Dimension(500, 350);
     }
-
+    
     private void finished() {
         fireFinishEvent();
     }
-
+    
     private void fireCancelEvent() {
         for (ByobEditorListener m : listeners) {
             m.cancel();
@@ -175,20 +192,20 @@ public class JByobEditor extends JPanel {
         }
         return null;
     }
-
+    
     private Component createInput(String type, String label) {
-        Component newc = null;
+        final Component newc;
         if (type.equals(InputTypeChooser.TYPE_TEXT)) {
             newc = new JLabel(label);
         } else {
-            newc = new JVariableInput(label);
+            newc = new JScriptVariableInput(label, type);
         }
         if (newc instanceof JComponent) {
             final JComponent comp = (JComponent) newc;
-            JPopupMenu menu = new JPopupMenu();
-            JMenuItem itemDelete = new JMenuItem("delete");
+            final JPopupMenu menu = new JPopupMenu();
+            final JMenuItem itemDelete = new JMenuItem("delete");
             itemDelete.addActionListener(new ActionListener() {
-
+                
                 @Override
                 public void actionPerformed(ActionEvent ae) {
                     Container parent = comp.getParent();
@@ -203,7 +220,7 @@ public class JByobEditor extends JPanel {
         }
         return newc;
     }
-
+    
     private void replacePlus(Plus p, String type, String label) {
         Component insert = createInput(type, label);
         int counter = 0;
@@ -213,29 +230,29 @@ public class JByobEditor extends JPanel {
             }
             counter++;
         }
-
+        
         block.add(insert, counter);
         block.add(createPlus(), counter);
     }
-
+    
     private Plus createPlus() {
         final Plus p = new Plus();
         p.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent ae) {
                 final JInternalFrame frm = new JInternalFrame("Select an input type");
                 frm.setFrameIcon(editorIcon);
                 frm.setClosable(true);
                 frm.setLayout(new BorderLayout());
-                InputTypeChooser ch = new InputTypeChooser();
+                final InputTypeChooser ch = new InputTypeChooser();
                 ch.addInputTypeChooserListener(new InputTypeChooser.InputTypeChooserListener() {
-
+                    
                     @Override
                     public void cancel() {
                         frm.dispose();
                     }
-
+                    
                     @Override
                     public void finished(String type, String label) {
                         frm.dispose();
@@ -244,13 +261,13 @@ public class JByobEditor extends JPanel {
                 });
                 frm.add(ch, BorderLayout.CENTER);
                 frm.pack();
-
-                JDesktopPane desktop = getDesktop();
-                Point loc = SwingUtilities.convertPoint(JByobEditor.this, getLocation(), desktop);
-
+                
+                final JDesktopPane desktop = getDesktop();
+                final Point loc = SwingUtilities.convertPoint(JByobEditor.this, getLocation(), desktop);
+                
                 frm.setLocation(loc.x + getWidth() / 2 - frm.getWidth() / 2, loc.y + getHeight() / 2 - frm.getHeight() / 2);
                 frm.setVisible(true);
-
+                
                 desktop.add(frm, 0);
                 try {
                     frm.setSelected(true);
@@ -260,7 +277,7 @@ public class JByobEditor extends JPanel {
         });
         return p;
     }
-
+    
     private void fireFinishEvent() {
         AbstrBlock[] pieces = JBlockSequence.getPuzzlePieces((Puzzle) hat, PuzzleAdapter.TYPE_DOWN);
         if (pieces.length <= 1) {
@@ -294,14 +311,15 @@ public class JByobEditor extends JPanel {
     public void removeByobEditorListener(ByobEditorListener m) {
         listeners.remove(m);
     }
-
+    
     private static String getSyntax(AbstrBlock b) {
         StringBuilder sb = new StringBuilder();
         for (Component c : b.getComponents()) {
             if (c instanceof JLabel) {
                 sb.append(BlockFactory.enquote(((JLabel) c).getText()));
-            } else if (c instanceof JVariableInput) {
-                sb.append("%{r}");
+            } else if (c instanceof JScriptVariableInput) {
+                String type = ((JScriptVariableInput) c).getType();
+                sb.append(BlockFactory.createInputFormat(type));
             } else if (c instanceof Plus) {
                 // do nothing
             } else {
@@ -315,19 +333,19 @@ public class JByobEditor extends JPanel {
             final Icon editorIcon, final String type,
             final String text, final String category,
             final Color c) {
-
+        
         final JInternalFrame frm = new JInternalFrame("Make a block");
         if (editorIcon != null) {
             frm.setFrameIcon(editorIcon);
         }
         final JByobEditor edt = new JByobEditor(type, text, category, c, editorIcon);
         edt.addByobEditorListener(new ByobEditorListener() {
-
+            
             @Override
             public void cancel() {
                 frm.dispose();
             }
-
+            
             @Override
             public void finished(final AbstrBlock script) {
                 try {
@@ -348,7 +366,7 @@ public class JByobEditor extends JPanel {
         frm.add(edt, BorderLayout.CENTER);
         frm.pack();
         frm.setVisible(true);
-
+        
         final Dimension size = frm.getSize();
         frm.setLocation(desktop.getWidth() / 2 - size.width / 2,
                 desktop.getHeight() / 2 - size.height / 2);
@@ -358,7 +376,7 @@ public class JByobEditor extends JPanel {
         } catch (java.beans.PropertyVetoException e) {
         }
     }
-
+    
     private static int count(String s) {
         int cnt = 0;
         for (int i = 0; i < s.length(); i++) {
@@ -366,7 +384,7 @@ public class JByobEditor extends JPanel {
                 cnt++;
             }
         }
-
+        
         return cnt;
     }
 
@@ -384,12 +402,12 @@ public class JByobEditor extends JPanel {
         }
         BlockTypeChooser chooser = new BlockTypeChooser();
         chooser.addBlockTypeListener(new BlockTypeChooser.BlockTypeChooserListener() {
-
+            
             @Override
             public void cancel() {
                 frm.dispose();
             }
-
+            
             @Override
             public void finished(final String type, final String category, final String label, final Color c) {
                 frm.dispose();
@@ -400,7 +418,7 @@ public class JByobEditor extends JPanel {
         frm.add(chooser, BorderLayout.CENTER);
         frm.pack();
         frm.setVisible(true);
-
+        
         Dimension size = frm.getSize();
         frm.setLocation(desktop.getWidth() / 2 - size.width / 2,
                 desktop.getHeight() / 2 - size.height / 2);
@@ -409,6 +427,6 @@ public class JByobEditor extends JPanel {
             frm.setSelected(true);
         } catch (java.beans.PropertyVetoException e) {
         }
-
+        
     }
 }

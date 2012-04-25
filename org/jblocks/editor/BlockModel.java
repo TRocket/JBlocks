@@ -1,8 +1,16 @@
 package org.jblocks.editor;
 
+import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.Random;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import org.jblocks.scriptengine.Block;
+import org.jblocks.scriptengine.ByobBlock;
+import org.jblocks.scriptengine.NativeBlock;
 
 /**
  * The BlockModel is storing informations about blocks. <br />
@@ -18,7 +26,7 @@ public class BlockModel {
     private final long id;
     private final String category;
     private final String type;
-    private Object content;
+    private String content;
     private String blockspec;
     private Block code;
 
@@ -114,7 +122,7 @@ public class BlockModel {
      * 
      * @see #setContent(java.lang.Object) 
      */
-    public Object getContent() {
+    public String getContent() {
         return content;
     }
 
@@ -126,7 +134,7 @@ public class BlockModel {
      * @see #getContent() 
      * @see o the new content, null is allowed
      */
-    public void setContent(final Object o) {
+    public void setContent(final String o) {
         content = o;
     }
     private static Random r;
@@ -215,6 +223,78 @@ public class BlockModel {
      */
     @Override
     public String toString() {
-        return "BlockModel [syntax=" + getSyntax() + ", type=" + getType() + ", category=" + category + ", code=" + code + "]";
+        return "BlockModel [syntax=" + getSyntax() + ", type=" + getType() + ", category=" + category + ", code=" + code
+                + (content == null ? "" : ", content=" + content) + "]";
+    }
+
+    private static void writeEntity(XMLStreamWriter writer, String key, String name) throws XMLStreamException {
+        writer.writeStartElement(key);
+        writer.writeCharacters(name);
+        writer.writeEndElement();
+    }
+
+    private static void writeBlock(final Block b, final XMLStreamWriter writer) throws XMLStreamException {
+        writer.writeStartElement("block");
+
+        writer.writeStartElement("params");
+        writer.writeAttribute("count", "" + b.getParameterCount());
+        for (final Object param : b.getParameters()) {
+            if (param instanceof String) {
+                writeEntity(writer, "string", "" + param);
+            } else if (param instanceof Integer) {
+                writeEntity(writer, "int", "" + param);
+            } else if (param instanceof Long) {
+                writeEntity(writer, "long", "" + param);
+            } else if (param instanceof Byte) {
+                writeEntity(writer, "byte", "" + param);
+            } else if (param instanceof Double) {
+                writeEntity(writer, "double", "" + param);
+            } else if (param instanceof Float) {
+                writeEntity(writer, "float", "" + param);
+            } else if (param instanceof Block) {
+                writeBlock((Block) param, writer);
+            } else if (param instanceof Block[]) {
+                writeScript((Block[]) param, writer);
+            } else {
+                throw new IllegalStateException("what to do with: '" + param + "'?");
+            }
+        }
+        writer.writeEndElement();
+
+        writer.writeEndElement();
+    }
+
+    private static void writeScript(final Block[] blocks, final XMLStreamWriter writer) throws XMLStreamException {
+        writer.writeStartElement("script");
+        for (final Block b : blocks) {
+            writeBlock(b, writer);
+        }
+        writer.writeEndElement();
+    }
+
+    public static void writeModel(final BlockModel model, final OutputStream out, final boolean indenting) throws XMLStreamException {
+        XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+        XMLStreamWriter writer = outputFactory.createXMLStreamWriter(out);
+        if (indenting) {
+            writer = new IndentingXMLStreamWriter(writer);
+        }
+        writer.writeStartElement("blockmodel");
+        writeEntity(writer, "syntax", model.getSyntax());
+        writeEntity(writer, "type", model.getType());
+        writeEntity(writer, "category", model.getCategory());
+        writeEntity(writer, "content", model.getContent());
+        writeEntity(writer, "id", Long.toString(model.getID()));
+
+        Block code = model.getCode();
+        if (code != null) {
+            writer.writeStartElement("code");
+            writer.writeAttribute("type", code instanceof NativeBlock ? "native"
+                    : code instanceof ByobBlock ? "byob"
+                    : code.toString());
+
+            writeBlock(code, writer);
+        }
+        writer.writeEndElement();
+        writer.close();
     }
 }

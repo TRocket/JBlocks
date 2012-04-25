@@ -164,15 +164,17 @@ public class BlockTypeChooser extends JPanel {
         south.add(cancel);
 
         add(south, BorderLayout.SOUTH);
+        resetColors();
     }
 
+    private final Color BACKGROUND = new Color(0xCCCCCC);
+    
     private void resetColors() {
-        reporter.setBackground(currColor);
-        command.setBackground(currColor);
-        bool.setBackground(currColor);
+        reporter.setBackground(BACKGROUND);
+        command.setBackground(BACKGROUND);
+        bool.setBackground(BACKGROUND);
 
-        selected.setBackground(currColor.brighter());
-        selected.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        selected.setBackground(currColor);
 
         reporter.repaint();
         command.repaint();

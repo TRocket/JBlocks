@@ -2,6 +2,7 @@ package org.jblocks;
 
 import javax.swing.JApplet;
 import org.jblocks.gui.JBlocksPane;
+import org.jblocks.gui.Repainter;
 
 /**
  * 
@@ -17,6 +18,7 @@ public class JBlocksApplet extends JApplet {
      */
     @Override
     public void init() {
+        Repainter.install();
         // TODO run JBlocks
 
         String frame = getParameter("frame");

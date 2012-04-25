@@ -13,17 +13,17 @@ import org.jblocks.JBlocks;
  * @author ZeroLuck
  */
 public class BlockFactory {
-
+    
     private static BufferedImage greenflag;
-
+    
     static {
         greenflag = JBlocks.getImage("greenFlag.png");
     }
-
+    
     private BlockFactory() {
         // don't let anyone make an instance of this class
     }
-
+    
     private static void addFmt0(AbstrBlock block, String fmt) {
         String[] s = fmt.split(";");
         if (s.length < 1) {
@@ -31,9 +31,21 @@ public class BlockFactory {
         }
         if (s[0].equals("r")) {
             JReporterInput inp = new JReporterInput();
+            inp.setType(JReporterInput.TYPE_REPORTER);
             inp.setBackground(block.getBackground());
             inp.reset();
             block.add(inp);
+        } else if (s[0].equals("t")) {
+            JReporterInput inp = new JReporterInput();
+            inp.setType(JReporterInput.TYPE_TEXT_AND_REPORTER);
+            inp.setBackground(block.getBackground());
+            inp.reset();
+            block.add(inp);
+        } else if (s[0].equals("v")) {
+            JVariableInput ch = new JVariableInput();
+            ch.setBackground(block.getBackground());
+            ch.reset();
+            block.add(ch);
         } else if (s[0].equals("b")) {
             JBooleanInput inp = new JBooleanInput();
             inp.setBackground(block.getBackground());
@@ -52,15 +64,14 @@ public class BlockFactory {
             block.add(seq);
         } else if (s[0].equals("br")) {
             block.add(new NewLineComponent());
-        } else if (s[0].equals("var")) {
-            block.add(new JVariableInput(s[1]));
         }
     }
     public static final String TYPE_CAP_BLOCK = "cap";
-    public static final String TYPE_CONTROL_BLOCK = "control";
+    public static final String TYPE_COMMAND_BLOCK = "command";
     public static final String TYPE_REPORTER_BLOCK = "reporter";
     public static final String TYPE_HAT_BLOCK = "hat";
-
+    public static final String TYPE_BOOLEAN_BLOCK = "boolean";
+    
     public static String enquote(String s) {
         return s.replace("%", "%%");
     }
@@ -70,7 +81,8 @@ public class BlockFactory {
      * Creates a block from a String. <br />
      * Format: <br />
      * <ul>
-     *  <li> <b>%{r}</b>                  : a reporter/boolean/text input. </li>
+     *  <li> <b>%{r}</b>                  : a reporter/boolean. </li>
+     *  <li> <b>%{t}</b>                  : a reporter/boolean/text input. </li>
      *  <li> <b>%{b}</b>                  : a boolean input. </li>
      *  <li> <b>%{s}</b>                  : a sequence. </li>
      *  <li> <b>%{br}</b>                 : a new line. </li>
@@ -87,17 +99,17 @@ public class BlockFactory {
     public static AbstrBlock createBlock(final BlockModel model) {
         final String type = model.getType();
         final String syntax = model.getSyntax();
-
+        
         AbstrBlock block = null;
-        if (type.equals("hat")) {
+        if (type.equals(TYPE_HAT_BLOCK)) {
             block = new JHatBlock(model);
-        } else if (type.equals("command")) {
+        } else if (type.equals(TYPE_COMMAND_BLOCK)) {
             block = new JCommandBlock(model);
-        } else if (type.equals("boolean")) {
+        } else if (type.equals(TYPE_BOOLEAN_BLOCK)) {
             block = new JBooleanBlock(model);
-        } else if (type.equals("reporter")) {
+        } else if (type.equals(TYPE_REPORTER_BLOCK)) {
             block = new JReporterBlock(model);
-        } else if (type.equals("cap")) {
+        } else if (type.equals(TYPE_CAP_BLOCK)) {
             block = new JCapBlock(model);
         }
         if (block == null) {
@@ -127,7 +139,7 @@ public class BlockFactory {
                         block.add(lab);
                     }
                     currentLabel.delete(0, currentLabel.length());
-
+                    
                     if (syntax.charAt(off++) != '{') {
                         throw new IllegalArgumentException("format problem at char " + off + "!");
                     }
@@ -136,9 +148,9 @@ public class BlockFactory {
                         fmt.append(syntax.charAt(off++));
                     }
                     final String fmtString = fmt.toString();
-
+                    
                     addFmt0(block, fmtString);
-
+                    
                     off++;
                 }
             } else {
@@ -151,13 +163,14 @@ public class BlockFactory {
             lab.setForeground(textColor);
             block.add(lab);
         }
-
+        
         return block;
     }
     public static final String TYPE_REPORTER_INPUT = "reporter";
     public static final String TYPE_REPORTER_AND_TEXT_INPUT = "reporter,text";
     public static final String TYPE_BOOLEAN_INPUT = "boolean";
     public static final String TYPE_SEQUENCE_INPUT = "sequence";
+    public static final String TYPE_VARIABLE_INPUT = "variable";
 
     /**
      * Creates a input from a string. <br />
@@ -178,12 +191,14 @@ public class BlockFactory {
             inp.setType(JReporterInput.TYPE_TEXT_AND_REPORTER);
             inp.reset();
             return inp;
+        } else if (type.equals(TYPE_VARIABLE_INPUT)) {
+            return new JVariableInput();
         } else if (type.equals(TYPE_BOOLEAN_INPUT)) {
             return new JBooleanInput();
         } else if (type.equals(TYPE_SEQUENCE_INPUT)) {
             return new JBlockSequence();
         } else {
-            throw new IllegalArgumentException("\"" + type + "\" isn't a available input type.");
+            throw new IllegalArgumentException("\"" + type + "\" isn't an available input type.");
         }
     }
 
@@ -205,5 +220,21 @@ public class BlockFactory {
      */
     public static JComponent createNewLine() {
         return new NewLineComponent();
+    }
+    
+    public static String createInputFormat(String type) {
+        if (type.equals(TYPE_REPORTER_INPUT)) {
+            return "%{r}";
+        } else if (type.equals(TYPE_REPORTER_AND_TEXT_INPUT)) {
+            return "%{t}";
+        } else if (type.equals(TYPE_VARIABLE_INPUT)) {
+            return "%{v}";
+        } else if (type.equals(TYPE_BOOLEAN_INPUT)) {
+            return "%{b}";
+        } else if (type.equals(TYPE_SEQUENCE_INPUT)) {
+            return "%{s}";
+        } else {
+            throw new IllegalArgumentException("\"" + type + "\" isn't an available input type.");
+        }
     }
 }

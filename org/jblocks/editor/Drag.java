@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingUtilities;
 import org.jblocks.gui.JDragPane;
+import org.jblocks.gui.Repainter;
 
 /**
  * Helper class for block/script dragging. <br />
@@ -16,7 +17,7 @@ import org.jblocks.gui.JDragPane;
  * @author ZeroLuck
  */
 class Drag {
-
+    
     private static void getDragTargets0(List<JScriptPane> panes, Container cont) {
         for (Component c : cont.getComponents()) {
             if (c instanceof JScriptPane) {
@@ -57,78 +58,91 @@ class Drag {
         }
         return target;
     }
-
+    
     static void dragPuzzle(JDragPane root, final Container cont, Point p, final AbstrBlock puzzle) {
-        JDragPane.DragFinishedHandler handler = new JDragPane.DragFinishedHandler() {
-
-            @Override
-            public void dragFinished(JDragPane jdrag, Component c, Point location) {
-                JScriptPane target = getTarget(jdrag, cont, new Rectangle(location, c.getSize()));
-                if (target != null) {
-                    Point p = SwingUtilities.convertPoint(jdrag, location, target);
-
-                    AbstrBlock dragBlock = (AbstrBlock) puzzle;
-                    dragBlock.setLocation(p);
-
-                    AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) puzzle, PuzzleAdapter.TYPE_DOWN);
-                    for (AbstrBlock b : blocks) {
-                        Container parent = b.getParent();
-                        if (parent != null) {
-                            parent.remove(b);
+        try {
+            Repainter.disable(root);
+            
+            JDragPane.DragFinishedHandler handler = new JDragPane.DragFinishedHandler() {
+                
+                @Override
+                public void dragFinished(JDragPane jdrag, Component c, Point location) {
+                    JScriptPane target = getTarget(jdrag, cont, new Rectangle(location, c.getSize()));
+                    if (target != null) {
+                        Point p = SwingUtilities.convertPoint(jdrag, location, target);
+                        
+                        AbstrBlock dragBlock = (AbstrBlock) puzzle;
+                        dragBlock.setLocation(p);
+                        
+                        AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) puzzle, PuzzleAdapter.TYPE_DOWN);
+                        for (AbstrBlock b : blocks) {
+                            Container parent = b.getParent();
+                            if (parent != null) {
+                                parent.remove(b);
+                            }
+                            target.add(b, 0);
                         }
-                        target.add(b, 0);
-                    }
-                    ((Puzzle) puzzle).layoutPuzzle();
+                        ((Puzzle) puzzle).layoutPuzzle();
+                        
+                        target.invalidate();
+                        target.validate();
+                        target.repaint();
 
-                    target.invalidate();
-                    target.validate();
-                    target.repaint();
-
-                    // this can be a problem in future.
-                    dragBlock.releasedEvent(null);
-                } else {
-                    AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) puzzle, PuzzleAdapter.TYPE_DOWN);
-                    for (AbstrBlock b : blocks) {
-                        Container parent = b.getParent();
-                        if (parent != null) {
-                            parent.remove(b);
+                        // this can be a problem in future.
+                        dragBlock.releasedEvent(null);
+                    } else {
+                        AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) puzzle, PuzzleAdapter.TYPE_DOWN);
+                        for (AbstrBlock b : blocks) {
+                            Container parent = b.getParent();
+                            if (parent != null) {
+                                parent.remove(b);
+                            }
                         }
                     }
                 }
+            };
+            
+            root.setDrag(puzzle, cont, puzzle.getLocation(), p, handler);
+            AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) puzzle, PuzzleAdapter.TYPE_DOWN);
+            for (AbstrBlock b : blocks) {
+                b.getParent().remove(b);
+                root.add(b, 0);
             }
-        };
-        root.setDrag(puzzle, cont, puzzle.getLocation(), p, handler);
-        AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) puzzle, PuzzleAdapter.TYPE_DOWN);
-        for (AbstrBlock b : blocks) {
-            b.getParent().remove(b);
-            root.add(b, 0);
+            ((Puzzle) puzzle).layoutPuzzle();
+        } finally {
+            Repainter.enable(root);
         }
-        ((Puzzle) puzzle).layoutPuzzle();
     }
-
+    
     static void drag(final JDragPane root, final Container cont, Point p, AbstrBlock block) {
-        JDragPane.DragFinishedHandler handler = new JDragPane.DragFinishedHandler() {
+        try {
+            Repainter.disable(root);
+            
+            JDragPane.DragFinishedHandler handler = new JDragPane.DragFinishedHandler() {
+                
+                @Override
+                public void dragFinished(JDragPane jdrag, Component c, Point location) {
+                    JScriptPane target = getTarget(jdrag, cont, new Rectangle(location, c.getSize()));
+                    if (target != null) {
+                        Point p = SwingUtilities.convertPoint(jdrag, location, target);
+                        
+                        AbstrBlock dragBlock = (AbstrBlock) c;
+                        
+                        target.add(c);
+                        c.setLocation(p);
+                        target.invalidate();
+                        target.validate();
+                        target.repaint();
 
-            @Override
-            public void dragFinished(JDragPane jdrag, Component c, Point location) {
-                JScriptPane target = getTarget(jdrag, cont, new Rectangle(location, c.getSize()));
-                if (target != null) {
-                    Point p = SwingUtilities.convertPoint(jdrag, location, target);
-
-                    AbstrBlock dragBlock = (AbstrBlock) c;
-
-                    target.add(c);
-                    c.setLocation(p);
-                    target.invalidate();
-                    target.validate();
-                    target.repaint();
-
-                    // this can be a problem in future.
-                    dragBlock.releasedEvent(null);
-                    dragBlock.toFront();
+                        // this can be a problem in future.
+                        dragBlock.releasedEvent(null);
+                        dragBlock.toFront();
+                    }
                 }
-            }
-        };
-        root.setDrag(block, cont, block.getLocation(), p, handler);
+            };
+            root.setDrag(block, cont, block.getLocation(), p, handler);
+        } finally {
+            Repainter.enable(root);
+        }
     }
 }
