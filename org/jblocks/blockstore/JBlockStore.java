@@ -56,7 +56,7 @@ public class JBlockStore extends JPanel {
         tools.add(newest);
 
         final JHintingTextField searchField = new JHintingTextField(20);
-        searchField.setEmptyTextHint("Search a block");
+        searchField.setEmptyTextHint("Search blocks");
 
         searchField.setLayout(new BorderLayout());
         tools.add(searchField);
@@ -124,7 +124,7 @@ public class JBlockStore extends JPanel {
                             model.addElement(createView(r.blockspec));
                         }
                     } else {
-                        model.addElement(new JLabel("<html><h3>The search returned without results!</h3></html>"));
+                        model.addElement(new JLabel("<html><h3>The search returned no results!</h3></html>"));
                     }
                 } catch (IOException io) {
                     model.addElement(new JLabel("<html><h3>An error occurred!</h3><i>" + io + "</i><br /></html>"));
@@ -132,7 +132,7 @@ public class JBlockStore extends JPanel {
                     progress.setIndeterminate(false);
                 }
                 // this may be a problem:
-                // the code should be runned int the EDT
+                // the code should be run in the EDT
 
                 JList list = new JList(model);
                 list.setSelectedIndex(0);
@@ -174,7 +174,7 @@ public class JBlockStore extends JPanel {
                             model.addElement(createView(r.blockspec));
                         }
                     } else {
-                        model.addElement(new JLabel("<html><h3>The search returned without results!</h3></html>"));
+                        model.addElement(new JLabel("<html><h3>The search returned no results!</h3></html>"));
                     }
 
                 } catch (IOException io) {

@@ -18,7 +18,7 @@ import org.jblocks.utils.StreamUtils;
  * This class provides methods to download, search and upload to the JBlocks blocks database. <br />
  * But please, don't spam! <br />
  * <br />
- * The server is currenlty my (ZerpLuck's) server <i>zero-bgn.de</i>. <br />
+ * The server is currenlty my (ZeroLuck's) server <i>zero-bgn.de</i>. <br />
  * 
  * @author ZeroLuck
  */
@@ -120,8 +120,8 @@ class BlockStoreServer {
     }
 
     /**
-     * Searchs for a specified keyword in the database. <br />
-     * A <code>%</code> in the keyword stands for a random string. <br />
+     * Searches for a specified keyword in the database. <br />
+     * A <code>%</code> in the keyword stands for a regexp-unknown string. <br />
      * 
      * @param keyword the keyword which to search for
      * @return the search result
@@ -165,7 +165,7 @@ class BlockStoreServer {
      * Returns the newest blocks. <br />
      * (Maximum: <= 30)
      * 
-     * @return the newset blocks in the block store
+     * @return The newest blocks in the block store
      * @throws IOException 
      */
     static SearchResult[] newest() throws IOException {
