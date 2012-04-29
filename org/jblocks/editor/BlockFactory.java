@@ -1,11 +1,13 @@
 package org.jblocks.editor;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 import org.jblocks.JBlocks;
 
 /**
@@ -13,18 +15,31 @@ import org.jblocks.JBlocks;
  * @author ZeroLuck
  */
 public class BlockFactory {
-    
+
+    // the green flag image
     private static BufferedImage greenflag;
-    
+    // blocks
+    public static final String TYPE_CAP_BLOCK = "cap";
+    public static final String TYPE_COMMAND_BLOCK = "command";
+    public static final String TYPE_REPORTER_BLOCK = "reporter";
+    public static final String TYPE_HAT_BLOCK = "hat";
+    public static final String TYPE_BOOLEAN_BLOCK = "boolean";
+    // inputs
+    public static final String TYPE_REPORTER_INPUT = "reporter";
+    public static final String TYPE_REPORTER_AND_TEXT_INPUT = "reporter,text";
+    public static final String TYPE_BOOLEAN_INPUT = "boolean";
+    public static final String TYPE_SEQUENCE_INPUT = "sequence";
+    public static final String TYPE_VARIABLE_INPUT = "variable";
+
     static {
         greenflag = JBlocks.getImage("greenFlag.png");
     }
-    
+
     private BlockFactory() {
         // don't let anyone make an instance of this class
     }
-    
-    private static void addFmt0(AbstrBlock block, String fmt) {
+
+    private static void addFormatComponent(AbstrBlock block, String fmt) {
         String[] s = fmt.split(";");
         if (s.length < 1) {
             throw new IllegalArgumentException("parse error in bs.");
@@ -66,14 +81,25 @@ public class BlockFactory {
             block.add(new NewLineComponent());
         }
     }
-    public static final String TYPE_CAP_BLOCK = "cap";
-    public static final String TYPE_COMMAND_BLOCK = "command";
-    public static final String TYPE_REPORTER_BLOCK = "reporter";
-    public static final String TYPE_HAT_BLOCK = "hat";
-    public static final String TYPE_BOOLEAN_BLOCK = "boolean";
-    
+
     public static String enquote(String s) {
         return s.replace("%", "%%");
+    }
+
+    /**
+     * Returns the count of parameters of a syntax. <br />
+     * 
+     * @param s the syntax
+     * @return the count of parameters of this syntax
+     */
+    public static int countParameters(String s) {
+        int cnt = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '%' && (i + 1 >= s.length() || s.charAt(i + 1) != '%')) {
+                cnt++;
+            }
+        }
+        return cnt;
     }
 
     /**
@@ -99,22 +125,9 @@ public class BlockFactory {
     public static AbstrBlock createBlock(final BlockModel model) {
         final String type = model.getType();
         final String syntax = model.getSyntax();
-        
-        AbstrBlock block = null;
-        if (type.equals(TYPE_HAT_BLOCK)) {
-            block = new JHatBlock(model);
-        } else if (type.equals(TYPE_COMMAND_BLOCK)) {
-            block = new JCommandBlock(model);
-        } else if (type.equals(TYPE_BOOLEAN_BLOCK)) {
-            block = new JBooleanBlock(model);
-        } else if (type.equals(TYPE_REPORTER_BLOCK)) {
-            block = new JReporterBlock(model);
-        } else if (type.equals(TYPE_CAP_BLOCK)) {
-            block = new JCapBlock(model);
-        }
-        if (block == null) {
-            throw new IllegalArgumentException("\"" + type + "\" isn't a available block type.");
-        }
+        final AbstrBlock block = createBlock(type);
+        block.setModel(model);
+
         final Color textColor = Color.BLACK;
         final StringBuilder currentLabel = new StringBuilder();
         final int len = syntax.length();
@@ -139,7 +152,7 @@ public class BlockFactory {
                         block.add(lab);
                     }
                     currentLabel.delete(0, currentLabel.length());
-                    
+
                     if (syntax.charAt(off++) != '{') {
                         throw new IllegalArgumentException("format problem at char " + off + "!");
                     }
@@ -148,9 +161,9 @@ public class BlockFactory {
                         fmt.append(syntax.charAt(off++));
                     }
                     final String fmtString = fmt.toString();
-                    
-                    addFmt0(block, fmtString);
-                    
+
+                    addFormatComponent(block, fmtString);
+
                     off++;
                 }
             } else {
@@ -163,14 +176,9 @@ public class BlockFactory {
             lab.setForeground(textColor);
             block.add(lab);
         }
-        
+
         return block;
     }
-    public static final String TYPE_REPORTER_INPUT = "reporter";
-    public static final String TYPE_REPORTER_AND_TEXT_INPUT = "reporter,text";
-    public static final String TYPE_BOOLEAN_INPUT = "boolean";
-    public static final String TYPE_SEQUENCE_INPUT = "sequence";
-    public static final String TYPE_VARIABLE_INPUT = "variable";
 
     /**
      * Creates a input from a string. <br />
@@ -202,6 +210,25 @@ public class BlockFactory {
         }
     }
 
+    private static AbstrBlock createBlock(String type) {
+        AbstrBlock block = null;
+        if (type.equals(TYPE_HAT_BLOCK)) {
+            block = new JHatBlock(null);
+        } else if (type.equals(TYPE_COMMAND_BLOCK)) {
+            block = new JCommandBlock(null);
+        } else if (type.equals(TYPE_BOOLEAN_BLOCK)) {
+            block = new JBooleanBlock(null);
+        } else if (type.equals(TYPE_REPORTER_BLOCK)) {
+            block = new JReporterBlock(null);
+        } else if (type.equals(TYPE_CAP_BLOCK)) {
+            block = new JCapBlock(null);
+        }
+        if (block == null) {
+            throw new IllegalArgumentException("\"" + type + "\" isn't a available block type.");
+        }
+        return block;
+    }
+
     /**
      * Creates a new preview block. <br />
      * The preview block will have an {@link BlockModel#createPreviewModel(java.lang.String, java.lang.String) } BlockModel. <br />
@@ -210,7 +237,7 @@ public class BlockFactory {
      * @param syntax the syntax of the block
      * @return the created block
      */
-    public static AbstrBlock createBlock(String type, String syntax) {
+    public static AbstrBlock createPreviewBlock(String type, String syntax) {
         return createBlock(BlockModel.createPreviewModel(type, syntax));
     }
 
@@ -221,7 +248,7 @@ public class BlockFactory {
     public static JComponent createNewLine() {
         return new NewLineComponent();
     }
-    
+
     public static String createInputFormat(String type) {
         if (type.equals(TYPE_REPORTER_INPUT)) {
             return "%{r}";

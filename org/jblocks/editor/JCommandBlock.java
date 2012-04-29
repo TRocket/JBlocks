@@ -12,6 +12,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
+import javax.swing.SwingUtilities;
 import org.jblocks.gui.JDragPane;
 
 /**
@@ -186,19 +187,23 @@ class JCommandBlock extends AbstrBlock implements Puzzle {
 
     @Override
     protected void pressedEvent(MouseEvent evt) {
-        Container parent = getParent();
-        Container pane = getScriptPane();
-        if (parent != pane) {
-            JBlockSequence.removeFromSequence(this);
-        }
+        if (SwingUtilities.isLeftMouseButton(evt)) {
+            Container parent = getParent();
+            Container pane = getScriptPane();
+            if (parent != pane) {
+                JBlockSequence.removeFromSequence(this);
+            }
 
-        AbstrBlock.removeFromPuzzle(this, overMe);
-        if (underMe.neighbour != null) {
-            AbstrBlock.puzzleToFront(this);
-        }
+            AbstrBlock.removeFromPuzzle(this, overMe);
+            if (underMe.neighbour != null) {
+                AbstrBlock.puzzleToFront(this);
+            }
 
-        if (underMe.neighbour != null) {
-            Drag.dragPuzzle(JDragPane.getDragPane(this), getParent(), evt.getPoint(), this);
+            if (underMe.neighbour != null) {
+                Drag.dragPuzzle(JDragPane.getDragPane(this), getParent(), evt.getPoint(), this);
+            } else {
+                super.pressedEvent(evt);
+            }
         } else {
             super.pressedEvent(evt);
         }

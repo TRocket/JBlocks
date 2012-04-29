@@ -129,7 +129,7 @@ public class JBlockSequence extends JComponent {
                 capEnd = true;
             }
         } else {
-            throw new IllegalArgumentException("hat is not a instanceof Puzzle.");
+            throw new IllegalArgumentException("hat is not an instanceof Puzzle.");
         }
     }
 

@@ -9,12 +9,12 @@ public class NativeBlock extends Block implements Executable {
 
     private Executable exec;
 
-    public NativeBlock(int paramCount) {
-        super(paramCount);
+    public NativeBlock(int paramCount, long id) {
+        super(paramCount, id);
     }
 
-    private NativeBlock(int paramCount, Executable e) {
-        super(paramCount);
+    private NativeBlock(int paramCount, long id, Executable e) {
+        super(paramCount, id);
         exec = e;
     }
 
@@ -59,7 +59,7 @@ public class NativeBlock extends Block implements Executable {
     @Override
     public Block clone() {
         int len = getParameterCount();
-        NativeBlock n = new NativeBlock(len, exec == null ? this : exec);
+        NativeBlock n = new NativeBlock(len, getID(), exec == null ? this : exec);
         for (int i = 0; i < len; i++) {
             Object o = getParameter(i);
             if (o instanceof Block) {

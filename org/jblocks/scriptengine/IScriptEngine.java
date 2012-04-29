@@ -14,7 +14,7 @@ public interface IScriptEngine {
 
     public IScriptThread[] getThreads();
 
-    public Map getGlobalVariables();
+    public Map<String, Object> getGlobalVariables();
 
     public Block getDefaultBlock(Block.Default def);
     

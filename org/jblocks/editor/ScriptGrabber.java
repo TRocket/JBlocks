@@ -1,17 +1,17 @@
 package org.jblocks.editor;
 
 import java.awt.Component;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
+
+
 import org.jblocks.editor.JVariableInput.VariableChooser;
 import org.jblocks.scriptengine.Block;
 
 /**
  * This class is for converting <code>AbstrBlock</code>s to executable code. <br />
  * 
+ * @see BlockIO
  * @see org.jblocks.scriptengine
  * @author ZeroLuck
  */
@@ -20,7 +20,7 @@ public class ScriptGrabber {
     private ScriptGrabber() {
         // don't let anyone make an instance of this class.
     }
-    
+
     /**
      * Creates code from a Script. <br />
      * 
@@ -31,11 +31,11 @@ public class ScriptGrabber {
     public static Block[] getCodeFromScript(final AbstrBlock hat) {
         AbstrBlock[] pieces = JBlockSequence.getPuzzlePieces(((Puzzle) hat), PuzzleAdapter.TYPE_DOWN);
         Block[] b = new Block[pieces.length];
-        
+
         for (int i = 0; i < b.length; i++) {
             b[i] = getCodeFromBlock(pieces[i]);
         }
-        
+
         return b;
     }
 
@@ -47,14 +47,14 @@ public class ScriptGrabber {
      */
     public static Block getCodeFromBlock(final AbstrBlock block) {
         final BlockModel model = block.getModel();
-        
+
         final String syntax = model.getSyntax();
         Block b = model.getCode();
         if (b == null) {
             throw new IllegalStateException("block for syntax '" + syntax + "' has no code!");
         }
         b = b.clone();
-        
+
         int parameter = 0;
         for (Component c : block.getComponents()) {
             if (c instanceof AbstrInput) {
@@ -93,21 +93,5 @@ public class ScriptGrabber {
             }
         }
         return b;
-    }
-
-    /**
-     * Creates code from a JScriptPane <br />
-     * 
-     * @param pane the JScriptPane from which to grab the scripts
-     * @param blockLib the installed blocks
-     * @return the grabbed scripts
-     */
-    public static Block[] getCodeFromEditor(JScriptPane pane, Map<String, Block> blockLib) {
-        assert true : "Not implemented yet";
-
-        List<Block> blocks = new ArrayList<Block>();
-        // TODO
-
-        return blocks.toArray(new Block[]{});
     }
 }

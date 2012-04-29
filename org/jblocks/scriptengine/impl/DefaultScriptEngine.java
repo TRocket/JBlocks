@@ -7,6 +7,7 @@ package org.jblocks.scriptengine.impl;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jblocks.scriptengine.Block;
@@ -32,13 +33,13 @@ import org.jblocks.scriptengine.impl.DefaultScriptThread.StackElement;
 public class DefaultScriptEngine implements IScriptEngine, Runnable {
 
     private final RepeatingQueue<DefaultScriptThread> threads;
-    private final Map globalVariables;
+    private final Map<String, Object> globalVariables;
     private Thread scriptThread;
     private final List<ScriptEngineListener> listeners;
 
     public DefaultScriptEngine() {
-        threads = new RepeatingQueue();
-        globalVariables = new java.util.HashMap(100);
+        threads = new RepeatingQueue<DefaultScriptThread>();
+        globalVariables = new HashMap<String, Object>(100);
         listeners = new ArrayList<ScriptEngineListener>(1);
     }
     
@@ -115,7 +116,7 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
     }
 
     @Override
-    public Map getGlobalVariables() {
+    public Map<String, Object> getGlobalVariables() {
         return globalVariables;
     }
 

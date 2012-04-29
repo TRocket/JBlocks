@@ -5,15 +5,16 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.MouseInfo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import org.jblocks.JBlocks;
 import org.jblocks.gui.JDragPane;
 
@@ -177,7 +178,7 @@ public class JBlockEditor extends JPanel {
             switchCategory(name);
         }
     }
-
+    
     /**
      * Adds a new block to the JBlockEditor. <br />
      * 
@@ -196,10 +197,12 @@ public class JBlockEditor extends JPanel {
                 public void mousePressed(MouseEvent evt) {
                     if (model != null) {
                         try {
-                            AbstrBlock block = BlockFactory.createBlock(model);
-                            block.setBackground(b.getBackground());
-                            block.setLocation(b.getLocation());
-                            Drag.drag(JDragPane.getDragPane(JBlockEditor.this), c.blocks, evt.getPoint(), block);
+                            if (SwingUtilities.isLeftMouseButton(evt)) {
+                                AbstrBlock block = BlockFactory.createBlock(model);
+                                block.setBackground(b.getBackground());
+                                block.setLocation(b.getLocation());
+                                Drag.drag(JDragPane.getDragPane(JBlockEditor.this), c.blocks, evt.getPoint(), block);
+                            }
                         } catch (RuntimeException ex) {
                             // syntax error in BlockFactory...
                             ex.printStackTrace(System.err);

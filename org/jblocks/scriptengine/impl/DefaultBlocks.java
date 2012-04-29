@@ -21,11 +21,23 @@ class DefaultBlocks {
     static final NativeBlock READ_PARAM_VARIABLE;     // 0: index
     static final NativeBlock WRITE_GLOBAL_VARIABLE;   // 0: name                  1: value
     static final NativeBlock WRITE_PARAM_VARIABLE;    // 0: index                 1: value
+    
+    static final long PREFIX = 100;
+    static final long FOR_ID = PREFIX + 1;
+    static final long RETURN_ID = PREFIX + 2;
+    static final long WHILE_ID = PREFIX + 3;
+    static final long IF_ID = PREFIX + 4;
+    static final long IF_ELSE_ID = PREFIX + 5;
+    static final long READ_GLOBAL_VARIABLE_ID = PREFIX + 6;
+    static final long READ_PARAM_VARIABLE_ID = PREFIX + 7;
+    static final long WRITE_GLOBAL_VARIABLE_ID = PREFIX + 8;
+    static final long WRITE_PARAM_VARIABLE_ID = PREFIX + 9;
+    
     // <private global>
     private final static Object[] empty = new Object[0];
 
     static {
-        READ_GLOBAL_VARIABLE = new NativeBlock(1) {
+        READ_GLOBAL_VARIABLE = new NativeBlock(1, READ_GLOBAL_VARIABLE_ID) {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {
@@ -35,7 +47,7 @@ class DefaultBlocks {
                 return ((StackElement) ctx).global.get("" + params[0]);
             }
         };
-        WRITE_GLOBAL_VARIABLE = new NativeBlock(2) {
+        WRITE_GLOBAL_VARIABLE = new NativeBlock(2, WRITE_GLOBAL_VARIABLE_ID) {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {
@@ -46,7 +58,7 @@ class DefaultBlocks {
                 return null;
             }
         };
-        READ_PARAM_VARIABLE = new NativeBlock(1) {
+        READ_PARAM_VARIABLE = new NativeBlock(1, READ_PARAM_VARIABLE_ID) {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {
@@ -58,7 +70,7 @@ class DefaultBlocks {
                 return byob.param[index];
             }
         };
-        WRITE_PARAM_VARIABLE = new NativeBlock(2) {
+        WRITE_PARAM_VARIABLE = new NativeBlock(2, WRITE_PARAM_VARIABLE_ID) {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {
@@ -71,7 +83,7 @@ class DefaultBlocks {
                 return null;
             }
         };
-        FOR = new NativeBlock(3) {
+        FOR = new NativeBlock(3, FOR_ID) {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {
@@ -105,7 +117,7 @@ class DefaultBlocks {
                 return null;
             }
         };
-        RETURN = new NativeBlock(1) {
+        RETURN = new NativeBlock(1, RETURN_ID) {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {
@@ -126,7 +138,7 @@ class DefaultBlocks {
                 return null;
             }
         };
-        IF = new NativeBlock(3) {
+        IF = new NativeBlock(3, IF_ID) {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {
@@ -149,7 +161,7 @@ class DefaultBlocks {
                 return null;
             }
         };
-        IF_ELSE = new NativeBlock(4) {
+        IF_ELSE = new NativeBlock(4, IF_ELSE_ID) {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {
@@ -180,7 +192,7 @@ class DefaultBlocks {
                 return null;
             }
         };
-        WHILE = new NativeBlock(4) {
+        WHILE = new NativeBlock(4, WHILE_ID) {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {

@@ -1,5 +1,7 @@
 package org.jblocks.scriptengine;
 
+import org.jblocks.editor.BlockModel;
+
 /**
  *
  * @author ZeroLuck
@@ -7,9 +9,18 @@ package org.jblocks.scriptengine;
 public abstract class Block {
 
     private final Object[] parameters;
+    private final long ID;
 
-    public Block(int parameterCount) {
-        parameters = new Object[parameterCount];
+    public Block(int parameterCount, long id) {
+        this.parameters = new Object[parameterCount];
+        this.ID = id;
+    }
+
+    /**
+     * Returns the ID of this Block. <br />
+     */
+    public long getID() {
+        return ID;
     }
 
     /**
@@ -50,6 +61,32 @@ public abstract class Block {
      */
     @Override
     public abstract Block clone();
+
+    /**
+     * Two blocks are equal if, and only if, the IDs are the same and the IDs aren't {@link BlockModel#NOT_AN_ID}.
+     * <hr />
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Block) {
+            Block b = (Block) o;
+            if (b.ID == ID && ID != BlockModel.NOT_AN_ID) {
+                return true;
+            }
+        }
+        return super.equals(o);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + (int) (this.ID ^ (this.ID >>> 32));
+        return hash;
+    }
 
     public static enum Default {
 

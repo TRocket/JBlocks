@@ -16,6 +16,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -148,13 +149,14 @@ class JCapBlock extends AbstrBlock implements Puzzle {
 
     @Override
     protected void pressedEvent(MouseEvent evt) {
-        Container parent = getParent();
-        Container pane = getScriptPane();
-        if (parent != pane) {
-            JBlockSequence.removeFromSequence(this);
+        if (SwingUtilities.isLeftMouseButton(evt)) {
+            Container parent = getParent();
+            Container pane = getScriptPane();
+            if (parent != pane) {
+                JBlockSequence.removeFromSequence(this);
+            }
+            AbstrBlock.removeFromPuzzle(this, overMe);
         }
-        AbstrBlock.removeFromPuzzle(this, overMe);
-
 
         super.pressedEvent(evt);
     }

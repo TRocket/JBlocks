@@ -105,7 +105,10 @@ class Drag {
             root.setDrag(puzzle, cont, puzzle.getLocation(), p, handler);
             AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) puzzle, PuzzleAdapter.TYPE_DOWN);
             for (AbstrBlock b : blocks) {
-                b.getParent().remove(b);
+                Container par = b.getParent();
+                if (par != null) {
+                    par.remove(b);
+                }
                 root.add(b, 0);
             }
             ((Puzzle) puzzle).layoutPuzzle();
@@ -113,7 +116,7 @@ class Drag {
             Repainter.enable(root);
         }
     }
-    
+
     static void drag(final JDragPane root, final Container cont, Point p, AbstrBlock block) {
         try {
             Repainter.disable(root);

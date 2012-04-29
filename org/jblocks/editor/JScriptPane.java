@@ -277,4 +277,39 @@ public class JScriptPane extends JPanel {
         //  return p;
         throw new IllegalStateException("the component has no JScriptPane parent!");
     }
+
+    /**
+     * Adds a specified script to this <code>JScriptPane</code>. <br />
+     * The blocks are iterated with {@link PuzzleAdapter#TYPE_DOWN}. <br />
+     * 
+     * @see #removeScript(org.jblocks.editor.AbstrBlock) 
+     * @param script the script to add
+     */
+    public void addScript(Puzzle script) {
+        AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces(script, PuzzleAdapter.TYPE_DOWN);
+        for (AbstrBlock b : blocks) {
+            add(b);
+        }
+        script.layoutPuzzle();
+        validate();
+    }
+
+    /**
+     * Removes a specified script from this <code>JScriptPane</code>. <br />
+     * The blocks are iterated with {@link PuzzleAdapter#TYPE_DOWN} <u>and</u> {@link PuzzleAdapter#TYPE_TOP}. <br />
+     * Call <code>repaint()</code> after this. <br />
+     * 
+     * @see #addScript(org.jblocks.editor.Puzzle) 
+     * @param script the script to remove
+     */
+    public void removeScript(Puzzle script) {
+        AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces(script, PuzzleAdapter.TYPE_DOWN);
+        for (AbstrBlock b : blocks) {
+            remove(b);
+        }
+        blocks = JBlockSequence.getPuzzlePieces(script, PuzzleAdapter.TYPE_TOP);
+        for (AbstrBlock b : blocks) {
+            remove(b);
+        }
+    }
 }

@@ -40,6 +40,7 @@ import javax.swing.filechooser.FileFilter;
 import org.jblocks.JBlocks;
 import org.jblocks.gui.JSmallColorChooser;
 import org.jblocks.gui.JZoomChooser;
+import org.jblocks.utils.FileChooserUtils;
 
 /**
  * A "vector"-graphics paint editor. <br />
@@ -314,53 +315,21 @@ public final class JPaintEditor extends JPanel {
             if (chooser == null) {
                 chooser = new JFileChooser();
                 final String[] suffix = ImageIO.getReaderFileSuffixes();
-                chooser.setFileFilter(new FileFilter() {
-
-                    @Override
-                    public boolean accept(File file) {
-                        if (file.isDirectory()) {
-                            return true;
-                        }
-                        String name = file.getName().toLowerCase();
-                        for (String s : suffix) {
-                            if (name.endsWith("." + s.toLowerCase())) {
-                                return true;
-                            }
-                        }
-                        return false;
+                StringBuilder sb = new StringBuilder("Images: ");
+                boolean first = true;
+                for (String s : suffix) {
+                    if (!first) {
+                        sb.append(", ");
                     }
-
-                    @Override
-                    public String getDescription() {
-                        StringBuilder sb = new StringBuilder("Images: ");
-                        boolean first = true;
-                        for (String s : suffix) {
-                            if (!first) {
-                                sb.append(", ");
-                            }
-                            sb.append(s);
-                            first = false;
-                        }
-                        return sb.toString();
-                    }
-                });
+                    sb.append(s);
+                    first = false;
+                }
+                final String description = sb.toString();
+                chooser.setFileFilter(FileChooserUtils.createFilter(suffix, description));
+                chooser.setDialogTitle("Select an image file...");
             }
         }
-        final JDesktopPane desktop = getDesktop();
-        final JInternalFrame frm = new JInternalFrame("Select a image file...");
-        frm.setClosable(true);
-        frm.setLayout(new BorderLayout());
-        frm.add(chooser, BorderLayout.CENTER);
-        frm.pack();
-
-        frm.setVisible(true);
-        Point loc = SwingUtilities.convertPoint(this, getLocation(), desktop);
-        frm.setLocation(loc.x + getWidth() / 2 - frm.getWidth() / 2,
-                loc.y + getHeight() / 2 - frm.getHeight() / 2);
-
-        desktop.add(frm, 0);
-        frm.toFront();
-
+        FileChooserUtils.showInternalFileChooser(getDesktop(), chooser);
         if (currentListener != null) {
             chooser.removeActionListener(currentListener);
         }
@@ -369,14 +338,8 @@ public final class JPaintEditor extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                String cmd = ae.getActionCommand();
-                if (cmd != null) {
-                    if (cmd.equals(JFileChooser.CANCEL_SELECTION)) {
-                        frm.dispose();
-                    } else if (cmd.equals(JFileChooser.APPROVE_SELECTION)) {
-                        open(chooser.getSelectedFile());
-                        frm.dispose();
-                    }
+                if (FileChooserUtils.isApproveSelection(ae)) {
+                    open(chooser.getSelectedFile());
                 }
             }
         };

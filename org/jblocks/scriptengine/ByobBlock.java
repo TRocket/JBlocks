@@ -8,8 +8,8 @@ public class ByobBlock extends Block {
 
     private final Block[] seq;
 
-    public ByobBlock(int paramCount, Block[] sequence) {
-        super(paramCount);
+    public ByobBlock(int paramCount, long id, Block[] sequence) {
+        super(paramCount, id);
         this.seq = sequence;
     }
 
@@ -28,7 +28,7 @@ public class ByobBlock extends Block {
             seqClone[i] = seq[i].clone();
         }
         len = getParameterCount();
-        ByobBlock n = new ByobBlock(len, seqClone);
+        ByobBlock n = new ByobBlock(len, getID(), seqClone);
         for (int i = 0; i < len; i++) {
             Object o = getParameter(i);
             if (o instanceof Block) {

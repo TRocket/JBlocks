@@ -48,6 +48,17 @@ public class JDragPane extends JPanel {
             }
         });
     }
+    
+    /**
+     * Returns the displayed component in the background. <br />
+     * (Setted in the constructor) <br />
+     * <br />
+     * Note: The <i>view</i> isn't the current drag! <br />
+     * 
+     */
+    public Component getView() {
+        return view;
+    }
 
     /**
      * @param evt the MouseEvent

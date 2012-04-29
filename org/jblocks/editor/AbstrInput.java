@@ -104,7 +104,10 @@ public abstract class AbstrInput extends JComponent {
      * Layouts the whole ScriptPane. <br />
      */
     protected void layoutRoot() {
-        getScriptPane().validate();
+        JScriptPane scriptPane = getScriptPane();
+        if (scriptPane != null) {
+            scriptPane.validate();
+        }
     }
 
     /**

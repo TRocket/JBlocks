@@ -26,6 +26,7 @@ import javax.swing.JToolBar;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import org.jblocks.JBlocks;
+import org.jblocks.blockstore.JBlockStore;
 import org.jblocks.byob.JByobEditor;
 import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.BlockModel;
@@ -96,6 +97,13 @@ public class JBlocksPane extends JDesktopPane {
         tools.add(new JSeparator(JSeparator.VERTICAL));
 
         final JButton blockstoreButton = new JButton(JBlocks.getIcon("download-folder.png"));
+        blockstoreButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                JBlockStore.openBlockStore(JBlocksPane.this, JBlocks.getIcon("download-folder.png"));
+            }
+        });
         blockstoreButton.setToolTipText("<HTML><b>Block-Store</b><ul><li>Download blocks</li><li>Share blocks</li></ul></HTML>");
         tools.add(blockstoreButton);
 
@@ -312,13 +320,13 @@ public class JBlocksPane extends JDesktopPane {
         edt.cleanup();
         return edt;
     }
-    
+
     private void removeVariable(final String name) {
         final IScriptEngine engine = context.getScriptEngine();
         final Map variables = engine.getGlobalVariables();
         final Map<Long, BlockModel> blocks = context.getInstalledBlocks();
         final Block READ_GLOBAL_VAR = engine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE).clone();
-        
+
         for (final BlockModel model : blocks.values()) {
             final String content = model.getContent();
             final Block code = model.getCode();
@@ -327,7 +335,7 @@ public class JBlocksPane extends JDesktopPane {
                 break;
             }
         }
-        
+
         variables.remove(name);
         repaint();
     }

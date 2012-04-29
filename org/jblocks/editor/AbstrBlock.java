@@ -11,6 +11,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import org.jblocks.JBlocks;
 import org.jblocks.gui.JDragPane;
 import org.jblocks.scriptengine.Block;
@@ -238,14 +239,19 @@ public abstract class AbstrBlock extends JComponent {
      */
     protected void toFront() {
         Container root = getScriptPane();
-        if (getParent() == root) {
+        if (root != null && getParent() == root) {
             root.remove(this);
             root.add(this, 0);
         }
     }
 
     protected void pressedEvent(MouseEvent evt) {
-        Drag.drag(JDragPane.getDragPane(this), getParent(), evt.getPoint(), this);
+        if (SwingUtilities.isLeftMouseButton(evt)) {
+            Drag.drag(JDragPane.getDragPane(this), getParent(), evt.getPoint(), this);
+        } else if (SwingUtilities.isRightMouseButton(evt)) {
+            JPopupBlockMenu menu = new JPopupBlockMenu(this);
+            menu.show(this, evt.getX(), evt.getY());
+        }
     }
 
     protected void releasedEvent(MouseEvent evt) {

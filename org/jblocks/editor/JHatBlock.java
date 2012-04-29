@@ -13,6 +13,7 @@ import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
+import javax.swing.SwingUtilities;
 import org.jblocks.gui.JDragPane;
 
 /**
@@ -172,7 +173,7 @@ class JHatBlock extends AbstrBlock implements Puzzle {
 
     @Override
     protected void pressedEvent(MouseEvent evt) {
-        if (underMe.neighbour != null) {
+        if (underMe.neighbour != null && SwingUtilities.isLeftMouseButton(evt)) {
             Drag.dragPuzzle(JDragPane.getDragPane(this), getParent(), evt.getPoint(), this);
         } else {
             super.pressedEvent(evt);

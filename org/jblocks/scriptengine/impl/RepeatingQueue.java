@@ -8,6 +8,7 @@ import java.util.Arrays;
  * 
  * @author ZeroLuck
  */
+@SuppressWarnings("unchecked")
 class RepeatingQueue<E> {
 
     private E[] elements;

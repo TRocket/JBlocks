@@ -105,7 +105,7 @@ public class JByobEditor extends JPanel {
         south.add(OK);
         add(south, BorderLayout.SOUTH);
         
-        hat = BlockFactory.createBlock("hat", "");
+        hat = BlockFactory.createPreviewBlock("hat", "");
         block = BlockFactory.createBlock(BlockModel.createModel(type, category, ""));
         block.add(createInput(InputTypeChooser.TYPE_TEXT, startLabel));
         block.setBackground(c);
@@ -353,7 +353,7 @@ public class JByobEditor extends JPanel {
                     final BlockModel bm = edt.block.getModel();
                     final BlockModel model = BlockModel.createModel(bm.getType(), bm.getCategory(), getSyntax(edt.block));
                     JBlocks ctx = JBlocks.getContextForComponent(edt);
-                    model.setCode(new ByobBlock(count(model.getSyntax()), code));
+                    model.setCode(new ByobBlock(BlockFactory.countParameters(model.getSyntax()), model.getID(),code));
                     ctx.installBlock(model);
                 } catch (IllegalStateException ex) {
                     JOptionPane.showInternalMessageDialog(edt, "Couldn't create the block: \n" + ex, "Error", JOptionPane.ERROR_MESSAGE);
@@ -375,17 +375,6 @@ public class JByobEditor extends JPanel {
             frm.setSelected(true);
         } catch (java.beans.PropertyVetoException e) {
         }
-    }
-    
-    private static int count(String s) {
-        int cnt = 0;
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == '%' && (i + 1 >= s.length() || s.charAt(i + 1) != '%')) {
-                cnt++;
-            }
-        }
-        
-        return cnt;
     }
 
     /**

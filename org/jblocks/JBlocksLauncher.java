@@ -15,17 +15,18 @@ import org.jblocks.gui.Splash;
  */
 public class JBlocksLauncher {
 
-    private static final String VERSION = "0.5";
+    private static final String VERSION = "0.5.90";
 
     /**
      * This is the standalone main method
      * 
-     * @param args the command line args
+     * @param args the command line arguments
      */
     public static void main(String[] args) {
         Repainter.install();
         // TODO run JBlocks
         Splash splash = new Splash();
+        splash.setTitle("JBlocks is loading...");
         splash.setAlwaysOnTop(true);
         splash.setText("JBlocks " + VERSION + " is starting...");
         splash.setVisible(true);

@@ -71,7 +71,7 @@ public class JVariableInput extends AbstrInput {
         // shouldn't happen, there will always be an input
         return new Dimension(30, 20);
     }
-
+ 
     /**
      * {@inheritDoc} 
      */

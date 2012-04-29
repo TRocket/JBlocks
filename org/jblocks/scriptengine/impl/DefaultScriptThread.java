@@ -3,6 +3,7 @@ package org.jblocks.scriptengine.impl;
 import org.jblocks.scriptengine.NativeBlock;
 import org.jblocks.scriptengine.ByobBlock;
 import java.util.Map;
+import org.jblocks.editor.BlockModel;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.IScriptThread;
 
@@ -18,7 +19,7 @@ public class DefaultScriptThread implements IScriptThread {
 
     public DefaultScriptThread(Map<String, Object> globalVariables, Block[] commands) {
         this.globalVariables = globalVariables;
-        this.stack = new StackElement(null, new ByobBlock(0, commands), commands, false, globalVariables);
+        this.stack = new StackElement(null, new ByobBlock(0, BlockModel.NOT_AN_ID, commands), commands, false, globalVariables);
     }
 
     public StackElement getStack() {

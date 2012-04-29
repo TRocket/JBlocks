@@ -46,6 +46,7 @@ import org.jblocks.sound.SimplePlayer;
 import org.jblocks.sound.SoftwareMixer;
 import org.jblocks.sound.SoundInput;
 import org.jblocks.sound.Volume16Filter;
+import org.jblocks.utils.FileChooserUtils;
 import org.jblocks.utils.StreamUtils;
 
 /**
@@ -87,7 +88,7 @@ public final class JSoundEditor extends JPanel {
 
     static {
         // TODO: Replace this with JBlocks.getIcon(...)
-        
+
         icon_microphone = new ImageIcon(JBlocks.class.getResource("res/microphone.png"));
         icon_play = new ImageIcon(JBlocks.class.getResource("res/play.png"));
         icon_stop = new ImageIcon(JBlocks.class.getResource("res/stop.png"));
@@ -356,63 +357,25 @@ public final class JSoundEditor extends JPanel {
      */
     private void openImportFileChooser() {
         final String[] ext = new String[]{"wav", /* "jbsp", */ "ogg", "aiff", "aif", "au"};
+        StringBuilder sb = new StringBuilder("Sound files: ");
+        if (ext.length > 0) {
+            sb.append(ext[0].toUpperCase());
+            for (int i = 1; i < ext.length; i++) {
+                sb.append(", ").append(ext[i].toUpperCase());
+            }
+        }
+        final String description = sb.toString();
         final JFileChooser ch = new JFileChooser();
+        ch.setDialogTitle("Select a sound file");
         ch.setMultiSelectionEnabled(false);
-        ch.setFileFilter(new FileFilter() {
-
-            @Override
-            public boolean accept(File f) {
-                if (f.isDirectory()) {
-                    return true;
-                }
-                String name = f.getName().toLowerCase();
-                for (String e : ext) {
-                    if (name.endsWith("." + e)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            @Override
-            public String getDescription() {
-                StringBuilder sb = new StringBuilder("Sound files: ");
-                if (ext.length > 0) {
-                    sb.append(ext[0].toUpperCase());
-                    for (int i = 1; i < ext.length; i++) {
-                        sb.append(", ").append(ext[i].toUpperCase());
-                    }
-                }
-                return sb.toString();
-            }
-        });
-        final JDesktopPane desktop = getDesktop();
-        final JInternalFrame frm = new JInternalFrame("Select a sound file...");
-        frm.setClosable(true);
-        frm.setLayout(new BorderLayout());
-        frm.add(ch, BorderLayout.CENTER);
-        frm.pack();
-
-        frm.setVisible(true);
-        Point loc = SwingUtilities.convertPoint(this, getLocation(), desktop);
-        frm.setLocation(loc.x + getWidth() / 2 - frm.getWidth() / 2,
-                loc.y + getHeight() / 2 - frm.getHeight() / 2);
-
-        desktop.add(frm, 0);
-        frm.toFront();
-
+        ch.setFileFilter(FileChooserUtils.createFilter(ext, description));
+        FileChooserUtils.showInternalFileChooser(getDesktop(), ch);
         ch.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                String cmd = ae.getActionCommand();
-                if (cmd != null) {
-                    if (cmd.equals(JFileChooser.CANCEL_SELECTION)) {
-                        frm.dispose();
-                    } else if (cmd.equals(JFileChooser.APPROVE_SELECTION)) {
-                        open(ch.getSelectedFile());
-                        frm.dispose();
-                    }
+                if (FileChooserUtils.isApproveSelection(ae)) {
+                    open(ch.getSelectedFile());
                 }
             }
         });

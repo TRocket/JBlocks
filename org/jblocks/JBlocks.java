@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JDesktopPane;
 import javax.swing.JProgressBar;
 import org.jblocks.editor.AbstrBlock;
 import org.jblocks.editor.BlockFactory;
@@ -94,21 +95,21 @@ public final class JBlocks {
      * (the blocks will be installed) <br />
      */
     private void initDefaultBlocks() {
-        installBlock(BlockModel.createModel("hat", "Control", "When %{gf} clicked", new NativeBlock(0) {
+        installBlock(BlockModel.createModel("hat", "Control", "When %{gf} clicked", new NativeBlock(0, 200 + 1) {
 
             @Override
             public Object evaluate(Object ctx, Object... param) {
                 return null;
             }
         }));
-        installBlock(BlockModel.createModel("boolean", "Operators", "true", new NativeBlock(0) {
+        installBlock(BlockModel.createModel("boolean", "Operators", "true", new NativeBlock(0, 200 + 2) {
 
             @Override
             public Object evaluate(Object ctx, Object... param) {
                 return true;
             }
         }));
-        installBlock(BlockModel.createModel("boolean", "Operators", "false", new NativeBlock(0) {
+        installBlock(BlockModel.createModel("boolean", "Operators", "false", new NativeBlock(0, 200 + 3) {
 
             @Override
             public Object evaluate(Object ctx, Object... param) {
@@ -138,10 +139,20 @@ public final class JBlocks {
      * The returned container can be displayed in a JFrame/JApplet etc... <br />
      * You don't have to use a {@link org.jblocks.gui.JDragPane} as a parent for this.
      * 
+     * @see #getDesktop() 
      * @see org.jblocks.gui.JBlocksPane
      */
     public Container getContentPane() {
         return drag;
+    }
+    
+    /**
+     * Returns the desktop of JBlocks. <br />
+     * You can use this to show a JInternalFrame. <br />
+     * @return 
+     */
+    public JDesktopPane getDesktop() {
+        return gui;
     }
 
     /**
@@ -266,8 +277,8 @@ public final class JBlocks {
     public static JBlocks getContextForComponent(Component c) {
         Container cont = c.getParent();
         while (cont != null) {
-            if (cont instanceof JBlocksPane) {
-                return ((JBlocksPane) cont).getContext();
+            if (cont instanceof JDragPane) {
+                return ((JBlocksPane) ((JDragPane) cont).getView()).getContext();
             }
             cont = cont.getParent();
         }
@@ -292,5 +303,15 @@ public final class JBlocks {
      */
     public void addHighlight(IScriptThread thread, AbstrBlock[] blocks) {
         blocksToReset.put(thread, blocks);
+    }
+
+    /**
+     * Returns <code>true</code> if the specified ID is a default block. <br />
+     */
+    public boolean isDefaultBlock(long ID) {
+        if (ID >= 100 && ID < 300) 
+            return true;
+        
+        return false;
     }
 }

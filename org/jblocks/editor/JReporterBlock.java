@@ -12,6 +12,7 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -25,8 +26,8 @@ class JReporterBlock extends AbstrBlock {
     public JReporterBlock(BlockModel model) {
         super(model);
     }
-    
-     @Override
+
+    @Override
     protected void paintBlockBorder(Graphics grp) {
         Graphics2D g = (Graphics2D) grp;
 
@@ -70,21 +71,22 @@ class JReporterBlock extends AbstrBlock {
 
     @Override
     protected void pressedEvent(MouseEvent evt) {
-        Container parent = getParent();
-        Container pane = getScriptPane();
-        if (parent != pane) {
-            Point loc = JScriptPane.getLocationOnScriptPane(this);
+        if (SwingUtilities.isLeftMouseButton(evt)) {
+            Container parent = getParent();
+            Container pane = getScriptPane();
+            if (parent != pane) {
+                Point loc = JScriptPane.getLocationOnScriptPane(this);
 
-            if (parent instanceof AbstrInput) {
-                ((AbstrInput) parent).reset();
+                if (parent instanceof AbstrInput) {
+                    ((AbstrInput) parent).reset();
+                }
+                parent.remove(this);
+
+                setLocation(loc);
+                pane.add(this);
+                layoutRoot();
             }
-            parent.remove(this);
-
-            setLocation(loc);
-            pane.add(this);
-            layoutRoot();
         }
-
         super.pressedEvent(evt);
     }
 
