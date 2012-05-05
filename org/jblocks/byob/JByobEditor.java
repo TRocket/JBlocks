@@ -15,6 +15,7 @@ import java.awt.event.ContainerListener;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -26,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+
 import org.jblocks.JBlocks;
 import org.jblocks.editor.AbstrBlock;
 import org.jblocks.editor.BlockFactory;

@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
@@ -28,6 +29,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JToolBar;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
+
 import org.jblocks.JBlocks;
 import org.jblocks.editor.AbstrBlock;
 import org.jblocks.editor.BlockFactory;

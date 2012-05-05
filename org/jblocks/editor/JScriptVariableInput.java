@@ -11,7 +11,9 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.JComponent;
+
 import org.jblocks.gui.JDragPane;
 
 /**

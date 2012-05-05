@@ -6,8 +6,10 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
+
 import org.jblocks.sound.SoundInput;
 
 public class VorbisCodec {

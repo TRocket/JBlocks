@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.sound.sampled.AudioFormat;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -16,9 +17,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.SoftBevelBorder;
-import org.jblocks.sound.SoundInput;
-import org.jblocks.sound.SimplePlayer;
+
 import org.jblocks.sound.Recorder;
+import org.jblocks.sound.SimplePlayer;
+import org.jblocks.sound.SoundInput;
 
 /**
  *

@@ -1,8 +1,8 @@
 package org.jblocks.scriptengine.impl;
 
-import org.jblocks.scriptengine.NativeBlock;
-import org.jblocks.scriptengine.ByobBlock;
 import org.jblocks.scriptengine.Block;
+import org.jblocks.scriptengine.ByobBlock;
+import org.jblocks.scriptengine.NativeBlock;
 import org.jblocks.scriptengine.impl.DefaultScriptThread.StackElement;
 
 /**

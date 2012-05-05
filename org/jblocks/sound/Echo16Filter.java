@@ -2,6 +2,7 @@ package org.jblocks.sound;
 
 import java.io.File;
 import java.io.IOException;
+
 import javax.sound.sampled.AudioSystem;
 
 public class Echo16Filter extends SoundFilter {

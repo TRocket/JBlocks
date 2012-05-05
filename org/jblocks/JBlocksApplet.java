@@ -1,6 +1,7 @@
 package org.jblocks;
 
 import javax.swing.JApplet;
+
 import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.Repainter;
 

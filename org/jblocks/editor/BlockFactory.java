@@ -1,13 +1,13 @@
 package org.jblocks.editor;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.image.BufferedImage;
+
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
+
 import org.jblocks.JBlocks;
 
 /**

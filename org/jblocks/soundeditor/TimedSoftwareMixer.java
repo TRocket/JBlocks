@@ -2,7 +2,9 @@ package org.jblocks.soundeditor;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
 import javax.sound.sampled.AudioFormat;
+
 import org.jblocks.sound.SoftwareMixer;
 import org.jblocks.sound.SoundInput;
 

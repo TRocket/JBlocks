@@ -3,6 +3,7 @@ package org.jblocks.gui;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.JComponent;
 import javax.swing.RepaintManager;
 

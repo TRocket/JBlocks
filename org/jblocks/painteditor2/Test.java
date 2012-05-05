@@ -2,7 +2,9 @@ package org.jblocks.painteditor2;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+
 import javax.swing.JFrame;
+
 import org.jblocks.gui.JBlocksPane;
 
 /**

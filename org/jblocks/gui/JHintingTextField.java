@@ -1,10 +1,20 @@
 package org.jblocks.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Insets;
+import java.awt.Shape;
 
-import javax.swing.*;
-import javax.swing.text.*;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.JTextComponent;
 
 /**
  * An enhanced text field, showing an {@link #getEmptyTextHint() empty text}

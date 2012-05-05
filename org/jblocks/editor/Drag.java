@@ -6,7 +6,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.SwingUtilities;
+
 import org.jblocks.gui.JDragPane;
 import org.jblocks.gui.Repainter;
 

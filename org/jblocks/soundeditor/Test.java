@@ -5,7 +5,9 @@
 package org.jblocks.soundeditor;
 
 import java.awt.BorderLayout;
+
 import javax.swing.JFrame;
+
 import org.jblocks.gui.JBlocksPane;
 
 /**

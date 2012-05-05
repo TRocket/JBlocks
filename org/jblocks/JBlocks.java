@@ -8,17 +8,18 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JProgressBar;
+
 import org.jblocks.editor.AbstrBlock;
 import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.BlockModel;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.JDragPane;
-import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.Block.Default;
 import org.jblocks.scriptengine.IScriptEngine;
 import org.jblocks.scriptengine.IScriptEngine.ScriptEngineListener;

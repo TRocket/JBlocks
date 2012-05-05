@@ -1,11 +1,12 @@
 package org.jblocks.scriptengine.impl;
 
-import org.jblocks.scriptengine.NativeBlock;
-import org.jblocks.scriptengine.ByobBlock;
 import java.util.Map;
+
 import org.jblocks.editor.BlockModel;
 import org.jblocks.scriptengine.Block;
+import org.jblocks.scriptengine.ByobBlock;
 import org.jblocks.scriptengine.IScriptThread;
+import org.jblocks.scriptengine.NativeBlock;
 
 /**
  *

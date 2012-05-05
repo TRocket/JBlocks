@@ -1,8 +1,10 @@
 package org.jblocks.sound;
 
 import java.io.IOException;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
+
 import org.jblocks.utils.StreamUtils;
 
 /**

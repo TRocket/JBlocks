@@ -1,9 +1,9 @@
 package org.jblocks.editor;
 
 import java.awt.Component;
+
 import javax.swing.JComponent;
 import javax.swing.JTextField;
-
 
 import org.jblocks.editor.JVariableInput.VariableChooser;
 import org.jblocks.scriptengine.Block;

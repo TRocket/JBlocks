@@ -4,11 +4,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
-
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
 import org.jblocks.JBlocks;
 
 public class Splash extends JFrame {

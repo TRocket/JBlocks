@@ -8,14 +8,16 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
+
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+
 import org.jblocks.JBlocks;
 import org.jblocks.gui.JDragPane;
-import org.jblocks.utils.SwingUtils;
 import org.jblocks.utils.StreamUtils;
+import org.jblocks.utils.SwingUtils;
 
 /**
  * * A <code>JPopupBlockMenu</code> has these standard <code>JMenuItem</code>s:

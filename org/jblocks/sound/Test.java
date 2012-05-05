@@ -1,8 +1,9 @@
 package org.jblocks.sound;
 
 import java.io.File;
+
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.SourceDataLine;
+
 import org.jblocks.soundeditor.TimedSoftwareMixer;
 
 /**

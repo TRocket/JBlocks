@@ -1,6 +1,5 @@
 package org.jblocks.soundeditor;
 
-import ext.ogg.VorbisCodec;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -23,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 import java.util.HashMap;
+
 import javax.sound.sampled.AudioFileFormat.Type;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -39,14 +39,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+
 import org.jblocks.JBlocks;
 import org.jblocks.sound.AudioFormat16Filter;
 import org.jblocks.sound.SimplePlayer;
-import org.jblocks.sound.SoftwareMixer;
 import org.jblocks.sound.SoundInput;
 import org.jblocks.sound.Volume16Filter;
-import org.jblocks.utils.SwingUtils;
 import org.jblocks.utils.StreamUtils;
+import org.jblocks.utils.SwingUtils;
+
+import ext.ogg.VorbisCodec;
 
 /**
  *

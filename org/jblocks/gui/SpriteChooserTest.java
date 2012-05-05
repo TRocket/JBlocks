@@ -2,9 +2,10 @@ package org.jblocks.gui;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.JComponent;
+
 import org.jblocks.JBlocks;
-import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.editor.JScriptPane;
 

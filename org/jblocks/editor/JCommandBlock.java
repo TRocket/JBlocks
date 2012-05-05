@@ -12,7 +12,9 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
+
 import javax.swing.SwingUtilities;
+
 import org.jblocks.gui.JDragPane;
 
 /**

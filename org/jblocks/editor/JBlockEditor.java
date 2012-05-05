@@ -1,21 +1,22 @@
 package org.jblocks.editor;
 
-import org.jblocks.gui.JCategoryChooser;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.MouseInfo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.HashMap;
+
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+
 import org.jblocks.JBlocks;
+import org.jblocks.gui.JCategoryChooser;
 import org.jblocks.gui.JDragPane;
 
 /**

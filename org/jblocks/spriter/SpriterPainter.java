@@ -9,8 +9,10 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.io.FileInputStream;
+
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+
 import org.jblocks.gui.JBlocksPane;
 
 /**

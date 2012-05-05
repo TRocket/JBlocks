@@ -11,17 +11,19 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
 import org.jblocks.editor.AbstrBlock;
 import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.BlockModel;
-import org.jblocks.gui.JCategoryChooser;
 import org.jblocks.gui.JBlocksPane;
+import org.jblocks.gui.JCategoryChooser;
 
 /**
  *

@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.Map;
+
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
@@ -24,6 +25,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+
 import org.jblocks.JBlocks;
 import org.jblocks.blockstore.JBlockStore;
 import org.jblocks.byob.JByobEditor;

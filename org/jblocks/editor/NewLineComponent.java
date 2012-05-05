@@ -1,6 +1,7 @@
 package org.jblocks.editor;
 
 import java.awt.Dimension;
+
 import javax.swing.JComponent;
 
 /**
