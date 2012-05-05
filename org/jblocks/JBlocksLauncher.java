@@ -15,7 +15,7 @@ import org.jblocks.gui.Splash;
  */
 public class JBlocksLauncher {
 
-    private static final String VERSION = "0.5.90";
+    private static final String VERSION = "0.5.93";
 
     /**
      * This is the standalone main method

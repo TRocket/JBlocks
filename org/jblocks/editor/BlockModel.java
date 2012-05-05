@@ -165,6 +165,20 @@ public class BlockModel {
     }
 
     /**
+     * Creates a <code>new BlockModel</code>. <br />
+     * The moedl will have the specified ID. <br />
+     * 
+     * @param type the type of the block ("reporter", "cap", etc)
+     * @param syntax the syntax of the block label (see BlockFactory)
+     * @param category the category of block
+     * @param ID the ID of the block
+     * @return the created BlockModel
+     */
+    public static BlockModel createModel(final String type, final String category, final String syntax, final long ID) {
+        return new BlockModel(ID, syntax, category, type);
+    }
+
+    /**
      * Creates a new ID. <br />
      */
     public static synchronized long createID() {

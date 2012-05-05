@@ -1,5 +1,5 @@
-package org.jblocks.scratch.objects;
+package org.jblocks.scratch;
 
 public class ScratchSpriteMorph extends ScriptableScratchMorph {
-
+    
 }

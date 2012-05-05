@@ -10,9 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
-import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import org.jblocks.JBlocks;
 
@@ -20,7 +18,7 @@ import org.jblocks.JBlocks;
  *
  * A small color chooser for the paint-editor. <br />
  * (Should be the default, but the should be an ability to open the <br />
- *          JColorChooser in an JInternalFrame too) <br />
+ *          {@link javax.swing.JColorChooser} in an JInternalFrame too) <br />
  * <br />
  * You can switch between two different color-chooser styles: <br />
  *  (with the <code>setStyle(int)</code> method) <br />

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -71,7 +72,7 @@ public class JVariableInput extends AbstrInput {
         // shouldn't happen, there will always be an input
         return new Dimension(30, 20);
     }
- 
+
     /**
      * {@inheritDoc} 
      */
@@ -195,7 +196,16 @@ public class JVariableInput extends AbstrInput {
          */
         @Override
         public void doLayout() {
-            setSize(getPreferredSize());
+            Dimension size = getPreferredSize();
+            if (getSize().equals(size)) {
+                return;
+            }
+
+            setSize(size);
+            Container parent = getParent();
+            if (parent != null) {
+                parent.validate();
+            }
         }
 
         /**
@@ -218,7 +228,6 @@ public class JVariableInput extends AbstrInput {
         public void setValue(String val) {
             currentSelected = val;
             doLayout();
-            getScriptPane().validate();
             repaint();
         }
 
@@ -239,7 +248,12 @@ public class JVariableInput extends AbstrInput {
          */
         @Override
         public Dimension getPreferredSize() {
-            FontMetrics fm = getFontMetrics(getFont());
+            Font fnt = getFont();
+            if (fnt == null) {
+                return super.getPreferredSize();
+            }
+
+            FontMetrics fm = getFontMetrics(fnt);
 
             return new Dimension(
                     Math.max(MIN_WIDTH, fm.stringWidth(currentSelected) + RIGHT_GAP + 2 * GAP),

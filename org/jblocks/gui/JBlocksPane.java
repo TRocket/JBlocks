@@ -2,8 +2,7 @@ package org.jblocks.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,13 +11,13 @@ import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
-import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
@@ -36,6 +35,7 @@ import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.Block.Default;
 import org.jblocks.scriptengine.IScriptEngine;
 import org.jblocks.soundeditor.JSoundEditor;
+import org.jblocks.utils.SwingUtils;
 
 /**
  *
@@ -51,6 +51,7 @@ public class JBlocksPane extends JDesktopPane {
     private final JToolBar tools;
     private final JBlockEditor editor;
     private final JPanel app;
+    private final JRootPane root;
     private final JSpriteChooser spriteChooser;
     private final JBlocks context;
     private final JProgressBar progress;
@@ -71,7 +72,7 @@ public class JBlocksPane extends JDesktopPane {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                // not implemented yet
+                saveProject(false);
             }
         });
         tools.add(saveButton);
@@ -82,7 +83,7 @@ public class JBlocksPane extends JDesktopPane {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                // not implemented yet
+                openProject();
             }
         });
         tools.add(openButton);
@@ -101,7 +102,7 @@ public class JBlocksPane extends JDesktopPane {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                JBlockStore.openBlockStore(JBlocksPane.this, JBlocks.getIcon("download-folder.png"));
+                openBlockStore();
             }
         });
         blockstoreButton.setToolTipText("<HTML><b>Block-Store</b><ul><li>Download blocks</li><li>Share blocks</li></ul></HTML>");
@@ -113,43 +114,7 @@ public class JBlocksPane extends JDesktopPane {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                final JInternalFrame frm = new JInternalFrame("ZeroLuck's Paint-Editor");
-                frm.setResizable(false);
-                frm.setClosable(true);
-                frm.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-                frm.setLayout(new BorderLayout());
-
-                JPaintEditor edt = new JPaintEditor();
-                edt.addPaintEditorListener(new JPaintEditor.PaintEditorListener() {
-
-                    @Override
-                    public void cancelSelected(BufferedImage img) {
-                        frm.dispose();
-                    }
-
-                    @Override
-                    public void finishSelected(BufferedImage img) {
-                        spriteChooser.addSpriteView(null, "Test", img);
-                        frm.dispose();
-                    }
-                });
-                frm.add(edt, BorderLayout.CENTER);
-
-
-                add(frm, 0);
-                frm.setVisible(true);
-                frm.pack();
-
-                int w = frm.getWidth();
-                int h = frm.getHeight();
-
-                frm.setFrameIcon(JBlocks.getIcon("paint-editor.png"));
-                frm.setLocation(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2);
-
-                try {
-                    frm.setSelected(true);
-                } catch (java.beans.PropertyVetoException e) {
-                }
+                openPaintEditor();
             }
         });
         tools.add(openPaint);
@@ -160,29 +125,7 @@ public class JBlocksPane extends JDesktopPane {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                final JInternalFrame frm = new JInternalFrame("ZeroLuck's Sound-Editor");
-                frm.setResizable(true);
-                frm.setClosable(true);
-                frm.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-                frm.setLayout(new BorderLayout());
-
-                Container edt = new JSoundEditor();
-                frm.add(edt, BorderLayout.CENTER);
-                frm.setVisible(true);
-
-                frm.setSize((int) (getWidth() / 1.3), (int) (getHeight() / 1.3));
-
-                int w = frm.getWidth();
-                int h = frm.getHeight();
-
-                frm.setFrameIcon(JBlocks.getIcon("speaker.png"));
-                frm.setLocation(getWidth() / 2 - w / 2, getHeight() / 2 - h / 2);
-
-                add(frm, 0);
-                try {
-                    frm.setSelected(true);
-                } catch (java.beans.PropertyVetoException e) {
-                }
+                openSoundEditor();
             }
         });
 
@@ -194,7 +137,7 @@ public class JBlocksPane extends JDesktopPane {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                JByobEditor.createEditor(JBlocksPane.this, JBlocks.getIcon("block-editor.png"));
+                openByobEditor();
             }
         });
         tools.add(openByob);
@@ -206,7 +149,7 @@ public class JBlocksPane extends JDesktopPane {
         final JScrollPane chScroll = new JScrollPane(spriteChooser);
         chScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-        JPopupMenu menu = new JPopupMenu();
+        JPopupMenu progressMenu = new JPopupMenu();
         ActionListener stopScripts = new ActionListener() {
 
             @Override
@@ -214,8 +157,8 @@ public class JBlocksPane extends JDesktopPane {
                 context.stopScripts();
             }
         };
-        menu.add("Stop all scripts").addActionListener(stopScripts);
-        progress.setComponentPopupMenu(menu);
+        progressMenu.add("Stop all scripts").addActionListener(stopScripts);
+        progress.setComponentPopupMenu(progressMenu);
 
         tools.addSeparator();
 
@@ -240,8 +183,12 @@ public class JBlocksPane extends JDesktopPane {
 
         app.add(tabs, BorderLayout.CENTER);
 
+        root = new JRootPane();
+        root.setContentPane(app);
+        root.setJMenuBar(new JBlocksMenu(this));
+
         // add app to the desktop-pane
-        add(app);
+        add(root);
     }
 
     public JProgressBar getProgress() {
@@ -257,6 +204,60 @@ public class JBlocksPane extends JDesktopPane {
         return context;
     }
 
+    /****************************************************************
+     *******************  Menu and Toolbar **************************
+     ****************************************************************/
+    void openProject() {
+        // TODO
+        JOptionPane.showInternalMessageDialog(this, "Not yet implemented!");
+    }
+
+    void saveProject(boolean saveAs) {
+        // TODO
+        JOptionPane.showInternalMessageDialog(this, "Not yet implemented!");
+    }
+
+    void newProject() {
+        // TODO
+        JOptionPane.showInternalMessageDialog(this, "Not yet implemented!");
+    }
+
+    void openBlockStore() {
+        JBlockStore.openBlockStore(JBlocksPane.this, JBlocks.getIcon("download-folder.png"));
+    }
+
+    void openPaintEditor() {
+        JPaintEditor edt = new JPaintEditor();
+        final JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, edt, "ZeroLuck's Paint-Editor");
+        frm.setFrameIcon(JBlocks.getIcon("paint-editor.png"));
+        edt.addPaintEditorListener(new JPaintEditor.PaintEditorListener() {
+
+            @Override
+            public void cancelSelected(BufferedImage img) {
+                frm.dispose();
+            }
+
+            @Override
+            public void finishSelected(BufferedImage img) {
+                spriteChooser.addSpriteView(null, "Test", img);
+                frm.dispose();
+            }
+        });
+    }
+
+    void openSoundEditor() {
+        JSoundEditor edt = new JSoundEditor();
+        JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, edt, "ZeroLuck's Sound-Editor",
+                new Dimension((int) (getWidth() / 1.3), (int) (getHeight() / 1.3)));
+        frm.setResizable(true);
+        frm.setFrameIcon(JBlocks.getIcon("speaker.png"));
+    }
+
+    void openByobEditor() {
+        JByobEditor.createEditor(JBlocksPane.this, JBlocks.getIcon("block-editor.png"));
+    }
+
+    /***********************************************************/
     private JBlockEditor createBlockEditor() {
         final JBlockEditor edt = new JBlockEditor();
 
@@ -321,6 +322,17 @@ public class JBlocksPane extends JDesktopPane {
         return edt;
     }
 
+    public void setToolbarVisible(boolean b) {
+        if (b && tools.getParent() == null) {
+            app.add(tools, BorderLayout.NORTH);
+        } else if (!b) {
+            app.remove(tools);
+        }
+        app.invalidate();
+        app.validate();
+        app.repaint();
+    }
+
     private void removeVariable(final String name) {
         final IScriptEngine engine = context.getScriptEngine();
         final Map variables = engine.getGlobalVariables();
@@ -352,41 +364,10 @@ public class JBlocksPane extends JDesktopPane {
         engine.getGlobalVariables().put(name, 0);
     }
 
-    private static JBlocksPane getJBlocksPane(Component c) {
-        if (c instanceof JBlocksPane) {
-            return (JBlocksPane) c;
-        }
-        Container cont = c.getParent();
-        while (cont != null) {
-            if (cont instanceof JBlocksPane) {
-                return (JBlocksPane) cont;
-            }
-
-            cont = cont.getParent();
-        }
-        return null;
-    }
-
-    // will be removed later
-    public static void openFileChooserRead(Component c, String text) {
-        JBlocksPane jblocks = getJBlocksPane(c);
-        JFileChooser chooser = new JFileChooser();
-        JInternalFrame frm = new JInternalFrame("File Chooser");
-        frm.setClosable(true);
-        frm.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-        frm.setResizable(true);
-        frm.add(chooser);
-        frm.setVisible(true);
-        frm.pack();
-        frm.setLocation(jblocks.getWidth() / 2 - frm.getWidth() / 2,
-                jblocks.getHeight() / 2 - frm.getHeight() / 2);
-        jblocks.add(frm, 0);
-    }
-
     @Override
     public void doLayout() {
         super.doLayout();
-        app.setBounds(0, 0, getWidth(), getHeight());
+        root.setBounds(0, 0, getWidth(), getHeight());
     }
 
     public static void setLaF() {

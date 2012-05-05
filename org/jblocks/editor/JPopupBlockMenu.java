@@ -1,26 +1,20 @@
 package org.jblocks.editor;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import javax.imageio.ImageIO;
-import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
-import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
 import org.jblocks.JBlocks;
 import org.jblocks.gui.JDragPane;
-import org.jblocks.utils.FileChooserUtils;
+import org.jblocks.utils.SwingUtils;
 import org.jblocks.utils.StreamUtils;
 
 /**
@@ -65,7 +59,11 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
             this.add("delete").addActionListener(this);
         }
         this.addSeparator();
-        this.add("share").addActionListener(this);
+
+        if (!JBlocks.getContextForComponent(parent).isDefaultBlock(parent.getModel().getID())) {
+            this.add("share").addActionListener(this);
+        }
+
         this.add("save picture of script").addActionListener(this);
 
         this.addSeparator();
@@ -101,15 +99,24 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
         ch.setMultiSelectionEnabled(false);
         ch.setDialogType(JFileChooser.SAVE_DIALOG);
         ch.setDialogTitle(title);
-        FileChooserUtils.showInternalFileChooser(ctx.getDesktop(), ch);
+        SwingUtils.showInternalFileChooser(ctx.getDesktop(), ch);
         return ch;
     }
 
     private void shareBlock() {
         // TODO
-        JOptionPane.showInternalMessageDialog(JBlocks.getContextForComponent(parent).getDesktop(),
-                "Not implemented yet. ", "Not implemented yet",
-                JOptionPane.INFORMATION_MESSAGE);
+        try {
+            org.jblocks.blockstore.BlockStoreServer.uploadBlock(JBlocks.getContextForComponent(parent), parent.getModel());
+
+            JOptionPane.showInternalMessageDialog(JBlocks.getContextForComponent(parent).getDesktop(),
+                    "The block was uploaded successfull!");
+
+        } catch (Exception io) {
+            JOptionPane.showInternalMessageDialog(JBlocks.getContextForComponent(parent).getDesktop(),
+                    "The block couldn't be uploaded!\n"
+                    + "The error can be: You tried to upload an already existing block.\n\n" + io, "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private Dimension calculateSize(Puzzle p) {
@@ -132,7 +139,7 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
     private void savePicture() {
         final JBlocks ctx = JBlocks.getContextForComponent(parent);
         final JFileChooser ch = showFileChooser("Save picture of script");
-        
+
         BufferedImage img = null;
 
         try {
@@ -148,7 +155,7 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
             if (parent instanceof Puzzle) {
                 pieces = JBlockSequence.getPuzzlePieces((Puzzle) parent, PuzzleAdapter.TYPE_DOWN);
             } else {
-                pieces = new AbstrBlock[] {parent};
+                pieces = new AbstrBlock[]{parent};
             }
             for (AbstrBlock b : pieces) {
                 g.translate(0, b.getY() - pieces[0].getY());
@@ -164,14 +171,14 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         final BufferedImage finalImg = img;
-        ch.setFileFilter(FileChooserUtils.createFilter(new String[]{"png"}, "Portable-network-graphics (PNG) files"));
+        ch.setFileFilter(SwingUtils.createFilter(new String[]{"png"}, "Portable-network-graphics (PNG) files"));
         ch.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                if (FileChooserUtils.isApproveSelection(ae)) {
+                if (SwingUtils.isApproveSelection(ae)) {
                     File f = ch.getSelectedFile();
                     if (f != null) {
                         try {
@@ -190,12 +197,12 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
     private void saveScript() {
         final JBlocks ctx = JBlocks.getContextForComponent(parent);
         final JFileChooser ch = showFileChooser("Save script");
-        ch.setFileFilter(FileChooserUtils.createFilter(new String[]{"jbs"}, "JBlocks script files (JBS)"));
+        ch.setFileFilter(SwingUtils.createFilter(new String[]{"jbs"}, "JBlocks script files (JBS)"));
         ch.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                if (FileChooserUtils.isApproveSelection(ae)) {
+                if (SwingUtils.isApproveSelection(ae)) {
                     File f = ch.getSelectedFile();
                     if (f != null) {
                         try {

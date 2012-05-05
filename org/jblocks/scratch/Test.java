@@ -1,32 +1,17 @@
 package org.jblocks.scratch;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.util.Arrays;
 
-import org.jblocks.scratch.ObjReader.LContext;
+class Test {
 
+    public static void main(String[] args) throws Exception {
+        final String testFile = "C:/JTest/test.sb";
+        
+        ObjReader r = new ObjReader(new FileInputStream(testFile));
+        Object[][] objTable = r.readObjects();
 
-public class Test {
-public static void main(String[] args) throws IOException{
-	//Reader r = new Reader(new DataInputStream(new FileInputStream(new File("C:\\Users\\Thomas\\Documents\\Scratch Projects\\Chat.py.sb"))));
-	//r.read();
-	ObjReader reader= new ObjReader(new FileInputStream(new File("C:\\JTest\\Chat.py.sb")));
-	try {
-		
-		LContext context = new LContext();
-		
-		System.out.println(reader.readObjects(context));
-	} catch (Exception e) {
-		// TODO: handle exception
-		e.printStackTrace();
-	}
-	System.out.println(reader.objTable);
-	for (int i = 0; i < reader.objTable.length; i++) {
-		for (int j = 0; j < reader.objTable[i].length; j++) {
-			System.out.println(reader.objTable[i][j]);
-		}
-	}
-	System.out.println(reader.objTable);
-}
+        // Or try Arrays.deepToString(objTable)
+        System.out.println(Arrays.toString(objTable));
+    }
 }

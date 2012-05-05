@@ -1,6 +1,5 @@
 package org.jblocks.editor;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.io.IOException;
 import java.io.InputStream;
@@ -220,6 +219,18 @@ public class BlockIO {
         Node scripts = doc.getFirstChild();
 
         return toBlockSequence(buildSequence(ctx, scripts));
+    }
+
+    /**
+     * Reads a script from a DOM Node. <br />
+     * See {@link #readFromXML(org.jblocks.JBlocks, java.io.InputStream) }
+     * 
+     * @param ctx the contxt of JBlocks
+     * @param root the Node in which the script is
+     * @return the script
+     */
+    public static Block[] readFromXML(JBlocks ctx, Node root) {
+        return toBlockSequence(buildSequence(ctx, root));
     }
 
     private static void setValue(JBlocks ctx, Component c, Object val) {

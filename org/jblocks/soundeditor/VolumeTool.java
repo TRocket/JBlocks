@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.jblocks.utils.SwingUtils;
 
 /**
  *
@@ -24,7 +25,7 @@ class VolumeTool extends SoundEditorTool {
             Component src = evt.getComponent();
             if (src instanceof JSoundTrack) {
                 final JSoundTrack track = (JSoundTrack) src;
-                JDesktopPane desktop = getEditor().getDesktop();
+                JDesktopPane desktop = SwingUtils.getDesktop(getEditor());
                 final JOptionPane optionPane = new JOptionPane();
 
                 JSlider slider = new JSlider();

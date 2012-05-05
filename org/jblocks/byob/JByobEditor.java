@@ -38,6 +38,7 @@ import org.jblocks.editor.PuzzleAdapter;
 import org.jblocks.editor.ScriptGrabber;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.ByobBlock;
+import org.jblocks.utils.SwingUtils;
 
 /**
  *
@@ -179,19 +180,6 @@ public class JByobEditor extends JPanel {
             m.cancel();
         }
     }
-
-    /**
-     * Returns the Plus's JDesktopPane or null if it hasn't one. <br />
-     */
-    public JDesktopPane getDesktop() {
-        Container cont = this;
-        while ((cont = cont.getParent()) != null) {
-            if (cont instanceof JDesktopPane) {
-                return (JDesktopPane) cont;
-            }
-        }
-        return null;
-    }
     
     private Component createInput(String type, String label) {
         final Component newc;
@@ -262,7 +250,7 @@ public class JByobEditor extends JPanel {
                 frm.add(ch, BorderLayout.CENTER);
                 frm.pack();
                 
-                final JDesktopPane desktop = getDesktop();
+                final JDesktopPane desktop = SwingUtils.getDesktop(JByobEditor.this);
                 final Point loc = SwingUtilities.convertPoint(JByobEditor.this, getLocation(), desktop);
                 
                 frm.setLocation(loc.x + getWidth() / 2 - frm.getWidth() / 2, loc.y + getHeight() / 2 - frm.getHeight() / 2);
@@ -334,11 +322,11 @@ public class JByobEditor extends JPanel {
             final String text, final String category,
             final Color c) {
         
-        final JInternalFrame frm = new JInternalFrame("Make a block");
+        final JByobEditor edt = new JByobEditor(type, text, category, c, editorIcon);
+        final JInternalFrame frm = SwingUtils.showInternalFrame(desktop, edt, "Make a block");
         if (editorIcon != null) {
             frm.setFrameIcon(editorIcon);
         }
-        final JByobEditor edt = new JByobEditor(type, text, category, c, editorIcon);
         edt.addByobEditorListener(new ByobEditorListener() {
             
             @Override
@@ -361,20 +349,6 @@ public class JByobEditor extends JPanel {
                 frm.dispose();
             }
         });
-        frm.setClosable(true);
-        frm.setLayout(new BorderLayout());
-        frm.add(edt, BorderLayout.CENTER);
-        frm.pack();
-        frm.setVisible(true);
-        
-        final Dimension size = frm.getSize();
-        frm.setLocation(desktop.getWidth() / 2 - size.width / 2,
-                desktop.getHeight() / 2 - size.height / 2);
-        desktop.add(frm, 0);
-        try {
-            frm.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-        }
     }
 
     /**
@@ -384,12 +358,11 @@ public class JByobEditor extends JPanel {
      * @param editorIcon - the icon for the created frames. (can be null)
      */
     public static void createEditor(final JDesktopPane desktop, final Icon editorIcon) {
-        final JInternalFrame frm = new JInternalFrame("Make a block");
-        frm.setClosable(true);
+        BlockTypeChooser chooser = new BlockTypeChooser();
+        final JInternalFrame frm = SwingUtils.showInternalFrame(desktop, chooser, "Make a block");
         if (editorIcon != null) {
             frm.setFrameIcon(editorIcon);
         }
-        BlockTypeChooser chooser = new BlockTypeChooser();
         chooser.addBlockTypeListener(new BlockTypeChooser.BlockTypeChooserListener() {
             
             @Override
@@ -403,19 +376,5 @@ public class JByobEditor extends JPanel {
                 createByobEditor(desktop, editorIcon, type, label, category, c);
             }
         });
-        frm.setLayout(new BorderLayout());
-        frm.add(chooser, BorderLayout.CENTER);
-        frm.pack();
-        frm.setVisible(true);
-        
-        Dimension size = frm.getSize();
-        frm.setLocation(desktop.getWidth() / 2 - size.width / 2,
-                desktop.getHeight() / 2 - size.height / 2);
-        desktop.add(frm, 0);
-        try {
-            frm.setSelected(true);
-        } catch (java.beans.PropertyVetoException e) {
-        }
-        
     }
 }

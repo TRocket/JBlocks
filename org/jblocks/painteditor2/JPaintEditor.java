@@ -5,10 +5,8 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Composite;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
@@ -26,21 +24,17 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
-import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileFilter;
 import org.jblocks.JBlocks;
 import org.jblocks.gui.JSmallColorChooser;
 import org.jblocks.gui.JZoomChooser;
-import org.jblocks.utils.FileChooserUtils;
+import org.jblocks.utils.SwingUtils;
 
 /**
  * A "vector"-graphics paint editor. <br />
@@ -294,19 +288,6 @@ public final class JPaintEditor extends JPanel {
         add(bottom, BorderLayout.SOUTH);
     }
 
-    /**
-     * Returns the desktop pane on which this JPaintEditor is, or null <br />
-     */
-    private JDesktopPane getDesktop() {
-        Container parent = getParent();
-        while (parent != null) {
-            if (parent instanceof JDesktopPane) {
-                return (JDesktopPane) parent;
-            }
-            parent = parent.getParent();
-        }
-        return null;
-    }
     private JFileChooser chooser;
     private ActionListener currentListener;
 
@@ -325,11 +306,11 @@ public final class JPaintEditor extends JPanel {
                     first = false;
                 }
                 final String description = sb.toString();
-                chooser.setFileFilter(FileChooserUtils.createFilter(suffix, description));
+                chooser.setFileFilter(SwingUtils.createFilter(suffix, description));
                 chooser.setDialogTitle("Select an image file...");
             }
         }
-        FileChooserUtils.showInternalFileChooser(getDesktop(), chooser);
+        SwingUtils.showInternalFileChooser(SwingUtils.getDesktop(this), chooser);
         if (currentListener != null) {
             chooser.removeActionListener(currentListener);
         }
@@ -338,7 +319,7 @@ public final class JPaintEditor extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                if (FileChooserUtils.isApproveSelection(ae)) {
+                if (SwingUtils.isApproveSelection(ae)) {
                     open(chooser.getSelectedFile());
                 }
             }

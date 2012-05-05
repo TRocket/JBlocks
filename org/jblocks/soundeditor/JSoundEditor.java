@@ -39,14 +39,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileFilter;
 import org.jblocks.JBlocks;
 import org.jblocks.sound.AudioFormat16Filter;
 import org.jblocks.sound.SimplePlayer;
 import org.jblocks.sound.SoftwareMixer;
 import org.jblocks.sound.SoundInput;
 import org.jblocks.sound.Volume16Filter;
-import org.jblocks.utils.FileChooserUtils;
+import org.jblocks.utils.SwingUtils;
 import org.jblocks.utils.StreamUtils;
 
 /**
@@ -286,7 +285,6 @@ public final class JSoundEditor extends JPanel {
     private void openExportFileChooser() {
         String[] chooser = new String[]{
             "OGG",
-            /*  "JBSP", */
             "WAV",
             "AIFF",
             "AU"};
@@ -299,15 +297,17 @@ public final class JSoundEditor extends JPanel {
 
         final JFileChooser ch = new JFileChooser();
         ch.setMultiSelectionEnabled(false);
-        ch.setApproveButtonText("Save");
+        ch.setDialogType(JFileChooser.SAVE_DIALOG);
+        ch.setDialogTitle("Select a sound file...");
 
-        final JDesktopPane desktop = getDesktop();
         final JInternalFrame frm = new JInternalFrame("Select a sound file...");
         frm.setClosable(true);
         frm.setLayout(new BorderLayout());
         frm.add(ch, BorderLayout.CENTER);
         frm.pack();
 
+        JDesktopPane desktop = SwingUtils.getDesktop(this);
+        
         frm.setVisible(true);
         Point loc = SwingUtilities.convertPoint(this, getLocation(), desktop);
         frm.setLocation(loc.x + getWidth() / 2 - frm.getWidth() / 2,
@@ -349,7 +349,6 @@ public final class JSoundEditor extends JPanel {
                 }
             }
         });
-
     }
 
     /**
@@ -368,13 +367,13 @@ public final class JSoundEditor extends JPanel {
         final JFileChooser ch = new JFileChooser();
         ch.setDialogTitle("Select a sound file");
         ch.setMultiSelectionEnabled(false);
-        ch.setFileFilter(FileChooserUtils.createFilter(ext, description));
-        FileChooserUtils.showInternalFileChooser(getDesktop(), ch);
+        ch.setFileFilter(SwingUtils.createFilter(ext, description));
+        SwingUtils.showInternalFileChooser(SwingUtils.getDesktop(this), ch);
         ch.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                if (FileChooserUtils.isApproveSelection(ae)) {
+                if (SwingUtils.isApproveSelection(ae)) {
                     open(ch.getSelectedFile());
                 }
             }
@@ -509,24 +508,10 @@ public final class JSoundEditor extends JPanel {
         }
     }
 
-    /**
-     * Returns the desktop pane on which this JSoundEditor is, or null <br />
-     * 
-     */
-    JDesktopPane getDesktop() {
-        Container parent = getParent();
-        while (parent != null) {
-            if (parent instanceof JDesktopPane) {
-                return (JDesktopPane) parent;
-            }
-            parent = parent.getParent();
-        }
-        return null;
-    }
     private int recordingCounter = 0;
 
     private void openRecorderDialog() {
-        Container desktop = getDesktop();
+        Container desktop = SwingUtils.getDesktop(this);
         if (desktop != null) {
             final JInternalFrame frm = new JInternalFrame("Microphone Recorder");
             frm.setClosable(true);
