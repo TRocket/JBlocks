@@ -1,0 +1,38 @@
+/* Don't define a package.
+   The package will be defined by JBlocks. */
+
+import org.jblocks.scriptengine.NativeBlock;
+
+/**
+ * @author ${user.name}
+ */
+public class YourNativeBlock extends NativeBlock {
+
+    private static final int PARAMETER_COUNT = 0;
+
+    /**
+     * This class needs a default constructor. (Don't modify)
+     * JBlocks will create only one instance of this class.
+     */
+    public YourNativeBlock() {
+        super(PARAMETER_COUNT, ${block.id});
+    }
+
+    /**
+     * This method is called from the JBlocks ScriptEngine
+     * when a block of this NativeBlock instance is executed.
+     * Throwing an Exception will stop the current Script.
+     *
+     * Warning: This method has to be executed (very) fast because
+     *          the ScriptEngine is halted while this method is running.
+     *
+     * @param context the ScriptEngine context.
+     * @param params the parameters for this block.
+     */
+     @Override
+     public Object evaluate(Object context, Object... param) {
+        // TODO
+
+        return null;
+     }
+}

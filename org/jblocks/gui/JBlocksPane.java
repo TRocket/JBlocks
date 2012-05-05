@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 
 import javax.swing.AbstractButton;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
@@ -29,6 +30,7 @@ import javax.swing.UIManager;
 import org.jblocks.JBlocks;
 import org.jblocks.blockstore.JBlockStore;
 import org.jblocks.byob.JByobEditor;
+import org.jblocks.cyob.JCyobEditor;
 import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.BlockModel;
 import org.jblocks.editor.JBlockEditor;
@@ -144,6 +146,19 @@ public class JBlocksPane extends JDesktopPane {
         });
         tools.add(openByob);
 
+        final JButton openCyob = new JButton(JBlocks.getIcon("cyob.png"));
+        openCyob.setToolTipText("<HTML><b>Code a block</b><ul><li>Create your own blocks in Java</li></ul></HTML>");
+        openCyob.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                openCyobEditor();
+            }
+        });
+        tools.add(openCyob);
+
+
+
         // add components to 'app'
         app.setLayout(new BorderLayout());
         app.add(tools, BorderLayout.NORTH);
@@ -257,6 +272,14 @@ public class JBlocksPane extends JDesktopPane {
 
     void openByobEditor() {
         JByobEditor.createEditor(JBlocksPane.this, JBlocks.getIcon("block-editor.png"));
+    }
+
+    void openCyobEditor() {
+        Icon icn = JBlocks.getIcon("cyob.png");
+        JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, new JCyobEditor(), "ZeroLuck's Cyob-Editor", 
+                new Dimension((int) (getWidth() * 0.8), (int) (getHeight() * 0.8)));
+        frm.setFrameIcon(icn);
+        frm.setResizable(true);
     }
 
     /***********************************************************/

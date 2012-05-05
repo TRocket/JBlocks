@@ -81,6 +81,13 @@ class JBlocksMenu extends JMenuBar {
                 jblocks.openBlockStore();
             }
         });
+        toolMenu.add("CYOB-Editor").addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                jblocks.openCyobEditor();
+            }
+        });
         toolMenu.addSeparator();
         toolMenu.add("Plugins");
 
