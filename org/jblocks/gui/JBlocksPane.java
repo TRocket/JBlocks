@@ -52,6 +52,8 @@ import org.jblocks.utils.SwingUtils;
 public class JBlocksPane extends JDesktopPane {
 
     // <member>
+    private JPaintEditor pedt = new JPaintEditor();
+    private JPaintEditor sedt = new JPaintEditor();
     private final JToolBar tools;
     private final JBlockEditor editor;
     private final JPanel app;
@@ -244,10 +246,9 @@ public class JBlocksPane extends JDesktopPane {
     }
 
     void openPaintEditor() {
-        JPaintEditor edt = new JPaintEditor();
-        final JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, edt, "ZeroLuck's Paint-Editor");
+        final JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, sedt, "ZeroLuck's Paint-Editor");
         frm.setFrameIcon(JBlocks.getIcon("paint-editor.png"));
-        edt.addPaintEditorListener(new JPaintEditor.PaintEditorListener() {
+        pedt.addPaintEditorListener(new JPaintEditor.PaintEditorListener() {
 
             @Override
             public void cancelSelected(BufferedImage img) {
