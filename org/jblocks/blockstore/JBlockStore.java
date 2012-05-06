@@ -37,6 +37,7 @@ import org.jblocks.editor.BlockModel;
 import org.jblocks.gui.JHintingTextField;
 import org.jblocks.scriptengine.NativeBlock;
 import org.jblocks.utils.SwingUtils;
+import org.jblocks.utils.XMLSwingLoader;
 
 /**
  *
@@ -44,7 +45,6 @@ import org.jblocks.utils.SwingUtils;
  */
 public class JBlockStore extends JPanel {
 
-    private final JPanel intro;
     private final JPaneSwitcher swt;
     private final JProgressBar progress;
     private final List<Long> blocks;
@@ -53,7 +53,7 @@ public class JBlockStore extends JPanel {
     public JBlockStore() {
         setLayout(new BorderLayout());
         swt = new JPaneSwitcher();
-        intro = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel intro = new JPanel(new FlowLayout(FlowLayout.CENTER));
         progress = new JProgressBar();
         blocks = new ArrayList<Long>();
         blockFilter = new JComboBox<JComponent>();
@@ -62,7 +62,7 @@ public class JBlockStore extends JPanel {
         intro.setBackground(Color.WHITE);
         swt.setView(intro);
 
-        blockFilter.setRenderer(new ComponentCellRenderer(true));
+        blockFilter.setRenderer(new ComponentCellRenderer<JComponent>(true));
 
         AbstrBlock reporterBlock = BlockFactory.createPreviewBlock("reporter", "reporter");
         AbstrBlock booleanBlock = BlockFactory.createPreviewBlock("boolean", "boolean");
@@ -201,14 +201,14 @@ public class JBlockStore extends JPanel {
         }.start();
     }
 
-    private void displayList(final ListModel model) {
+    private void displayList(final ListModel<JComponent> model) {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             @Override
             public void run() {
-                final JList list = new JList(model);
+                final JList<JComponent> list = new JList<JComponent>(model);
                 list.setSelectedIndex(0);
-                list.setCellRenderer(new ComponentCellRenderer(true));
+                list.setCellRenderer(new ComponentCellRenderer<JComponent>(true));
                 list.addMouseListener(new MouseAdapter() {
 
                     @Override
@@ -235,7 +235,7 @@ public class JBlockStore extends JPanel {
 
             @Override
             public void run() {
-                DefaultListModel model = new DefaultListModel();
+                DefaultListModel<JComponent> model = new DefaultListModel<JComponent>();
                 try {
                     String filter = null;
                     if (blockFilter.getSelectedIndex() == 1) {
@@ -260,7 +260,7 @@ public class JBlockStore extends JPanel {
         }.start();
     }
 
-    private void addToModel(BlockModel[] m, DefaultListModel model) {
+    private void addToModel(BlockModel[] m, DefaultListModel<JComponent> model) {
         blocks.clear();
         if (m.length > 0) {
             for (BlockModel bm : m) {
@@ -277,7 +277,7 @@ public class JBlockStore extends JPanel {
         }
     }
 
-    private static class ComponentCellRenderer extends JPanel implements ListCellRenderer {
+    public static class ComponentCellRenderer<E extends JComponent> extends JPanel implements ListCellRenderer {
 
         private static final Color HIGHLIGHT_COLOR = new Color(175, 175, 255);
         private static final int GAP = 2;
@@ -314,6 +314,7 @@ public class JBlockStore extends JPanel {
         @Override
         public Component getListCellRendererComponent(JList list, Object value,
                 int index, boolean isSelected, boolean cellHasFocus) {
+
             JComponent comp = (JComponent) value;
             if (isSelected) {
                 setBackground(HIGHLIGHT_COLOR);
@@ -321,6 +322,7 @@ public class JBlockStore extends JPanel {
                 setBackground(Color.WHITE);
             }
             removeAll();
+            if (comp != null)
             add(comp);
             doLayout();
             setSize(getPreferredSize());

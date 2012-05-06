@@ -24,10 +24,12 @@ public class YourNativeBlock extends NativeBlock {
      * Throwing an Exception will stop the current Script.
      *
      * Warning: This method has to be executed (very) fast because
-     *          the ScriptEngine is halted while this method is running.
+     *          the ScriptEngine is halted while a NativeBlock is running.
      *
      * @param context the ScriptEngine context.
      * @param params the parameters for this block.
+     * @return the return value of this block. 
+     *         command-blocks should return null.
      */
      @Override
      public Object evaluate(Object context, Object... param) {

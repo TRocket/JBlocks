@@ -148,9 +148,10 @@ class MultiSyntaxDocument extends DefaultStyledDocument {
     }
 
     /** sets the number of characters per tab */
+    @SuppressWarnings("deprecation")
     public void setTabs(int charactersPerTab) {
         Font f = new Font(fontName, Font.PLAIN, fontSize);
-        FontMetrics fm = java.awt.Toolkit.getDefaultToolkit().getFontMetrics(f);
+        FontMetrics fm = Toolkit.getDefaultToolkit().getFontMetrics(f);
         int charWidth = fm.charWidth('w');
         int tabWidth = charWidth * charactersPerTab;
         TabStop[] tabs = new TabStop[35];

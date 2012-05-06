@@ -165,7 +165,7 @@ public class BlockIO {
     private static Object[] buildSequence(JBlocks ctx, Node n) {
         final NodeList nodes = n.getChildNodes();
         final int length = nodes.getLength();
-        final List<Object> seq = new ArrayList(length);
+        final List<Object> seq = new ArrayList<Object>(length);
         for (int i = 0; i < length; i++) {
             final Node child = nodes.item(i);
             final String name = child.getNodeName().toLowerCase();

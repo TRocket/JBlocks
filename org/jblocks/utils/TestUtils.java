@@ -17,30 +17,41 @@ import org.jblocks.gui.JBlocksPane;
  */
 public class TestUtils {
 
+    public static void displayPacked(final Component c, final String title) {
+        SwingUtils.run(new Runnable() {
 
-    public static void displayPacked(Component c, String title) {
-        JFrame frm = new JFrame(title == null ? "Test" : "Test : " + title);
-        frm.setLocationByPlatform(true);
-        frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frm.setLayout(new BorderLayout());
-        frm.add(c, BorderLayout.CENTER);
-        frm.pack();
+            @Override
+            public void run() {
+                JFrame frm = new JFrame(title == null ? "Test" : "Test : " + title);
+                frm.setLocationByPlatform(true);
+                frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frm.setLayout(new BorderLayout());
+                frm.add(c, BorderLayout.CENTER);
+                frm.pack();
 
-        frm.setVisible(true);
-        JBlocksPane.setLaF();
-        SwingUtilities.updateComponentTreeUI(frm);
+                frm.setVisible(true);
+                JBlocksPane.setLaF();
+                SwingUtilities.updateComponentTreeUI(frm);
+            }
+        });
     }
 
-    public static void displayWithSize(Component c, String title, Dimension size) {
-        JFrame frm = new JFrame(title == null ? "Test" : "Test : " + title);
-        frm.setLocationByPlatform(true);
-        frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frm.setLayout(new BorderLayout());
-        frm.add(c, BorderLayout.CENTER);
-        frm.setSize(size);
+    public static void displayWithSize(final Component c, final String title, final Dimension size) {
+        SwingUtils.run(new Runnable() {
 
-        frm.setVisible(true);
-        JBlocksPane.setLaF();
-        SwingUtilities.updateComponentTreeUI(frm);
+            @Override
+            public void run() {
+                JFrame frm = new JFrame(title == null ? "Test" : "Test : " + title);
+                frm.setLocationByPlatform(true);
+                frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frm.setLayout(new BorderLayout());
+                frm.add(c, BorderLayout.CENTER);
+                frm.setSize(size);
+
+                frm.setVisible(true);
+                JBlocksPane.setLaF();
+                SwingUtilities.updateComponentTreeUI(frm);
+            }
+        });
     }
 }

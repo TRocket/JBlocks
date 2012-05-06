@@ -1,0 +1,30 @@
+<panel setLayout="new BorderLayout()">
+    <org.jblocks.blockstore.JPaneSwitcher name="'switcher'" constrains="BorderLayout.CENTER" >
+        <panel name="'intro'" setLayout="new FlowLayout(FlowLayout.CENTER)" background="Color.WHITE">
+            <label icon="welcome-to-the-blockstore.png" />
+        </panel>
+    </org.jblocks.blockstore.JPaneSwitcher>
+    
+    <toolbar floatable="false" constrains="BorderLayout.NORTH">
+        <button icon="new.png" name="'newest'" />
+        <combobox name="'blockFilter'" renderer="new org.jblocks.blockstore.JBlockStore.ComponentCellRenderer(true)"
+            focusable="false">
+            <methods>
+                <addItem>new JLabel("any block")</addItem>
+                <addItem>org.jblocks.editor.BlockFactory.createPreviewBlock('command', 'command')</addItem>
+                <addItem>org.jblocks.editor.BlockFactory.createPreviewBlock('reporter', 'reporter')</addItem>
+                <addItem>org.jblocks.editor.BlockFactory.createPreviewBlock('boolean', 'boolean')</addItem>
+                <addItem>org.jblocks.editor.BlockFactory.createPreviewBlock('cap', 'cap block')</addItem>
+            </methods>
+        </combobox>
+        <org.jblocks.gui.JHintingTextField name="'searchField'" emptyTextHint="'Search a block'" 
+            setLayout="new BorderLayout()" columns="20">
+                
+            <label icon="search.png" constrains="BorderLayout.EAST" />
+        </org.jblocks.gui.JHintingTextField>
+    </toolbar>
+    
+    <panel setLayout="new FlowLayout(FlowLayout.RIGHT)" constrains="BorderLayout.SOUTH">
+        <progressbar name="'progress'" />
+    </panel>
+</panel>

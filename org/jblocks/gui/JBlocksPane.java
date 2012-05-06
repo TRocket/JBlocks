@@ -52,8 +52,6 @@ import org.jblocks.utils.SwingUtils;
 public class JBlocksPane extends JDesktopPane {
 
     // <member>
-    private JPaintEditor pedt = new JPaintEditor();
-    private JPaintEditor sedt = new JPaintEditor();
     private final JToolBar tools;
     private final JBlockEditor editor;
     private final JPanel app;
@@ -246,9 +244,10 @@ public class JBlocksPane extends JDesktopPane {
     }
 
     void openPaintEditor() {
-        final JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, sedt, "ZeroLuck's Paint-Editor");
+        JPaintEditor edt = new JPaintEditor();
+        final JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, edt, "ZeroLuck's Paint-Editor");
         frm.setFrameIcon(JBlocks.getIcon("paint-editor.png"));
-        pedt.addPaintEditorListener(new JPaintEditor.PaintEditorListener() {
+        edt.addPaintEditorListener(new JPaintEditor.PaintEditorListener() {
 
             @Override
             public void cancelSelected(BufferedImage img) {
@@ -406,7 +405,7 @@ public class JBlocksPane extends JDesktopPane {
                     defaults.put("info", new Color(0xF0F0F0));
                     return;
                 }
-            }
+            } 
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Throwable t) {
             System.err.println("Exception while setting LaF. (" + t + ")");

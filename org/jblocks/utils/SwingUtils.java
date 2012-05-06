@@ -3,6 +3,7 @@ package org.jblocks.utils;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -19,6 +20,19 @@ import javax.swing.filechooser.FileFilter;
  * @author ZeroLuck
  */
 public class SwingUtils {
+
+    /**
+     * Ensures to run the Runnable in the EDT. <br />
+     * 
+     * @param r the Runnable to run in the EDT
+     */
+    public static void run(Runnable r) {
+        if (EventQueue.isDispatchThread()) {
+            r.run();
+        } else {
+            EventQueue.invokeLater(r);
+        }
+    }
 
     /**
      * Creates a FileFilter for a specified description
@@ -71,7 +85,7 @@ public class SwingUtils {
      * @param desktop the JDesktopPane on which to display the JFileChooser
      * @param ch the JFileChooser to display
      */
-    public static void showInternalFileChooser(JDesktopPane desktop, JFileChooser ch) {
+    public static void showInternalFileChooser(JDesktopPane desktop, final JFileChooser ch) {
         final JInternalFrame frm = new JInternalFrame(ch.getDialogTitle());
         frm.setClosable(true);
         frm.setResizable(true);
@@ -91,6 +105,7 @@ public class SwingUtils {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 frm.dispose();
+                ch.removeActionListener(this);
             }
         });
 
@@ -163,7 +178,7 @@ public class SwingUtils {
 
         return frm;
     }
-    
+
     /**
      * Returns the JDesktopPane of the specified Component. <br />
      * 

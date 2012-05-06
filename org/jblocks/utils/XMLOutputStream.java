@@ -165,6 +165,28 @@ public class XMLOutputStream {
         write(encode(text));
     }
 
+    /**
+     * Writes an entry to the stream. <br />
+     * An entry is looking like this:
+     * <div style="border: 1px solid black;">
+     *  <code>
+     *      {@literal <ENTRY-NAME>ENTRY-VALUE</ENTRY-NAME>}
+     *  </code>
+     * </div>
+     * <p />
+     * You can replace this method with: <br />
+     * <div style="border: 1px solid black;">
+     *  <code>
+     *      writeStartElement(name); <br />
+     *      writeText(value); <br />
+     *      writeEndElement(); <br />
+     *  </code>
+     * </div>
+     * 
+     * @param name the name of the entry
+     * @param value the value of the entry
+     * @throws IOException 
+     */
     public void writeEntry(String name, String value) throws IOException {
         writeStartElement(name);
         writeText(value);

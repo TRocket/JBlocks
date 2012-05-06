@@ -168,9 +168,8 @@ public class BlockTypeChooser extends JPanel {
         add(south, BorderLayout.SOUTH);
         resetColors();
     }
-
     private final Color BACKGROUND = new Color(0xCCCCCC);
-    
+
     private void resetColors() {
         reporter.setBackground(BACKGROUND);
         command.setBackground(BACKGROUND);
@@ -239,17 +238,5 @@ public class BlockTypeChooser extends JPanel {
                 changeBlockCategory(name, c);
             }
         });
-    }
-
-    public static void main(String[] args) {
-        JBlocksPane.setLaF();
-
-        JFrame frm = new JFrame("JByobEditor : Test");
-        frm.setLayout(new BorderLayout());
-        frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frm.setLocationByPlatform(true);
-        frm.add(new BlockTypeChooser(), BorderLayout.CENTER);
-        frm.pack();
-        frm.setVisible(true);
     }
 }

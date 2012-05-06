@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
@@ -285,7 +286,7 @@ public final class JBlocks {
         }
         return null;
     }
-
+    
     /**
      * Stops all threads of the current ScriptEngine. <br />
      * <i>This method is synchronized.</i>

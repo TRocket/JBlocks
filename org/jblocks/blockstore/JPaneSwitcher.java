@@ -12,7 +12,7 @@ import javax.swing.Timer;
  *
  * @author ZeroLuck
  */
-class JPaneSwitcher extends JPanel {
+public class JPaneSwitcher extends JPanel {
 
     private Component currentDisplayed;
     private Component switching;
@@ -37,13 +37,19 @@ class JPaneSwitcher extends JPanel {
         
         if (currentDisplayed != null) {
             switching = c;
-            add(c);
+            super.add(c);
             doLayout();
             switchTo();
         } else {
             currentDisplayed = c;
-            add(currentDisplayed);
+            super.add(currentDisplayed);
         }
+    }
+    
+    @Override
+    public Component add(Component c) {
+        setView(c);
+        return this;
     }
     
     public Component getView() {

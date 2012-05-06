@@ -49,7 +49,7 @@ class ObjReader {
         readObjTable();
 
         Object[] table = (Object[]) this.objTable[0][0];
-        HashMap info = new HashMap(table.length);
+        HashMap<Object, Object> info = new HashMap<Object, Object>(table.length);
         for (int j = 0; j < table.length - 1; j += 2) {
             info.put(table[j], table[(j + 1)]);
         }

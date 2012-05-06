@@ -2,9 +2,15 @@ package org.jblocks.utils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
+import java.util.zip.Deflater;
+import java.util.zip.ZipEntry;
 
 /**
  *
@@ -14,6 +20,27 @@ import java.io.OutputStream;
  */
 public class StreamUtils {
 
+    /**
+     * Packs a <code>{@literal  Map<String, byte[]>}</code> to a JAR byte array. <br />
+     * The JAR will be compressed. <br />
+     * 
+     * @param data the Map of entrys
+     * @return the Map to pack
+     * @throws IOException 
+     */
+    public static byte[] jarPack(Map<String, byte[]> data, Manifest m) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JarOutputStream zip = new JarOutputStream(out, m);
+        zip.setLevel(Deflater.BEST_COMPRESSION);
+        for (String key : data.keySet()) {
+            zip.putNextEntry(new ZipEntry(key));
+            zip.write(data.get(key));
+            zip.closeEntry();
+        }
+        zip.close();
+        return out.toByteArray();
+    }
+    
     /**
      * Adds the file extension to a file-name if it is necessary. <br />
      * 

@@ -1,23 +1,38 @@
 package org.jblocks.cyob;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.Map;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import org.jblocks.JBlocks;
+import org.jblocks.byob.BlockTypeChooser;
+import org.jblocks.byob.BlockTypeChooser.BlockTypeChooserListener;
 import org.jblocks.editor.BlockModel;
+import org.jblocks.scriptengine.StoreableNativeBlock;
+import org.jblocks.utils.Base64;
+import org.jblocks.utils.StreamUtils;
+import org.jblocks.utils.SwingUtils;
 import org.jblocks.utils.TestUtils;
 
 /**
@@ -26,6 +41,8 @@ import org.jblocks.utils.TestUtils;
  */
 public class JCyobEditor extends JPanel {
 
+    private static final String PACKAGE_PREFIX = "org.jblocks.ext.block";
+    
     private final CloseableJTabbedPane tabs;
     private final JToolBar tools;
     private final JTextArea output;
@@ -41,6 +58,26 @@ public class JCyobEditor extends JPanel {
         output.setFont(new Font(MultiSyntaxDocument.DEFAULT_FONT_FAMILY, Font.PLAIN, MultiSyntaxDocument.DEFAULT_FONT_SIZE));
         output.setEditable(false);
 
+        JButton saveBlock = new JButton(JBlocks.getIcon("save.png"));
+        saveBlock.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                saveBlock();
+            }
+        });
+        tools.add(saveBlock);
+
+        JButton openBlock = new JButton(JBlocks.getIcon("open.png"));
+        openBlock.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                openBlock();
+            }
+        });
+        tools.add(openBlock);
+
         JButton newBlock = new JButton(JBlocks.getIcon("new.png"));
         newBlock.addActionListener(new ActionListener() {
 
@@ -55,7 +92,7 @@ public class JCyobEditor extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                compile();
+                compile(BlockModel.createID());
             }
         });
         tools.add(compile);
@@ -98,6 +135,18 @@ public class JCyobEditor extends JPanel {
         split.setBottomComponent(new JScrollPane(output));
         split.setResizeWeight(0.75);
 
+        JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton finish = new JButton("Finish selected block");
+        finish.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                finishBlock();
+            }
+        });
+        south.add(finish);
+
+        add(south, BorderLayout.SOUTH);
         add(tools, BorderLayout.NORTH);
         add(split, BorderLayout.CENTER);
     }
@@ -106,12 +155,141 @@ public class JCyobEditor extends JPanel {
         output.append(s + "\n");
     }
     private int blockCounter = 1;
+    private JFileChooser chooser;
 
     private void newBlock() {
         JCodePane code = new JCodePane();
         code.setText(getDefaultText());
 
         tabs.addTab("Block " + (blockCounter++), new JScrollPane(code));
+    }
+
+    private String getClassName(String text) throws IOException {
+        String main = "";
+        StreamTokenizer tok = new StreamTokenizer(new StringReader(text));
+        tok.slashSlashComments(true);
+        tok.slashStarComments(true);
+
+        while (tok.nextToken() != StreamTokenizer.TT_EOF) {
+            if (tok.sval != null && tok.sval.equals("class")) {
+                tok.nextToken();
+                main = tok.sval;
+                return main;
+            }
+        }
+        return null;
+    }
+
+    private void finishBlock() {
+        JCodePane code = currentPane();
+        if (code != null) {
+            final String text = code.getText();
+            final Map<String, byte[]> files;
+            final long ID = BlockModel.createID();
+            if ((files = compile(ID)) != null) {
+                final BlockTypeChooser ch = new BlockTypeChooser();
+                final JInternalFrame frm =
+                        SwingUtils.showInternalFrame(JBlocks.getContextForComponent(this).getDesktop(), ch, "Select a block type");
+
+                ch.addBlockTypeListener(new BlockTypeChooserListener() {
+
+                    @Override
+                    public void cancel() {
+                        frm.dispose();
+                    }
+
+                    @Override
+                    public void finished(String type, String category, String label, Color c) {
+                        cancel();
+                        try {
+                            files.put("source.java", text.getBytes());
+                            String block = StoreableNativeBlock.createData(files, getFullClassName(ID, getClassName(text)));
+                            BlockModel model = BlockModel.createModel(type, category, label, ID);
+                            model.setCode(StoreableNativeBlock.load(block));
+                            JBlocks.getContextForComponent(JCyobEditor.this).installBlock(model);
+                            tabs.removeTabAt(tabs.getSelectedIndex());
+                            JOptionPane.showInternalMessageDialog(JCyobEditor.this, "The block is now finished!\n(Look in the Block-Editor)");
+                        } catch (Exception io) {
+                            JOptionPane.showInternalMessageDialog(JCyobEditor.this, "Error: \n" + io, "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    private void open(File f) {
+        try {
+            FileReader r = new FileReader(f);
+            StringBuilder sb = new StringBuilder();
+            char[] buf = new char[1024];
+            int len;
+            while ((len = r.read(buf)) != -1) {
+                sb.append(buf, 0, len);
+            }
+            r.close();
+
+
+            JCodePane code = new JCodePane();
+            code.setText(sb.toString());
+
+            tabs.addTab(f.getName(), new JScrollPane(code));
+        } catch (IOException io) {
+            JOptionPane.showInternalMessageDialog(this, "Error while saving file:\n" + io);
+        }
+    }
+
+    private void save(File f) {
+        JCodePane code = currentPane();
+        if (code != null) {
+            try {
+                FileWriter w = new FileWriter(StreamUtils.addFileExtension(f.getAbsolutePath(), "java"));
+                w.write(code.getText());
+                w.close();
+            } catch (IOException io) {
+                JOptionPane.showInternalMessageDialog(this, "Error while saving file:\n" + io);
+            }
+        }
+    }
+
+    private void ensureChooserExists() {
+        if (chooser == null) {
+            chooser = new JFileChooser();
+            chooser.setFileFilter(SwingUtils.createFilter(new String[]{"java"}, "Java source files (.java)"));
+            chooser.setMultiSelectionEnabled(false);
+            chooser.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    if (SwingUtils.isApproveSelection(ae) && chooser.getSelectedFile() != null) {
+                        switch (chooser.getDialogType()) {
+                            case JFileChooser.SAVE_DIALOG:
+                                save(chooser.getSelectedFile());
+                                break;
+                            case JFileChooser.OPEN_DIALOG:
+                                open(chooser.getSelectedFile());
+                                break;
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    private void saveBlock() {
+        ensureChooserExists();
+        chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+        chooser.setDialogTitle("Save a source file");
+        SwingUtils.showInternalFileChooser(JBlocks.getContextForComponent(this).getDesktop(),
+                chooser);
+    }
+
+    private void openBlock() {
+        ensureChooserExists();
+        chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+        chooser.setDialogTitle("Open a source file");
+        SwingUtils.showInternalFileChooser(JBlocks.getContextForComponent(this).getDesktop(),
+                chooser);
     }
 
     private JCodePane currentPane() {
@@ -121,44 +299,43 @@ public class JCyobEditor extends JPanel {
         }
         return null;
     }
+    
+    private String getFullClassName(long ID, String name) {
+        return PACKAGE_PREFIX + Math.abs(ID) + "." + name;
+    }
+    
+    private Map<String, byte[]> compile(long ID) {
+        if (!CodeCompiler.compilerAvailable()) {
+            return null;
+        }
 
-    private void compile() {
-        if (!CodeCompiler.compilerAvailable())
-            return;
-        
         JCodePane pane = currentPane();
         if (pane != null) {
             String text = pane.getText();
-            long ID = BlockModel.createID();
             text = text.replace("${block.id}", Long.toString(ID) + "L");
-            text = "package org.jblocks.ext.block" + Math.abs(ID) + ";" + text;
+            text = "package " + PACKAGE_PREFIX + Math.abs(ID) + ";" + text;
             try {
-                String main = "";
-                StreamTokenizer tok = new StreamTokenizer(new StringReader(text));
-                tok.slashSlashComments(true);
-                tok.slashStarComments(true);
+                String main = getClassName(text);
 
-                while (tok.nextToken() != StreamTokenizer.TT_EOF) {
-                    if (tok.sval != null && tok.sval.equals("class")) {
-                        tok.nextToken();
-                        main = tok.sval;
-                    }
-                }
-
-                out("Compiling: " + main + " [");
+                out("Compiling: " + tabs.getTitleAt(tabs.getSelectedIndex()) + ": " + main + " [");
                 StringBuilder sb = new StringBuilder();
                 Map<String, byte[]> files = CodeCompiler.compile(main, text, sb);
                 output.append(sb.toString());
+                return files;
             } catch (Throwable ex) {
                 out("ERROR: Exception occured: " + ex);
             } finally {
                 out("] finished.");
             }
-
         }
+        return null;
     }
+    private static String defaultText;
 
     private static String getDefaultText() {
+        if (defaultText != null) {
+            return defaultText;
+        }
         try {
             StringBuilder sb = new StringBuilder();
             BufferedReader r = new BufferedReader(new InputStreamReader(JCyobEditor.class.getResourceAsStream("default.txt")));
@@ -172,7 +349,7 @@ public class JCyobEditor extends JPanel {
                 userName = "";
             }
 
-            return sb.toString().replace("${user.name}", userName);
+            return defaultText = sb.toString().replace("${user.name}", userName);
         } catch (Exception io) {
             return "// Couldn't load the default template.";
         }

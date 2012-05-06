@@ -142,7 +142,7 @@ class JBlocksMenu extends JMenuBar {
             if (item != null) {
                 String txt = item.getText();
                 for (char c : txt.toCharArray()) {
-                    if (Character.isAlphabetic(c) && Character.isUpperCase(c)
+                    if ("ABCDEFGHIJKLMNOPQRSTUVWXYZ".indexOf(c) != -1
                             && !set.contains(c)) {
                         item.setMnemonic(c);
                         set.add(c);
