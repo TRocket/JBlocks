@@ -1,5 +1,6 @@
 package org.jblocks;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.image.BufferedImage;
@@ -19,6 +20,7 @@ import org.jblocks.editor.AbstrBlock;
 import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.BlockModel;
 import org.jblocks.editor.JBlockEditor;
+import org.jblocks.editor.JBlockEditor.Category;
 import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.JDragPane;
 import org.jblocks.scriptengine.Block.Default;
@@ -123,7 +125,7 @@ public final class JBlocks {
         installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.IF)));
         installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}%{br}else%{s}", scriptEngine.getDefaultBlock(Default.IF_ELSE)));
         installBlock(BlockModel.createModel("command", "Control", "repeat %{t}%{br}%{s}", scriptEngine.getDefaultBlock(Default.FOR)));
-       
+
         // TODO %{v} for variable choose combo-box
         installBlock(BlockModel.createModel("command", "Variables", "set %{v} to %{t}", scriptEngine.getDefaultBlock(Default.WRITE_GLOBAL_VARIABLE)));
     }
@@ -147,7 +149,7 @@ public final class JBlocks {
     public Container getContentPane() {
         return drag;
     }
-    
+
     /**
      * Returns the desktop of JBlocks. <br />
      * You can use this to show a JInternalFrame. <br />
@@ -286,7 +288,7 @@ public final class JBlocks {
         }
         return null;
     }
-    
+
     /**
      * Stops all threads of the current ScriptEngine. <br />
      * <i>This method is synchronized.</i>
@@ -311,9 +313,25 @@ public final class JBlocks {
      * Returns <code>true</code> if the specified ID is a default block. <br />
      */
     public boolean isDefaultBlock(long ID) {
-        if (ID >= 100 && ID < 300) 
+        if (ID >= 100 && ID < 300) {
             return true;
-        
+        }
+
         return false;
+    }
+
+    /**
+     * Returns the <code>Color</code> of a category. <br />
+     * If the category doesn't exists, {@link AbstrBlock#DEFAULT_COLOR} is returned. <br />
+     * 
+     * @param category the name of the category
+     * @return the color of the category
+     */
+    public Color getCategoryColor(String category) {
+        Category catg = getEditor().getCategory(category);
+        if (catg != null) {
+            return catg.getColor();
+        }
+        return AbstrBlock.DEFAULT_COLOR;
     }
 }

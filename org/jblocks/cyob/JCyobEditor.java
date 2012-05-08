@@ -2,7 +2,6 @@ package org.jblocks.cyob;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -30,10 +29,8 @@ import org.jblocks.byob.BlockTypeChooser;
 import org.jblocks.byob.BlockTypeChooser.BlockTypeChooserListener;
 import org.jblocks.editor.BlockModel;
 import org.jblocks.scriptengine.StoreableNativeBlock;
-import org.jblocks.utils.Base64;
 import org.jblocks.utils.StreamUtils;
 import org.jblocks.utils.SwingUtils;
-import org.jblocks.utils.TestUtils;
 
 /**
  *
@@ -42,7 +39,6 @@ import org.jblocks.utils.TestUtils;
 public class JCyobEditor extends JPanel {
 
     private static final String PACKAGE_PREFIX = "org.jblocks.ext.block";
-    
     private final CloseableJTabbedPane tabs;
     private final JToolBar tools;
     private final JTextArea output;
@@ -133,7 +129,7 @@ public class JCyobEditor extends JPanel {
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         split.setTopComponent(tabs);
         split.setBottomComponent(new JScrollPane(output));
-        split.setResizeWeight(0.75);
+        split.setResizeWeight(0.85);
 
         JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton finish = new JButton("Finish selected block");
@@ -161,7 +157,7 @@ public class JCyobEditor extends JPanel {
         JCodePane code = new JCodePane();
         code.setText(getDefaultText());
 
-        tabs.addTab("Block " + (blockCounter++), new JScrollPane(code));
+        tabs.addTab("Block " + (blockCounter++), code);
     }
 
     private String getClassName(String text) throws IOException {
@@ -233,7 +229,7 @@ public class JCyobEditor extends JPanel {
             JCodePane code = new JCodePane();
             code.setText(sb.toString());
 
-            tabs.addTab(f.getName(), new JScrollPane(code));
+            tabs.addTab(f.getName(), code);
         } catch (IOException io) {
             JOptionPane.showInternalMessageDialog(this, "Error while saving file:\n" + io);
         }
@@ -295,15 +291,15 @@ public class JCyobEditor extends JPanel {
     private JCodePane currentPane() {
         int current = tabs.getSelectedIndex();
         if (current >= 0) {
-            return (JCodePane) (((JScrollPane) tabs.getComponentAt(current)).getViewport().getView());
+            return (JCodePane) tabs.getComponentAt(current);
         }
         return null;
     }
-    
+
     private String getFullClassName(long ID, String name) {
         return PACKAGE_PREFIX + Math.abs(ID) + "." + name;
     }
-    
+
     private Map<String, byte[]> compile(long ID) {
         if (!CodeCompiler.compilerAvailable()) {
             return null;
@@ -353,15 +349,5 @@ public class JCyobEditor extends JPanel {
         } catch (Exception io) {
             return "// Couldn't load the default template.";
         }
-    }
-
-    public static void main(String[] args) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                TestUtils.displayWithSize(new JCyobEditor(), "Cyob Editor", new Dimension(600, 400));
-            }
-        });
     }
 }

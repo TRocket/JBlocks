@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 /**
  * This is just for speed. <br />
- * (should be little bit faster than the usual java.util Queues...) <br />
+ * (should be little bit faster than the java.util Queues...) <br />
  * 
  * @author ZeroLuck
  */

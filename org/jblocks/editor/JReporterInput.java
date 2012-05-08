@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -181,13 +182,13 @@ class JReporterInput extends AbstrInput {
                     update();
                 }
             });
+            setFont(new Font(Font.SERIF, Font.PLAIN, 10));
         }
 
         @Override
         public Dimension getPreferredSize() {
             Dimension dim = super.getPreferredSize();
-            FontMetrics fm = super.getFontMetrics(getFont());
-            return new Dimension(Math.max(26, dim.width + fm.charWidth(' ') * 4), dim.height);
+            return new Dimension(Math.max(18, dim.width + 5), dim.height - 3); // looks OK with the most LAFs
         }
     }
 }

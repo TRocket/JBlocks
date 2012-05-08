@@ -26,10 +26,12 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 
+import javax.swing.table.DefaultTableModel;
 import org.jblocks.JBlocks;
 import org.jblocks.editor.AbstrBlock;
 import org.jblocks.editor.BlockFactory;
@@ -130,7 +132,7 @@ public class JBlockStore extends JPanel {
 
         try {
             final BlockModel model = BlockStoreServer.downloadBlock(JBlocks.getContextForComponent(this), id);
-
+            
             JPanel root = new JPanel(new BorderLayout());
             root.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -143,19 +145,30 @@ public class JBlockStore extends JPanel {
 
             south.add(cancelButton);
 
+            DefaultTableModel table = new DefaultTableModel(new Object[][]{
+                        {"Syntax", model.getSyntax()},
+                        {"ID", model.getID()},
+                        {"Type", model.getType()},
+                        {"Native", (model.getCode() instanceof NativeBlock)},
+                        {"Category", model.getCategory()},
+                        {"Description", model.getDescription()}
+                    }, new String[]{"Key", "Value"}) {
+
+                @Override
+                public boolean isCellEditable(int x, int y) {
+                    return false;
+                }
+            };
+
             JLabel info = new JLabel("<html>"
                     + "<h3>Do you really want to download this block?</h3>"
-                    + "<b>Syntax: </b><i>" + model.getSyntax() + "</i> <br />"
-                    + "<b>ID: </b><i>" + model.getID() + "</i> <br />"
-                    + "<b>Type: </b><i>" + model.getType() + "</i> <br />"
-                    + "<b>Native: </b><i>" + (model.getCode() instanceof NativeBlock) + "</i> <br />"
-                    + "<b>Category: </b><i>" + model.getCategory() + "</i> <p />"
                     + (jblocks.getInstalledBlocks().containsKey(id)
-                    ? ("Warning: A block with this ID is already installed. <br />"
-                    + "Your project may not be compatible with the new block.") : "")
+                    ? ("<b>Warning:</b> <font color='red'>A block with this ID is already installed. <br />"
+                    + "Your project may not be compatible with the new block.</font>") : "")
                     + "</html>");
-
-            root.add(info, BorderLayout.CENTER);
+            
+            root.add(info, BorderLayout.NORTH);
+            root.add(new JTable(table), BorderLayout.CENTER);
             root.add(south, BorderLayout.SOUTH);
 
             final JInternalFrame frm = SwingUtils.showInternalFrame(SwingUtils.getDesktop(this), root, "Block Downloader");
@@ -266,6 +279,7 @@ public class JBlockStore extends JPanel {
             for (BlockModel bm : m) {
                 AbstrBlock block = BlockFactory.createBlock(bm);
                 block.setDraggable(false);
+                block.setBackground(JBlocks.getContextForComponent(this).getCategoryColor(bm.getCategory()));
                 if (bm.getID() == BlockModel.NOT_AN_ID) {
                     block.setBackground(Color.RED);
                 }
@@ -315,19 +329,22 @@ public class JBlockStore extends JPanel {
         public Component getListCellRendererComponent(JList list, Object value,
                 int index, boolean isSelected, boolean cellHasFocus) {
 
-            JComponent comp = (JComponent) value;
-            if (isSelected) {
-                setBackground(HIGHLIGHT_COLOR);
-            } else {
-                setBackground(Color.WHITE);
-            }
-            removeAll();
-            if (comp != null)
-            add(comp);
-            doLayout();
-            setSize(getPreferredSize());
+            if (value instanceof JComponent) {
+                JComponent comp = (JComponent) value;
+                if (isSelected) {
+                    setBackground(HIGHLIGHT_COLOR);
+                } else {
+                    setBackground(Color.WHITE);
+                }
+                removeAll();
+                add(comp);
+                doLayout();
+                setSize(getPreferredSize());
 
-            return this;
+                return this;
+            } else {
+                return (Component) value;
+            }
         }
     }
 

@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 
 import javax.swing.AbstractButton;
+import javax.swing.DefaultDesktopManager;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
@@ -206,8 +207,22 @@ public class JBlocksPane extends JDesktopPane {
 
         // add app to the desktop-pane
         add(root);
+        
+        // set a DesktopManager
+        setDesktopManager(new DefaultDesktopManager() {
+            
+            @Override
+            public void iconifyFrame(JInternalFrame frm) {
+                super.iconifyFrame(frm);
+                frm.toFront();
+            }
+        });
     }
 
+    /**
+     * Returns the JProgressBar which displays
+     * whether script are running. <br />
+     */
     public JProgressBar getProgress() {
         return progress;
     }
@@ -276,10 +291,12 @@ public class JBlocksPane extends JDesktopPane {
 
     void openCyobEditor() {
         Icon icn = JBlocks.getIcon("cyob.png");
-        JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, new JCyobEditor(), "ZeroLuck's Cyob-Editor", 
+        JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, new JCyobEditor(), "ZeroLuck's CYOB-Editor", 
                 new Dimension((int) (getWidth() * 0.8), (int) (getHeight() * 0.8)));
         frm.setFrameIcon(icn);
         frm.setResizable(true);
+        frm.setMaximizable(true);
+        frm.setIconifiable(true);
     }
 
     /***********************************************************/

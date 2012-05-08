@@ -150,13 +150,7 @@ public class BlockIO {
         if (params != null) {
             final Object[] seq = buildSequence(ctx, params);
             final Object[] dest = instance.getParameters();
-            try {
-                System.arraycopy(seq, 0, dest, 0, seq.length);
-            } catch (Exception ex) {
-                System.out.println(ex);
-                System.out.println(Arrays.toString(seq) + ";  " + Arrays.toString(dest));
-                throw new Error();
-            }
+            System.arraycopy(seq, 0, dest, 0, seq.length);
         }
 
         return instance;

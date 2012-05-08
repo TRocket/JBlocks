@@ -35,6 +35,9 @@ public class CodeIO {
         if (model.getContent() != null) {
             writer.writeEntry("content", model.getContent());
         }
+        if (model.getDescription() != null) {
+            writer.writeEntry("description", model.getDescription());
+        }
         writer.writeEntry("type", model.getType());
         writer.writeEntry("id", Long.toString(model.getID()));
     }
@@ -82,9 +85,9 @@ public class CodeIO {
      * @param b the block
      * @throws IOException 
      */
-    public static void writeBlock(JBlocks ctx, OutputStream out, Block b) throws IOException {
-        BlockModel model = ctx.getInstalledBlocks().get(b.getID());
-
+    public static void writeBlock(JBlocks ctx, OutputStream out, BlockModel model) throws IOException {
+        Block b = model.getCode();
+        
         XMLOutputStream writer = new XMLOutputStream(out, true);
         writer.writeStartElement("block");
         writer.writeAttribute("type", b instanceof NativeBlock ? "native" : "byob");
@@ -139,9 +142,14 @@ public class CodeIO {
         BlockModel model = BlockModel.createModel(type, category, syntax, Long.valueOf(id));
 
         // 'content' is an optional entry
-        Node content = nodeForName(children, "content");
-        if (content != null) {
-            model.setContent(content.getTextContent());
+        Node contentNode = nodeForName(children, "content");
+        if (contentNode != null) {
+            model.setContent(contentNode.getTextContent());
+        }
+        // 'description' is an optional entry
+        Node descriptionNode = nodeForName(children, "description");
+        if (descriptionNode != null) {
+            model.setDescription(descriptionNode.getTextContent());
         }
 
         return model;

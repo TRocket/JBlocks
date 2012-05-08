@@ -9,6 +9,7 @@ public class NativeBlock extends Block implements Executable {
 
     private Executable exec;
 
+    @SuppressWarnings("LeakingThisInConstructor")
     public NativeBlock(int paramCount, long id) {
         super(paramCount, id);
     }

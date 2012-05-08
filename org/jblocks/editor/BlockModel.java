@@ -21,6 +21,7 @@ public class BlockModel {
     private final String type;
     private String content;
     private String blockspec;
+    private String description;
     private Block code;
 
     private BlockModel(long id, String spec, String ctg, String type) {
@@ -125,11 +126,34 @@ public class BlockModel {
      * informations about the block. <br />
      * 
      * @see #getContent() 
-     * @see o the new content, null is allowed
+     * @param o the new content, null is allowed
      */
     public void setContent(final String o) {
         content = o;
     }
+
+    /**
+     * Sets the <code>description</code> of this BlockModel. <br />
+     * The <code>description</code> is just for helping the user. <br />
+     * 
+     * @see #getDescription(java.lang.String) 
+     * @param description the description for this block, null is allowed
+     */
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    /**
+     * Returns the <code>description</code> of this BlockModel. <br />
+     * The <code>description</code> is just for helping the user. <br />
+     * 
+     * @see #setDescription(java.lang.String) 
+     * @param description the description for this block or null
+     */
+    public String getDescription() {
+        return description;
+    }
+    
     private static Random r;
 
     /**

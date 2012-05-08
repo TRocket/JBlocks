@@ -1,6 +1,9 @@
 package org.jblocks.editor;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -10,12 +13,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import javax.imageio.ImageIO;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import org.jblocks.JBlocks;
 import org.jblocks.gui.JDragPane;
+import org.jblocks.scriptengine.NativeBlock;
 import org.jblocks.utils.StreamUtils;
 import org.jblocks.utils.SwingUtils;
 
@@ -106,19 +116,50 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
     }
 
     private void shareBlock() {
-        // TODO
-        try {
-            org.jblocks.blockstore.BlockStoreServer.uploadBlock(JBlocks.getContextForComponent(parent), parent.getModel());
+        final BlockModel model = parent.getModel();
+        final JPanel p = new JPanel(new BorderLayout());
+        final JTextArea description = new JTextArea(
+                "I am a " + (model.getCode() instanceof NativeBlock ? "native" : "BYOB") + " " +model.getType()  + " block "
+                + "made by " + System.getProperty("user.name") + ".\n");
+        description.setFont(new Font(Font.MONOSPACED,Font.PLAIN, description.getFont().getSize()));
+        
+        p.add(new JScrollPane(description), BorderLayout.CENTER);
+        JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton uploadButton = new JButton("Upload");
+        JButton cancelButton = new JButton("Cancel");
+        south.add(uploadButton);
+        south.add(cancelButton);
+        p.add(south, BorderLayout.SOUTH);
+        p.add(new JLabel("Description: "), BorderLayout.NORTH);
 
-            JOptionPane.showInternalMessageDialog(JBlocks.getContextForComponent(parent).getDesktop(),
-                    "The block was uploaded successfull!");
+        final JInternalFrame frm = SwingUtils.showInternalFrame(SwingUtils.getDesktop(parent), p, "Share a block", new Dimension(340, 240));
 
-        } catch (Exception io) {
-            JOptionPane.showInternalMessageDialog(JBlocks.getContextForComponent(parent).getDesktop(),
-                    "The block couldn't be uploaded!\n"
-                    + "The error can be: You tried to upload an already existing block.\n\n" + io, "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
+        uploadButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                try {
+                    frm.dispose();
+                    model.setDescription(description.getText());
+                    org.jblocks.blockstore.BlockStoreServer.uploadBlock(JBlocks.getContextForComponent(parent), model);
+                    JOptionPane.showInternalMessageDialog(JBlocks.getContextForComponent(parent).getDesktop(),
+                            "The block is uploaded!");
+
+                } catch (Exception io) {
+                    JOptionPane.showInternalMessageDialog(JBlocks.getContextForComponent(parent).getDesktop(),
+                            "The block couldn't be uploaded!\n"
+                            + "The error can be: You tried to upload an already existing block.\n\n" + io, "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        cancelButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                frm.dispose();
+            }
+        });
     }
 
     private Dimension calculateSize(Puzzle p) {

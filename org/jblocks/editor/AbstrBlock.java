@@ -29,6 +29,8 @@ import org.jblocks.scriptengine.IScriptEngine;
  */
 public abstract class AbstrBlock extends JComponent {
 
+    public static Color DEFAULT_COLOR = new Color(0xCCCCCC);
+    
     private boolean draggable = true;
     private boolean highlight = false;
     private BlockModel model;
@@ -38,7 +40,7 @@ public abstract class AbstrBlock extends JComponent {
 
         this.setLayout(null);
         this.setOpaque(false);
-        this.setBackground(new Color(0xD6900A)); // <- TEST
+        this.setBackground(DEFAULT_COLOR);
         this.setBorder(null);
 
         BlockMouseListener listener = new BlockMouseListener();

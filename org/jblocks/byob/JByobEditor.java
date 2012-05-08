@@ -326,6 +326,7 @@ public class JByobEditor extends JPanel {
         
         final JByobEditor edt = new JByobEditor(type, text, category, c, editorIcon);
         final JInternalFrame frm = SwingUtils.showInternalFrame(desktop, edt, "Make a block");
+        frm.setResizable(true);
         if (editorIcon != null) {
             frm.setFrameIcon(editorIcon);
         }

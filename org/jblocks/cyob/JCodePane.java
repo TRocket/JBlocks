@@ -1,5 +1,9 @@
 package org.jblocks.cyob;
 
+import javax.swing.JScrollPane;
+import javax.swing.text.ViewFactory;
+import java.awt.BorderLayout;
+import javax.swing.JPanel;
 import javax.swing.undo.UndoManager;
 import javax.swing.event.UndoableEditListener;
 import javax.swing.event.UndoableEditEvent;
@@ -16,7 +20,9 @@ import static org.jblocks.cyob.MultiSyntaxDocument.*;
  *
  * @author ZeroLuck
  */
-class JCodePane extends JTextPane {
+class JCodePane extends JPanel {
+
+    private final JTextPane textPane;
 
     public JCodePane() {
         final HashMap<String, MutableAttributeSet> javaKeywords = new HashMap<String, MutableAttributeSet>(16);
@@ -91,9 +97,15 @@ class JCodePane extends JTextPane {
                 return doc;
             }
         };
+        textPane = new JTextPane();
+        textPane.setEditorKitForContentType("text/java", editorKit);
+        textPane.setContentType("text/java");
 
-        setEditorKitForContentType("text/java", editorKit);
-        setContentType("text/java");
+        JScrollPane scroll = new JScrollPane(textPane);
+        scroll.setRowHeaderView(new TextLineNumber(textPane));
+        
+        setLayout(new BorderLayout());
+        add(scroll, BorderLayout.CENTER);
     }
     private UndoManager mng = new UndoManager();
 
@@ -111,6 +123,14 @@ class JCodePane extends JTextPane {
         }
 
         return mng.canRedo();
+    }
+
+    public void setText(String code) {
+        textPane.setText(code);
+    }
+
+    public String getText() {
+        return textPane.getText();
     }
 
     private class UndoListener implements UndoableEditListener {

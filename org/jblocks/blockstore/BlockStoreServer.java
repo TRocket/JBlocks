@@ -260,7 +260,7 @@ public class BlockStoreServer {
 
     public static void uploadBlock(JBlocks ctx, BlockModel model) throws IOException {
         ByteArrayOutputStream data = new ByteArrayOutputStream();
-        CodeIO.writeBlock(ctx, data, model.getCode());
+        CodeIO.writeBlock(ctx, data, model);
         upload(model.getID(), encode(model.getSyntax(), model.getCategory(), model.getType()), data.toByteArray());
     }
 

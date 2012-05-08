@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.Repainter;
 import org.jblocks.gui.Splash;
+import org.jblocks.utils.SwingUtils;
 
 /**
  * 
@@ -15,9 +16,9 @@ import org.jblocks.gui.Splash;
  * @author TRocket
  * @author ZeroLuck
  */
-public class JBlocksLauncher {
+public class JBlocksLauncher implements Runnable {
 
-    private static final String VERSION = "0.5.93";
+    private static final String VERSION = "0.5.99";
 
     /**
      * This is the standalone main method
@@ -27,6 +28,11 @@ public class JBlocksLauncher {
     public static void main(String[] args) {
         Repainter.install();
         // TODO run JBlocks
+        SwingUtils.run(new JBlocksLauncher());
+    }
+
+    @Override
+    public void run() {
         Splash splash = new Splash();
         splash.setTitle("JBlocks is loading...");
         splash.setAlwaysOnTop(true);
@@ -34,14 +40,14 @@ public class JBlocksLauncher {
         splash.setVisible(true);
         
         JBlocksPane.setLaF();
-        
+
         JFrame frm = new JFrame("JBlocks " + VERSION);
         frm.setIconImage(JBlocks.getImage("jblocks-icon.png"));
         frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frm.setSize(1000, 600);
         frm.setLocationByPlatform(true);
         frm.setLayout(new BorderLayout());
-        
+
         frm.add(new JBlocks().getContentPane(), BorderLayout.CENTER);
 
         frm.setVisible(true);
