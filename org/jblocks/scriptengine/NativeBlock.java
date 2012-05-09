@@ -5,54 +5,18 @@ package org.jblocks.scriptengine;
  * 
  * @author ZeroLuck
  */
-public class NativeBlock extends Block implements Executable {
-
-    private Executable exec;
+public abstract class NativeBlock extends Block implements Executable {
 
     @SuppressWarnings("LeakingThisInConstructor")
     public NativeBlock(int paramCount, long id) {
         super(paramCount, id);
     }
-
-    private NativeBlock(int paramCount, long id, Executable e) {
-        super(paramCount, id);
-        exec = e;
-    }
-
     /**
      * This has to be executed <b>fast</b>. <br />
      * This code can block the thread-scheduler. <br />
      */
     @Override
-    public Object evaluate(Object ctx, Object... params) {
-        return exec.evaluate(ctx, params);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof NativeBlock) || o == null || exec == null) {
-            return super.equals(o);
-        }
-        NativeBlock block = (NativeBlock) o;
-        return exec == block.exec;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        if (exec == null) {
-            return super.hashCode();
-        } else {
-            int hash = 3;
-            hash = 31 * hash + this.exec.hashCode();
-            return hash;
-        }
-    }
+    public abstract Object evaluate(Object ctx, Object... params);
 
     /**
      * {@inheritDoc}
@@ -60,7 +24,19 @@ public class NativeBlock extends Block implements Executable {
     @Override
     public Block clone() {
         int len = getParameterCount();
-        NativeBlock n = new NativeBlock(len, getID(), exec == null ? this : exec);
+        final NativeBlock src = this;
+        NativeBlock n = new NativeBlock(len, getID()) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... params) {
+                return src.evaluate(ctx, params);
+            }
+            
+            @Override
+            public Block clone() {
+                return src.clone();
+            }
+        };
         for (int i = 0; i < len; i++) {
             Object o = getParameter(i);
             if (o instanceof Block) {
@@ -74,6 +50,6 @@ public class NativeBlock extends Block implements Executable {
 
     @Override
     public String toString() {
-        return "NativeBlock";
+        return "NativeBlock[" + getID() + "]";
     }
 }

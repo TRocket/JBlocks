@@ -87,7 +87,7 @@ public class CodeIO {
      */
     public static void writeBlock(JBlocks ctx, OutputStream out, BlockModel model) throws IOException {
         Block b = model.getCode();
-        
+
         XMLOutputStream writer = new XMLOutputStream(out, true);
         writer.writeStartElement("block");
         writer.writeAttribute("type", b instanceof NativeBlock ? "native" : "byob");
@@ -170,7 +170,11 @@ public class CodeIO {
         if (type.equals("byob")) {
             b = new ByobBlock(parameters, model.getID(), BlockIO.readFromXML(ctx, nodeForName(root.getChildNodes(), "code")));
         } else if (type.equals("native")) {
-            b = new NativeBlock(parameters, model.getID());
+            try {
+                b = StoreableNativeBlock.load(nodeForName(root.getChildNodes(), "code").getTextContent());
+            } catch (Exception ex) {
+                throw new IOException("Couldn't load the code of the NativeBlock.", ex);
+            }
         } else {
             throw new IOException("block type '" + type + "' isn't supported!");
         }
