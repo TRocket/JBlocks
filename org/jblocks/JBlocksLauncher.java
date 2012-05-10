@@ -18,7 +18,7 @@ import org.jblocks.utils.SwingUtils;
  */
 public class JBlocksLauncher implements Runnable {
 
-    private static final String VERSION = "0.5.99";
+    private static final String VERSION = "0.5.101";
 
     /**
      * This is the standalone main method

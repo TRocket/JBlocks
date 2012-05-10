@@ -192,7 +192,11 @@ public class JBlocksPane extends JDesktopPane {
 
         JPanel scripts = new JPanel(new BorderLayout());
         scripts.add(editor, BorderLayout.CENTER);
-        scripts.add(spriteChooser, BorderLayout.EAST);
+        
+        JPanel east = new JPanel(new BorderLayout());
+        east.add(new JHeading("Sprites"), BorderLayout.NORTH);
+        east.add(chScroll, BorderLayout.CENTER);
+        scripts.add(east, BorderLayout.EAST);
         tabs.addTab("Scripts", scripts);
 
         JPanel stage = new JPanel(new FlowLayout());
@@ -385,7 +389,7 @@ public class JBlocksPane extends JDesktopPane {
             final String content = model.getContent();
             final Block code = model.getCode();
             if (content != null && code != null && code.equals(READ_GLOBAL_VAR) && content.equals(name)) {
-                context.uninstallBlock(model);
+                System.out.println("TODO: removeVariable()");
                 break;
             }
         }
@@ -394,15 +398,16 @@ public class JBlocksPane extends JDesktopPane {
         repaint();
     }
 
-    private void addVariable(String name) {
+    private void addVariable(final String name) {
         final IScriptEngine engine = context.getScriptEngine();
+        final JBlockEditor blockEditor = getEditor();
         final Block readVar = engine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE).clone();
         readVar.setParameter(0, name);
 
         final BlockModel var = BlockModel.createModel("reporter", "Variables", BlockFactory.enquote(name), readVar);
         var.setContent(name);
-        context.installBlock(var);
-
+        
+        blockEditor.addBlock(BlockFactory.createBlock(var));
         engine.getGlobalVariables().put(name, 0);
     }
 
@@ -426,8 +431,6 @@ public class JBlocksPane extends JDesktopPane {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Throwable t) {
             System.err.println("Exception while setting LaF. (" + t + ")");
-            // we don't want that our application crashs just because of this LaF.
-            // (older Java versions may not support the nimbus LaF.)
         }
     }
 

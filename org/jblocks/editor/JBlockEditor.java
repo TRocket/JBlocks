@@ -194,15 +194,24 @@ public class JBlockEditor extends JPanel {
             b.setBackground(c.color);
             b.addMouseListener(new MouseAdapter() {
 
+                private AbstrBlock parent = b;
+                
                 @Override
                 public void mousePressed(MouseEvent evt) {
                     if (model != null) {
                         try {
                             if (SwingUtilities.isLeftMouseButton(evt)) {
+                                parent.removeMouseListener(this);
                                 AbstrBlock block = BlockFactory.createBlock(model);
-                                block.setBackground(b.getBackground());
-                                block.setLocation(b.getLocation());
-                                Drag.drag(JDragPane.getDragPane(JBlockEditor.this), c.blocks, evt.getPoint(), block);
+                                block.setBackground(parent.getBackground());
+                                block.setLocation(parent.getLocation());
+                                block.setSize(parent.getSize());
+                                block.addMouseListener(this);
+                                c.blocks.remove(parent);
+                                c.blocks.add(block);
+                                c.blocks.cleanup();
+                                Drag.drag(JDragPane.getDragPane(JBlockEditor.this), c.blocks, evt.getPoint(), parent);
+                                parent = block;
                             }
                         } catch (RuntimeException ex) {
                             // syntax error in BlockFactory...

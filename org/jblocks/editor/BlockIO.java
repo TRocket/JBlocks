@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JTextField;
@@ -146,7 +145,7 @@ public class BlockIO {
         final Node params = n;
         final BlockModel model = ctx.getInstalledBlocks().get(id);
         final Block instance = model.getCode().clone();
-
+        
         if (params != null) {
             final Object[] seq = buildSequence(ctx, params);
             final Object[] dest = instance.getParameters();
