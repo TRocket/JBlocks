@@ -10,10 +10,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
+import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 
 import org.jblocks.editor.AbstrBlock;
@@ -22,6 +22,7 @@ import org.jblocks.editor.BlockModel;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.editor.JBlockEditor.Category;
 import org.jblocks.gui.JBlocksPane;
+import org.jblocks.gui.JBubble;
 import org.jblocks.gui.JDragPane;
 import org.jblocks.scriptengine.Block.Default;
 import org.jblocks.scriptengine.IScriptEngine;
@@ -74,6 +75,17 @@ public final class JBlocks {
                     prg.setIndeterminate(false);
                 }
                 AbstrBlock[] blocks = blocksToReset.get(t);
+                if (error != null) {
+                    JLabel errorLabel = new JLabel("Error!");
+                    errorLabel.setForeground(Color.RED);
+                    JBubble.showBubble(blocks[0], errorLabel);
+                } else {
+                    Object ret = t.getReturnValue();
+                    if (ret != null) {
+                        JLabel infoLabel = new JLabel("" + ret);
+                        JBubble.showBubble(blocks[0], infoLabel);
+                    }
+                }
                 if (blocks != null) {
                     for (AbstrBlock b : blocks) {
                         b.setHighlight(false);
@@ -126,7 +138,7 @@ public final class JBlocks {
         installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}%{br}else%{s}", scriptEngine.getDefaultBlock(Default.IF_ELSE)));
         installBlock(BlockModel.createModel("command", "Control", "repeat %{t}%{br}%{s}", scriptEngine.getDefaultBlock(Default.FOR)));
 
-        // TODO %{v} for variable choose combo-box
+        installBlock(BlockModel.createModel("reporter", "Variables", "%{v}", scriptEngine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE)));
         installBlock(BlockModel.createModel("command", "Variables", "set %{v} to %{t}", scriptEngine.getDefaultBlock(Default.WRITE_GLOBAL_VARIABLE)));
     }
 

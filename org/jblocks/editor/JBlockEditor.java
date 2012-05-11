@@ -93,6 +93,14 @@ public class JBlockEditor extends JPanel {
         ctgPanel.setLayout(new BorderLayout());
         ctgPanel.setBorder(BorderFactory.createBevelBorder(4, Color.yellow, Color.black));
 
+        chooser.addCategoryChooserSelectionListener(new JCategoryChooser.CategoryChooserSelectionListener() {
+
+            @Override
+            public void categorySelected(String name) {
+                switchCategory(name);
+            }
+        });
+
         setLayout(new BorderLayout());
         add(ctgPanel, BorderLayout.WEST);
         ctgPanel.add(chooser, BorderLayout.NORTH);
@@ -161,14 +169,7 @@ public class JBlockEditor extends JPanel {
         if (ctgs.containsKey(name)) {
             return;
         }
-        final JComponent comp = chooser.addCategory(name, c);
-        comp.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mousePressed(MouseEvent evt) {
-                switchCategory(name);
-            }
-        });
+        chooser.addCategory(name, c);
         final JScriptPane p = new JScriptPane(false);
         p.setDragEnabled(false);
         p.setScriptPaneImage(JBlocks.getImage("blockchooser.png"));
@@ -179,7 +180,7 @@ public class JBlockEditor extends JPanel {
             switchCategory(name);
         }
     }
-    
+
     /**
      * Adds a new block to the JBlockEditor. <br />
      * 
@@ -195,7 +196,7 @@ public class JBlockEditor extends JPanel {
             b.addMouseListener(new MouseAdapter() {
 
                 private AbstrBlock parent = b;
-                
+
                 @Override
                 public void mousePressed(MouseEvent evt) {
                     if (model != null) {

@@ -18,7 +18,7 @@ import org.jblocks.utils.SwingUtils;
  */
 public class JBlocksLauncher implements Runnable {
 
-    private static final String VERSION = "0.5.101";
+    private static final String VERSION = "0.5.102";
 
     /**
      * This is the standalone main method
@@ -44,7 +44,7 @@ public class JBlocksLauncher implements Runnable {
         JFrame frm = new JFrame("JBlocks " + VERSION);
         frm.setIconImage(JBlocks.getImage("jblocks-icon.png"));
         frm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frm.setSize(1000, 600);
+        frm.setSize(1100, 650);
         frm.setLocationByPlatform(true);
         frm.setLayout(new BorderLayout());
 

@@ -3,19 +3,19 @@ package org.jblocks.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+
 import java.util.Map;
 
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultDesktopManager;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -23,6 +23,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.UIDefaults;
@@ -35,11 +36,13 @@ import org.jblocks.cyob.JCyobEditor;
 import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.BlockModel;
 import org.jblocks.editor.JBlockEditor;
+import org.jblocks.editor.JScriptPane;
 import org.jblocks.painteditor2.JPaintEditor;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.Block.Default;
 import org.jblocks.scriptengine.IScriptEngine;
 import org.jblocks.soundeditor.JSoundEditor;
+import org.jblocks.stage.JSwingStage;
 import org.jblocks.utils.SwingUtils;
 
 /**
@@ -60,6 +63,7 @@ public class JBlocksPane extends JDesktopPane {
     private final JSpriteChooser spriteChooser;
     private final JBlocks context;
     private final JProgressBar progress;
+    private final JScriptPane backpack;
 
     public JBlocksPane(JBlocks ctx) {
         // initialise final variables...
@@ -68,8 +72,9 @@ public class JBlocksPane extends JDesktopPane {
         this.progress = new JProgressBar();
         this.tools = new JToolBar();
         this.editor = createBlockEditor();
+        this.backpack = new JScriptPane();
         this.spriteChooser = SpriteChooserTest.createTestSpriteChooser2(editor);
-
+        
         // build up the GUI...
         final JButton saveButton = new JButton(JBlocks.getIcon("save.png"));
         saveButton.setToolTipText("<HTML><b>Save project</b><ul><li>Save your project</li></ul></HTML>");
@@ -193,15 +198,26 @@ public class JBlocksPane extends JDesktopPane {
         JPanel scripts = new JPanel(new BorderLayout());
         scripts.add(editor, BorderLayout.CENTER);
         
+        JSplitPane eastSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         JPanel east = new JPanel(new BorderLayout());
         east.add(new JHeading("Sprites"), BorderLayout.NORTH);
         east.add(chScroll, BorderLayout.CENTER);
-        scripts.add(east, BorderLayout.EAST);
+        
+        JPanel bp = new JPanel(new BorderLayout());
+        bp.add(new JHeading("Backpack"), BorderLayout.NORTH);
+        
+        bp.add(backpack, BorderLayout.CENTER);
+        
+        east.add(bp, BorderLayout.SOUTH);
+        eastSplit.setTopComponent(east);
+        eastSplit.setBottomComponent(bp);
+        eastSplit.setResizeWeight(0.7);
+        eastSplit.setBorder(BorderFactory.createRaisedBevelBorder());
+        tabs.setBorder(BorderFactory.createRaisedBevelBorder());
+        app.add(eastSplit, BorderLayout.EAST);
         tabs.addTab("Scripts", scripts);
 
-        JPanel stage = new JPanel(new FlowLayout());
-        stage.add(new JLabel("Not finished yet!"));
-        tabs.addTab("Stage", stage);
+        tabs.addTab("Stage", new JSwingStage());
 
         app.add(tabs, BorderLayout.CENTER);
 
@@ -379,10 +395,11 @@ public class JBlocksPane extends JDesktopPane {
         app.repaint();
     }
 
+
     private void removeVariable(final String name) {
         final IScriptEngine engine = context.getScriptEngine();
         final Map variables = engine.getGlobalVariables();
-        final Map<Long, BlockModel> blocks = context.getInstalledBlocks();
+  /*      final Map<Long, BlockModel> blocks = context.getInstalledBlocks();
         final Block READ_GLOBAL_VAR = engine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE).clone();
 
         for (final BlockModel model : blocks.values()) {
@@ -393,21 +410,21 @@ public class JBlocksPane extends JDesktopPane {
                 break;
             }
         }
-
+*/
         variables.remove(name);
-        repaint();
+   //     repaint();
     }
 
     private void addVariable(final String name) {
         final IScriptEngine engine = context.getScriptEngine();
-        final JBlockEditor blockEditor = getEditor();
+    /*    final JBlockEditor blockEditor = getEditor();
         final Block readVar = engine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE).clone();
         readVar.setParameter(0, name);
 
         final BlockModel var = BlockModel.createModel("reporter", "Variables", BlockFactory.enquote(name), readVar);
         var.setContent(name);
         
-        blockEditor.addBlock(BlockFactory.createBlock(var));
+        blockEditor.addBlock(BlockFactory.createBlock(var)); */
         engine.getGlobalVariables().put(name, 0);
     }
 

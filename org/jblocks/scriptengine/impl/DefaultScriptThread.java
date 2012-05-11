@@ -1,5 +1,6 @@
 package org.jblocks.scriptengine.impl;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.jblocks.editor.BlockModel;
@@ -17,16 +18,18 @@ public class DefaultScriptThread implements IScriptThread {
     private volatile boolean stopRequest = false;
     private StackElement stack;
     private final Map<String, Object> globalVariables;
+    private final StackElement rootStack;
 
     public DefaultScriptThread(Map<String, Object> globalVariables, Block[] commands) {
         this.globalVariables = globalVariables;
-        this.stack = new StackElement(null, new ByobBlock(0, BlockModel.NOT_AN_ID, commands), commands, false, globalVariables);
+        this.stack = new StackElement(null, new ByobBlock(commands.length, BlockModel.NOT_AN_ID, commands), commands, true, globalVariables);
+        this.rootStack = stack;
     }
 
     public StackElement getStack() {
         return stack;
     }
-    
+
     public boolean step() {
         if (stopRequest || stack == null) {
             return true;
@@ -81,6 +84,14 @@ public class DefaultScriptThread implements IScriptThread {
     @Override
     public boolean isAlive() {
         return !stopRequest;
+    }
+
+    @Override
+    public Object getReturnValue() {
+        if (rootStack.param.length == 0) {
+            return null;
+        }
+        return rootStack.param[0];
     }
 
     public static class StackElement {

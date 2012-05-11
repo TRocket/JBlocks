@@ -14,15 +14,12 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jblocks.editor.AbstrBlock;
 import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.BlockModel;
-import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.JCategoryChooser;
 
 /**
@@ -93,6 +90,14 @@ public class BlockTypeChooser extends JPanel {
         bool.addMouseListener(ma);
         reporter.addMouseListener(ma);
         command.addMouseListener(ma);
+        
+        categories.addCategoryChooserSelectionListener(new JCategoryChooser.CategoryChooserSelectionListener() {
+
+            @Override
+            public void categorySelected(String name) {
+                changeBlockCategory(name, categories.getCategoryColorForName(name));
+            }
+        });
 
         JPanel north = new JPanel(new FlowLayout());
         // <test>
@@ -230,13 +235,6 @@ public class BlockTypeChooser extends JPanel {
     }
 
     private void addCategory(final String name, final Color c) {
-        JComponent comp = categories.addCategory(name, c);
-        comp.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mousePressed(MouseEvent evt) {
-                changeBlockCategory(name, c);
-            }
-        });
+        categories.addCategory(name, c);
     }
 }

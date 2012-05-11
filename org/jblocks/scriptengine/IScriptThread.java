@@ -9,4 +9,6 @@ public interface IScriptThread {
     public void stop();
 
     public boolean isAlive();
+    
+    public Object getReturnValue();
 }

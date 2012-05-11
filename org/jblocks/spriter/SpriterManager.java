@@ -74,7 +74,7 @@ public class SpriterManager {
     public void startAnimation(SpriterCharacter c) {
         stopAnimation(c);
         Animation anim = new Animation(c);
-        anim.nextFrame = (long) (System.currentTimeMillis() + (c.getCurrentKeyFrame().duration * 10));
+        anim.nextFrame = System.currentTimeMillis() + ((long) (c.getCurrentKeyFrame().duration * 10));
         animations.add(anim);
     }
 
@@ -83,12 +83,13 @@ public class SpriterManager {
         a.nextFrame += (long) (a.c.getCurrentKeyFrame().duration * 10);
     }
 
-    public void stepAnimation() {
+    public boolean stepAnimation() {
         for (Animation a : animations) {
             while (a.nextFrame < System.currentTimeMillis()) {
                 nextFrame(a);
             }
         }
+        return !animations.isEmpty();
     }
 
     public void optimize(GraphicsConfiguration cfg) {

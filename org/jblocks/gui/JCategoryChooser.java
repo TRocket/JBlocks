@@ -9,9 +9,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -35,6 +38,11 @@ public class JCategoryChooser extends JPanel {
     // <member>
     private int columns;
     private Category current;
+    // <listeners>
+    public static interface CategoryChooserSelectionListener extends EventListener {
+        
+        public void categorySelected(String name);
+    }
 
     /**
      * Creates a new <code>JCategoryChooser</code> with <code>n</code> columns. <br />
@@ -44,7 +52,22 @@ public class JCategoryChooser extends JPanel {
      */
     public JCategoryChooser(int categories_per_line) {
         columns = categories_per_line;
-        // setBackground(new Color(0xB0B0B0));
+    }
+    
+    /**
+     * Adds the specified <code>CategoryChooserSelectionListener</code> to this <code>JCategoryChooser</code>.
+     * @param c the listener
+     */
+    public void addCategoryChooserSelectionListener(CategoryChooserSelectionListener c) {
+        this.listenerList.add(CategoryChooserSelectionListener.class, c);
+    }
+    
+    /**
+     * Removes the specified <code>CategoryChooserSelectionListener</code> from this <code>JCategoryChooser</code>.
+     * @param c the listener
+     */
+    public void removeCategoryChooserSelectionListener(CategoryChooserSelectionListener c) {
+        this.listenerList.remove(CategoryChooserSelectionListener.class, c);
     }
 
     /**
@@ -59,9 +82,8 @@ public class JCategoryChooser extends JPanel {
      * 
      * @param name the name of the new category
      * @param c the color of the new category
-     * @return the created category
      */
-    public JComponent addCategory(final String name, final Color c) {
+    public void addCategory(final String name, final Color c) {
         final Category ctg = new Category(name);
         ctg.setBackground(c);
         add(ctg);
@@ -69,8 +91,6 @@ public class JCategoryChooser extends JPanel {
             current = ctg;
             ctg.clicked = true;
         }
-        
-        return ctg;
     }
     
     /**
@@ -90,6 +110,24 @@ public class JCategoryChooser extends JPanel {
         return categories.toArray(new String[]{});
     }
 
+    /**
+     * Returns the color of a specified category. <br />
+     * If the category doesn't exists <code>null</code> is returned. <br />
+     * 
+     * @param name the name of the category
+     * @return the color of the category or null
+     */
+    public Color getCategoryColorForName(String name) {
+        for (final Component c : getComponents()) {
+            if (c instanceof Category) {
+                final Category ctg = (Category) c;
+                if (ctg.text.equals(name))
+                    return ctg.getBackground();
+            }
+        }
+        return null;
+    }
+    
     /**
      * Removes the category with the specified name. <br />
      * 
@@ -157,6 +195,22 @@ public class JCategoryChooser extends JPanel {
         setPreferredSize(new Dimension(maxX, maxY));
     }
     
+    private void select(Category c) {
+        c.clicked = true;
+        if (current != null) {
+            current.clicked = false;
+            current.repaint();
+        }
+        current = c;
+        c.repaint();
+        
+        for (CategoryChooserSelectionListener listener : 
+                this.listenerList.getListeners(CategoryChooserSelectionListener.class)) {
+            
+            listener.categorySelected(c.text);
+        }
+    }
+    
     private class Category extends JComponent {
         
         private String text;
@@ -177,13 +231,7 @@ public class JCategoryChooser extends JPanel {
                 
                 @Override
                 public void mousePressed(MouseEvent me) {
-                    clicked = true;
-                    if (current != null) {
-                        current.clicked = false;
-                        current.repaint();
-                    }
-                    current = Category.this;
-                    repaint();
+                    select(Category.this);
                 }
                 
                 @Override

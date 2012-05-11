@@ -10,6 +10,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -119,12 +120,20 @@ class JBlocksMenu extends JMenuBar {
                 }
             });
         }
-
+        
+        JMenu helpMenu = new JMenu("Help");
+        
         settingsMenu.add(lookAndFeels);
 
+        fileMenu.setMnemonic('F');
+        toolMenu.setMnemonic('T');
+        settingsMenu.setMnemonic('S');
+        helpMenu.setMnemonic('H');
+        
         add(fileMenu);
         add(toolMenu);
         add(settingsMenu);
+        add(helpMenu);
 
         // creates short cuts for the JMenu-s
         int len = getMenuCount();

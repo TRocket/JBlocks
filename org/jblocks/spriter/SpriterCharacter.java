@@ -4,14 +4,14 @@ import java.awt.AlphaComposite;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
+import org.jblocks.stage.Sprite;
 
-public final class SpriterCharacter {
+public final class SpriterCharacter extends Sprite {
 
     final CharacterData character;
-    private float xPos;
-    private float yPos;
     private int currentFrame = 0;
     private AnimationData currentAnimation;
 
@@ -70,14 +70,6 @@ public final class SpriterCharacter {
     }
 
     /**
-     * Sets the location of this Sprite. <br />
-     */
-    public void setLocation(float x, float y) {
-        xPos = x;
-        yPos = y;
-    }
-
-    /**
      * @return the character's name
      */
     public String getName() {
@@ -97,13 +89,12 @@ public final class SpriterCharacter {
         final float w = s.width;
         final float scaleX = w / img.getWidth(null) * (s.xFlip ? -1 : 1);
         final float scaleY = h / img.getHeight(null) * (s.yFlip ? -1 : 1);
+        final Point.Float location = getLocation();
         if (canBeNull && scaleX == 1 && scaleY == 1 && s.angle == 0) {
             return null;
         }
-        if (s.xFlip || s.yFlip)
-            System.out.println("yo");
         AffineTransform tx = new AffineTransform();
-        tx.translate(xPos, yPos);
+        tx.translate(location.x, location.y);
         if (scaleX != 1 || scaleY != 1) {
             tx.scale(scaleX, scaleY);
         }
@@ -125,9 +116,11 @@ public final class SpriterCharacter {
      * Paints the Sprite in the specified <code>Graphics</code> at the
      * Sprite's location. <br />
      */
+    @Override
     public void paint(Graphics2D g) {
         final SpriteData[] sprites = getSprites();
         final Composite backup = g.getComposite();
+        final Point.Float location = getLocation();
 
         for (SpriteData s : sprites) {
             final Image img = s.image;
@@ -136,7 +129,7 @@ public final class SpriterCharacter {
                 g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, s.opacity / 100));
             }
             if (tx == null) {
-                g.drawImage(img, (int) (xPos + s.x), (int) (yPos + s.y), null);
+                g.drawImage(img, (int) (location.x + s.x), (int) (location.y + s.y), null);
             } else {
                 g.drawImage(img, tx, null);
             }
@@ -152,5 +145,15 @@ public final class SpriterCharacter {
     
     KeyFrameData getCurrentKeyFrame() {
         return currentAnimation.frames[currentFrame];
+    }
+
+    @Override
+    public Rectangle getClipBounds() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean contains(int x, int y) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
