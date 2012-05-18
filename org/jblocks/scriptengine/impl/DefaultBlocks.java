@@ -21,7 +21,6 @@ class DefaultBlocks {
     static final NativeBlock READ_PARAM_VARIABLE;     // 0: index
     static final NativeBlock WRITE_GLOBAL_VARIABLE;   // 0: name                  1: value
     static final NativeBlock WRITE_PARAM_VARIABLE;    // 0: index                 1: value
-    
     static final long PREFIX = 100;
     static final long FOR_ID = PREFIX + 1;
     static final long RETURN_ID = PREFIX + 2;
@@ -32,7 +31,6 @@ class DefaultBlocks {
     static final long READ_PARAM_VARIABLE_ID = PREFIX + 7;
     static final long WRITE_GLOBAL_VARIABLE_ID = PREFIX + 8;
     static final long WRITE_PARAM_VARIABLE_ID = PREFIX + 9;
-    
     // <private global>
     private final static Object[] empty = new Object[0];
 
@@ -62,11 +60,17 @@ class DefaultBlocks {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {
+                if (params[0] == null) {
+                    System.out.println("read param => null");
+                    return null;
+                }
+
                 int index = (Integer) params[0];
                 StackElement byob = ((StackElement) ctx);
                 while (!(byob.perform instanceof ByobBlock)) {
                     byob = byob.parent;
                 }
+                System.out.println("read param =>>> " + byob.param[index]);
                 return byob.param[index];
             }
         };
@@ -74,6 +78,10 @@ class DefaultBlocks {
 
             @Override
             public Object evaluate(Object ctx, Object... params) {
+                if (params[0] == null) {
+                    return null;
+                }
+
                 int index = (Integer) params[0];
                 StackElement byob = ((StackElement) ctx);
                 while (!(byob.perform instanceof ByobBlock)) {
@@ -127,14 +135,12 @@ class DefaultBlocks {
                 while (!(byob.perform instanceof ByobBlock)) {
                     byob = byob.parent;
                 }
-                if (byob.parent != null) {
-                    if (byob.parent.doParam) {
-                        byob.parent.param[byob.parent.off - 1] = val;
-                    }
+                if (byob.parent != null && byob.parent.doParam) {
+                    byob.parent.param[byob.parent.off - 1] = val;
                 }
 
                 byob.off = byob.commands.length;
-                ((StackElement) ctx).parent = byob;
+                ((StackElement) ctx).parent = byob.parent;
                 return null;
             }
         };

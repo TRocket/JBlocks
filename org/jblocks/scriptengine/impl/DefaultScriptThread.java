@@ -93,12 +93,13 @@ public class DefaultScriptThread implements IScriptThread {
         }
         return rootStack.param[0];
     }
-
+    
     public static class StackElement {
 
         int off = 0;
-        final Block perform;
         StackElement parent;
+        
+        final Block perform;
         final Object[] commands;
         final Object[] param;
         final Map<String, Object> global;

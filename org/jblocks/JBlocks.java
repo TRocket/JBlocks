@@ -6,8 +6,10 @@ import java.awt.Container;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -21,10 +23,14 @@ import org.jblocks.editor.BlockFactory;
 import org.jblocks.editor.BlockModel;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.editor.JBlockEditor.Category;
+import org.jblocks.editor.JScriptPane;
+import org.jblocks.editor.ScriptGrabber;
 import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.JBubble;
 import org.jblocks.gui.JDragPane;
+import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.Block.Default;
+import org.jblocks.scriptengine.IScript;
 import org.jblocks.scriptengine.IScriptEngine;
 import org.jblocks.scriptengine.IScriptEngine.ScriptEngineListener;
 import org.jblocks.scriptengine.IScriptThread;
@@ -47,6 +53,7 @@ import org.jblocks.scriptengine.NativeBlock;
  */
 public final class JBlocks {
 
+    private static final int GREEN_FLAG_PRESSED_ID = 200 + 1;
     private final JBlocksPane gui;
     private final JDragPane drag;
     private final Map<Long, BlockModel> blockLib;
@@ -111,7 +118,7 @@ public final class JBlocks {
      * (the blocks will be installed) <br />
      */
     private void initDefaultBlocks() {
-        installBlock(BlockModel.createModel("hat", "Control", "When %{gf} clicked", new NativeBlock(0, 200 + 1) {
+        installBlock(BlockModel.createModel("hat", "Control", "When %{gf} clicked", new NativeBlock(0, GREEN_FLAG_PRESSED_ID) {
 
             @Override
             public Object evaluate(Object ctx, Object... param) {
@@ -135,7 +142,7 @@ public final class JBlocks {
         installBlock(BlockModel.createModel("cap", "Control", "return %{t}", scriptEngine.getDefaultBlock(Default.RETURN)));
         installBlock(BlockModel.createModel("command", "Control", "while %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.WHILE)));
         installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.IF)));
-        installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}%{br}else%{s}", scriptEngine.getDefaultBlock(Default.IF_ELSE)));
+        installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}%{br}else%{br}%{s}", scriptEngine.getDefaultBlock(Default.IF_ELSE)));
         installBlock(BlockModel.createModel("command", "Control", "repeat %{t}%{br}%{s}", scriptEngine.getDefaultBlock(Default.FOR)));
 
         installBlock(BlockModel.createModel("reporter", "Variables", "%{v}", scriptEngine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE)));
@@ -303,11 +310,28 @@ public final class JBlocks {
 
     /**
      * Stops all threads of the current ScriptEngine. <br />
-     * <i>This method is synchronized.</i>
      */
-    public synchronized void stopScripts() {
+    public void stopScripts() {
         for (IScriptThread t : scriptEngine.getThreads()) {
             t.stop();
+        }
+    }
+
+    /**
+     * Starts all "green flag" hat blocks. <br />
+     */
+    public synchronized void startScripts() {
+        // TODO: Run all JScriptPanes (=> JSpriteChooser)
+        
+        JScriptPane pane = gui.getEditor().getScriptPane();
+        for (Component c : pane.getComponents()) {
+            if (c instanceof AbstrBlock) {
+                AbstrBlock block = (AbstrBlock) c;
+                BlockModel model = block.getModel();
+                if (model != null && model.getID() == GREEN_FLAG_PRESSED_ID) {
+                    block.tryToExecute();
+                }
+            }
         }
     }
 

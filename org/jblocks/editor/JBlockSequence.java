@@ -79,9 +79,9 @@ public class JBlockSequence extends JComponent {
             if (!capEnd) {
                 ymax += lastp;
             }
-            dim = new Dimension(Math.max(75, xmax + 10), ymax);
+            dim = new Dimension(Math.max(70, xmax + 10), ymax);
         } else {
-            dim = new Dimension(70, 35);
+            dim = new Dimension(70, 25);
         }
         setPreferredSize(dim);
     }

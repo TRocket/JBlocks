@@ -47,7 +47,7 @@ class JReporterBlock extends AbstrBlock {
         g.drawRoundRect(0, 0, size.width - 1, size.height - 1, size.height / 2, size.height / 2);
 
         g.setColor(Colors.bright(col, 0.85f));
-        g.setClip(new Rectangle(0, size.height / 2, size.width, size.height / 2).intersection(clip.getBounds()));
+        g.setClip(new Rectangle(0, size.height / 2, size.width, size.height / 2 + 1).intersection(clip.getBounds()));
         g.drawRoundRect(0, 0, size.width - 1, size.height - 1, size.height / 2, size.height / 2);
 
         g.setClip(clip);

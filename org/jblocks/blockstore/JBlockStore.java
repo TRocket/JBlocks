@@ -50,7 +50,7 @@ public class JBlockStore extends JPanel {
     private final JPaneSwitcher swt;
     private final JProgressBar progress;
     private final List<Long> blocks;
-    private final JComboBox<JComponent> blockFilter;
+    private final JSimpleComboBox<JComponent> blockFilter;
 
     public JBlockStore() {
         setLayout(new BorderLayout());
@@ -58,13 +58,13 @@ public class JBlockStore extends JPanel {
         JPanel intro = new JPanel(new FlowLayout(FlowLayout.CENTER));
         progress = new JProgressBar();
         blocks = new ArrayList<Long>();
-        blockFilter = new JComboBox<JComponent>();
+        blockFilter = new JSimpleComboBox<JComponent>();// new JComboBox<JComponent>();
 
         intro.add(new JLabel(JBlocks.getIcon("welcome-to-the-blockstore.png")));
         intro.setBackground(Color.WHITE);
         swt.setView(intro);
 
-        blockFilter.setRenderer(new ComponentCellRenderer<JComponent>(true));
+      //  blockFilter.setRenderer(new ComponentCellRenderer<JComponent>(true));
 
         AbstrBlock reporterBlock = BlockFactory.createPreviewBlock("reporter", "reporter");
         AbstrBlock booleanBlock = BlockFactory.createPreviewBlock("boolean", "boolean");
@@ -86,11 +86,17 @@ public class JBlockStore extends JPanel {
 
         tools.add(blockFilter);
 
+        JPanel top = new JPanel(new BorderLayout());
+        top.add(tools, BorderLayout.CENTER);
+        
         final JHintingTextField searchField = new JHintingTextField(20);
         searchField.setEmptyTextHint("Search a block");
         searchField.setLayout(new BorderLayout());
         searchField.add(new JLabel(JBlocks.getIcon("search.png")), BorderLayout.EAST);
-        tools.add(searchField);
+        
+        JPanel centeringPanel = new JPanel(new FlowLayout());
+        centeringPanel.add(searchField);
+        top.add(centeringPanel, BorderLayout.EAST);
 
 
         ActionListener onSearch = new ActionListener() {
@@ -120,7 +126,7 @@ public class JBlockStore extends JPanel {
 
         add(swt, BorderLayout.CENTER);
         add(south, BorderLayout.SOUTH);
-        add(tools, BorderLayout.NORTH);
+        add(top, BorderLayout.NORTH);
     }
 
     private void openDownloader(long id) {

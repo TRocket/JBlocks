@@ -70,7 +70,7 @@ public class ScriptGrabber {
                         Block paramCode = getCodeFromBlock(paramBlock);
                         // this should be fixed:
                         boolean doPreExec = !(syntax.equals("while %{b}%{br}%{s}"));
-
+                        
                         if (doPreExec) {
                             b.setParameter(parameter, paramCode);
                         } else {

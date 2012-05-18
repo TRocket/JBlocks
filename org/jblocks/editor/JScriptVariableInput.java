@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
@@ -14,7 +15,9 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
 
+import javax.swing.SwingUtilities;
 import org.jblocks.gui.JDragPane;
+import org.jblocks.gui.Repainter;
 
 /**
  *
@@ -23,25 +26,36 @@ import org.jblocks.gui.JDragPane;
 public class JScriptVariableInput extends AbstrInput {
 
     private AbstrBlock variable;
-    private String type;
+    private final String type;
+    private final BlockModel model;
+    private MouseAdapter variableMouseAdapter = new MouseAdapter() {
+
+        @Override
+        public void mousePressed(MouseEvent evt) {
+            final AbstrBlock clone = BlockFactory.createBlock(model);
+            clone.setBackground(variable.getBackground());
+
+            variable.removeMouseListener(variableMouseAdapter);
+            clone.addMouseListener(variableMouseAdapter);
+
+            JScriptVariableInput.super.setInput(clone);
+                 
+            invalidate();
+            validate();
+            repaint();
+            
+            Drag.drag(JDragPane.getDragPane(JScriptVariableInput.this), JScriptVariableInput.this, evt.getPoint(), variable);
+            
+            variable = clone;
+        }
+    };
 
     public JScriptVariableInput(String name, String type) {
-        final BlockModel model = BlockModel.createModel("reporter", null, name);
+        this.model = BlockModel.createModel("reporter", null, name);
         this.variable = BlockFactory.createBlock(model);
-        this.variable.setDraggable(false);
         this.variable.setBackground(new Color(0xf3761d));
         this.type = type;
-
-        variable.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mousePressed(MouseEvent evt) {
-                final AbstrBlock clone = BlockFactory.createBlock(model);
-                clone.setLocation(variable.getLocation());
-                clone.setBackground(variable.getBackground());
-                Drag.drag(JDragPane.getDragPane(JScriptVariableInput.this), JScriptVariableInput.this, evt.getPoint(), clone);
-            }
-        });
+        this.variable.addMouseListener(variableMouseAdapter);
 
         super.setInput(variable);
     }

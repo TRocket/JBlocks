@@ -149,6 +149,7 @@ public final class JPaintEditor extends JPanel {
         addTool(new EraserTool(this), JBlocks.getIcon("eraser.png"), "eraser");
         addTool(new BrushTool(this), JBlocks.getIcon("brush.png"), "brush");
         addTool(new LineTool(this), JBlocks.getIcon("line.png"), "line");
+        addTool(new PolygonTool(this), JBlocks.getIcon("polygon.png"), "polygon");
         addTool(new RectTool(this), JBlocks.getIcon("rect.png"), "rect");
         addTool(new CircleTool(this), JBlocks.getIcon("circle.png"), "circle");
         // </tools>

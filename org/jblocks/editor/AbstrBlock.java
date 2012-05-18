@@ -11,6 +11,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import java.util.Arrays;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
@@ -30,7 +31,6 @@ import org.jblocks.scriptengine.IScriptEngine;
 public abstract class AbstrBlock extends JComponent {
 
     public static Color DEFAULT_COLOR = new Color(0xCCCCCC);
-    
     private boolean draggable = true;
     private boolean highlight = false;
     private BlockModel model;
@@ -136,6 +136,9 @@ public abstract class AbstrBlock extends JComponent {
                 if (size.height > lineH) {
                     lineH = size.height;
                 }
+                if (comp instanceof JBlockSequence) {
+                    xoff += INPUT_X_PADDING;
+                }
                 xoff += size.width + INPUT_X_PADDING;
             }
             lineW = xoff;
@@ -147,7 +150,18 @@ public abstract class AbstrBlock extends JComponent {
                     break;
                 }
                 Dimension size = comp.getPreferredSize();
-                comp.setSize(size);
+
+                if (comp instanceof JBlockSequence) {
+                    xoff += INPUT_X_PADDING;
+                    if (((idx >= components.length)
+                            || (idx - 2 >= 0 && components[idx - 2] instanceof NewLineComponent))) {
+                        comp.setSize(lineW - xoff + INPUT_X_PADDING, size.height);
+                    } else {
+                        comp.setSize(size);
+                    }
+                } else {
+                    comp.setSize(size);
+                }
 
                 comp.setLocation(xoff, yoff + (lineH / 2 - size.height / 2));
 
@@ -410,15 +424,15 @@ public abstract class AbstrBlock extends JComponent {
      * @see org.jblocks.JBlocks#getContextForComponent(java.awt.Component) 
      * @see org.jblocks.scriptengine.IScriptEngine
      */
-    protected void tryToExecute() {
+    public void tryToExecute() {
         JBlocks context = JBlocks.getContextForComponent(this);
         if (context != null) {
             try {
                 IScriptEngine eng = context.getScriptEngine();
                 if (!(this instanceof Puzzle)) {
                     Block b = ScriptGrabber.getCodeFromBlock(this);
-                    context.addHighlight(eng.execute(eng.compile(new Block[]{b})), new AbstrBlock[]{this});
                     setHighlight(true);
+                    context.addHighlight(eng.execute(eng.compile(new Block[]{b})), new AbstrBlock[]{this});
                 } else {
                     Block[] b = ScriptGrabber.getCodeFromScript(this);
                     AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) this, PuzzleAdapter.TYPE_DOWN);
@@ -446,7 +460,7 @@ public abstract class AbstrBlock extends JComponent {
 
         @Override
         public void mouseClicked(MouseEvent evt) {
-            if (evt.getClickCount() >= 2) {
+            if (!veto()) {
                 tryToExecute();
             }
         }

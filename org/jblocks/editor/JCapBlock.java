@@ -85,6 +85,7 @@ class JCapBlock extends AbstrBlock implements Puzzle {
             g.setColor(highlightColor);
             g.setStroke(thick);
         } else {
+            g.setStroke(new BasicStroke(1.5f));
             g.setColor(shadow);
         }
         g.drawRoundRect(15, -10, 15, 10 + TOP, 5, 5);

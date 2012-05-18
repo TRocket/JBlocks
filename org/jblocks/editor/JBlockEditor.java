@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.HashMap;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -91,7 +90,6 @@ public class JBlockEditor extends JPanel {
         chooser = new JCategoryChooser(2);
         ctgPanel = new JPanel();
         ctgPanel.setLayout(new BorderLayout());
-        ctgPanel.setBorder(BorderFactory.createBevelBorder(4, Color.yellow, Color.black));
 
         chooser.addCategoryChooserSelectionListener(new JCategoryChooser.CategoryChooserSelectionListener() {
 

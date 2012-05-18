@@ -74,7 +74,7 @@ public class JBlocksPane extends JDesktopPane {
         this.editor = createBlockEditor();
         this.backpack = new JScriptPane();
         this.spriteChooser = SpriteChooserTest.createTestSpriteChooser2(editor);
-        
+
         // build up the GUI...
         final JButton saveButton = new JButton(JBlocks.getIcon("save.png"));
         saveButton.setToolTipText("<HTML><b>Save project</b><ul><li>Save your project</li></ul></HTML>");
@@ -180,12 +180,20 @@ public class JBlocksPane extends JDesktopPane {
                 context.stopScripts();
             }
         };
+        ActionListener startScripts = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                context.startScripts();
+            }
+        };
         progressMenu.add("Stop all scripts").addActionListener(stopScripts);
         progress.setComponentPopupMenu(progressMenu);
 
         tools.addSeparator();
 
         AbstractButton startButton = new JImageButton(JBlocks.getImage("play.png"));
+        startButton.addActionListener(startScripts);
         tools.add(startButton);
         AbstractButton stopButton = new JImageButton(JBlocks.getImage("stop.png"));
         stopButton.addActionListener(stopScripts);
@@ -197,17 +205,17 @@ public class JBlocksPane extends JDesktopPane {
 
         JPanel scripts = new JPanel(new BorderLayout());
         scripts.add(editor, BorderLayout.CENTER);
-        
+
         JSplitPane eastSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         JPanel east = new JPanel(new BorderLayout());
         east.add(new JHeading("Sprites"), BorderLayout.NORTH);
         east.add(chScroll, BorderLayout.CENTER);
-        
+
         JPanel bp = new JPanel(new BorderLayout());
         bp.add(new JHeading("Backpack"), BorderLayout.NORTH);
-        
+
         bp.add(backpack, BorderLayout.CENTER);
-        
+
         east.add(bp, BorderLayout.SOUTH);
         eastSplit.setTopComponent(east);
         eastSplit.setBottomComponent(bp);
@@ -227,10 +235,10 @@ public class JBlocksPane extends JDesktopPane {
 
         // add app to the desktop-pane
         add(root);
-        
+
         // set a DesktopManager
         setDesktopManager(new DefaultDesktopManager() {
-            
+
             @Override
             public void iconifyFrame(JInternalFrame frm) {
                 super.iconifyFrame(frm);
@@ -311,7 +319,7 @@ public class JBlocksPane extends JDesktopPane {
 
     void openCyobEditor() {
         Icon icn = JBlocks.getIcon("cyob.png");
-        JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, new JCyobEditor(), "ZeroLuck's CYOB-Editor", 
+        JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, new JCyobEditor(), "ZeroLuck's CYOB-Editor",
                 new Dimension((int) (getWidth() * 0.8), (int) (getHeight() * 0.8)));
         frm.setFrameIcon(icn);
         frm.setResizable(true);
@@ -395,32 +403,31 @@ public class JBlocksPane extends JDesktopPane {
         app.repaint();
     }
 
-
     private void removeVariable(final String name) {
         final IScriptEngine engine = context.getScriptEngine();
         final Map variables = engine.getGlobalVariables();
-  /*      final Map<Long, BlockModel> blocks = context.getInstalledBlocks();
+        /*      final Map<Long, BlockModel> blocks = context.getInstalledBlocks();
         final Block READ_GLOBAL_VAR = engine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE).clone();
-
+        
         for (final BlockModel model : blocks.values()) {
-            final String content = model.getContent();
-            final Block code = model.getCode();
-            if (content != null && code != null && code.equals(READ_GLOBAL_VAR) && content.equals(name)) {
-                System.out.println("TODO: removeVariable()");
-                break;
-            }
+        final String content = model.getContent();
+        final Block code = model.getCode();
+        if (content != null && code != null && code.equals(READ_GLOBAL_VAR) && content.equals(name)) {
+        System.out.println("TODO: removeVariable()");
+        break;
         }
-*/
+        }
+         */
         variables.remove(name);
-   //     repaint();
+        //     repaint();
     }
 
     private void addVariable(final String name) {
         final IScriptEngine engine = context.getScriptEngine();
-    /*    final JBlockEditor blockEditor = getEditor();
+        /*    final JBlockEditor blockEditor = getEditor();
         final Block readVar = engine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE).clone();
         readVar.setParameter(0, name);
-
+        
         final BlockModel var = BlockModel.createModel("reporter", "Variables", BlockFactory.enquote(name), readVar);
         var.setContent(name);
         
@@ -444,7 +451,7 @@ public class JBlocksPane extends JDesktopPane {
                     defaults.put("info", new Color(0xF0F0F0));
                     return;
                 }
-            } 
+            }
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Throwable t) {
             System.err.println("Exception while setting LaF. (" + t + ")");

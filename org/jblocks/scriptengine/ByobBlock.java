@@ -10,7 +10,8 @@ public class ByobBlock extends Block {
 
     public ByobBlock(int paramCount, long id, Block[] sequence) {
         super(paramCount, id);
-        this.seq = sequence;
+        this.seq = new Block[sequence.length];
+        System.arraycopy(sequence, 0, seq, 0, sequence.length);
     }
 
     public Block[] getSequence() {
@@ -22,13 +23,8 @@ public class ByobBlock extends Block {
      */
     @Override
     public Block clone() {
-        int len = seq.length;
-        Block[] seqClone = new Block[len];
-        for (int i = 0; i < len; i++) {
-            seqClone[i] = seq[i].clone();
-        }
-        len = getParameterCount();
-        ByobBlock n = new ByobBlock(len, getID(), seqClone);
+        int len = getParameterCount();
+        ByobBlock n = new ByobBlock(len, getID(), seq);
         for (int i = 0; i < len; i++) {
             Object o = getParameter(i);
             if (o instanceof Block) {
@@ -42,6 +38,6 @@ public class ByobBlock extends Block {
     
     @Override
     public String toString() {
-        return "ByobBlock";
+        return "ByobBlock[" + super.getID() + "]";
     }
 }

@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +22,25 @@ public class JSwingStage extends JPanel implements Stage {
     public JSwingStage() {
         this.sprites = new ArrayList<Sprite>();
         this.size = new Dimension(640, 480);
+        
+        initTest();
     }
-
+    
+    private void initTest() {
+        ImageSprite test = new ImageSprite();
+        test.setLocation(size.width /2, size.height /2);
+        test.addCostume("Test", org.jblocks.JBlocks.getImage("splash.png"));
+        add(test);
+    }
+    
     private void render(Graphics2D g, boolean all) {
         final Rectangle clip = new Rectangle(0, 0, size.width, size.height);
         g.setClip(g.getClipBounds().intersection(clip));
-
+        
         if (all) {
             g.setColor(Color.WHITE);
             g.fillRect(0, 0, size.width, size.height);
-
+            
             for (Sprite s : sprites) {
                 s.paint(g);
             }
@@ -40,7 +50,7 @@ public class JSwingStage extends JPanel implements Stage {
     @Override
     public void paintComponent(Graphics g) {
         Dimension dim = getSize();
-        g.setColor(Color.WHITE);
+        g.setColor(Color.GRAY);
         g.fillRect(0, 0, dim.width, dim.height);
 
         g.translate(dim.width / 2 - size.width / 2, dim.height / 2 - size.height / 2);

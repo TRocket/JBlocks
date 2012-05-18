@@ -32,7 +32,6 @@ public class JImageButton extends AbstractButton {
             @Override
             public void mousePressed(MouseEvent evt) {
                 getModel().setPressed(true);
-                fireActionPerformed(new java.awt.event.ActionEvent(JImageButton.this, ActionEvent.ACTION_PERFORMED, getActionCommand()));
             }
             
             @Override
