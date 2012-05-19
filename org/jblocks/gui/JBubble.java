@@ -65,7 +65,7 @@ public class JBubble extends JComponent {
         g.fillRoundRect(0, 0, size.width + 2 * GAP, size.height + 2 * GAP, GAP * 4, GAP * 4);
 
         Polygon p = new Polygon();
-        p.addPoint(GAP * 2 , 2 * GAP + size.height);
+        p.addPoint(GAP * 2, 2 * GAP + size.height);
         p.addPoint(GAP * 2 + size.width / 2, 2 * GAP + size.height);
         p.addPoint(0, size.height + 2 * GAP + BOTTOM);
         g.fillPolygon(p);
@@ -88,8 +88,7 @@ public class JBubble extends JComponent {
             drag.repaint(bubble.getBounds());
         }
     }
-    
-    private static List<QueueEntry> entries = new ArrayList<QueueEntry>();
+    private static final List<QueueEntry> entries = new ArrayList<QueueEntry>();
 
     /**
      * Shows a JBubble next to a specified <code>Component c</code>. (in the {@link JDragPane}) <br/>
@@ -108,7 +107,7 @@ public class JBubble extends JComponent {
         drag.add(bubble, 0);
         bubble.validate();
         bubble.repaint();
-        
+
         entries.add(new QueueEntry(drag, bubble));
 
         Toolkit.getDefaultToolkit().getSystemEventQueue().push(new EventQueue() {
@@ -118,10 +117,12 @@ public class JBubble extends JComponent {
                 if (event instanceof MouseEvent) {
                     MouseEvent me = (MouseEvent) event;
                     if (me.getID() == MouseEvent.MOUSE_PRESSED) {
-                        for (QueueEntry e : entries) {
-                            e.delete();
+                        synchronized (entries) {
+                            for (QueueEntry e : entries) {
+                                e.delete();
+                            }
+                            entries.clear();
                         }
-                        entries.clear();
                     }
                 }
                 super.dispatchEvent(event);

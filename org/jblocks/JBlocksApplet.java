@@ -20,7 +20,6 @@ public class JBlocksApplet extends JApplet {
     @Override
     public void init() {
         Repainter.install();
-        // TODO run JBlocks
 
         String frame = getParameter("frame");
         if (frame != null && frame.equalsIgnoreCase("true")) {

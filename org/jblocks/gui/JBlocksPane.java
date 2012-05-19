@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.AbstractButton;
@@ -33,16 +35,17 @@ import org.jblocks.JBlocks;
 import org.jblocks.blockstore.JBlockStore;
 import org.jblocks.byob.JByobEditor;
 import org.jblocks.cyob.JCyobEditor;
-import org.jblocks.editor.BlockFactory;
-import org.jblocks.editor.BlockModel;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.editor.JScriptPane;
+import org.jblocks.gui.JSpriteChooser.SpriteChooserSelectionListener;
 import org.jblocks.painteditor2.JPaintEditor;
-import org.jblocks.scriptengine.Block;
-import org.jblocks.scriptengine.Block.Default;
 import org.jblocks.scriptengine.IScriptEngine;
 import org.jblocks.soundeditor.JSoundEditor;
+import org.jblocks.stage.ImageSprite;
 import org.jblocks.stage.JSwingStage;
+import org.jblocks.stage.Sprite;
+import org.jblocks.stage.SpriteData;
+import org.jblocks.stage.Stage;
 import org.jblocks.utils.SwingUtils;
 
 /**
@@ -64,16 +67,29 @@ public class JBlocksPane extends JDesktopPane {
     private final JBlocks context;
     private final JProgressBar progress;
     private final JScriptPane backpack;
+    private final JSwingStage stage;
+    private final Map<String, SpriteData> sprites;
 
     public JBlocksPane(JBlocks ctx) {
         // initialise final variables...
         this.context = ctx;
+        this.sprites = new HashMap<String, SpriteData>(100);
         this.app = new JPanel();
         this.progress = new JProgressBar();
         this.tools = new JToolBar();
         this.editor = createBlockEditor();
         this.backpack = new JScriptPane();
-        this.spriteChooser = SpriteChooserTest.createTestSpriteChooser2(editor);
+        this.spriteChooser = new JSpriteChooser();
+        this.stage = new JSwingStage();
+
+        this.resetEditor();
+        this.spriteChooser.addSelectionListener(new SpriteChooserSelectionListener() {
+
+            @Override
+            public void selected(String text) {
+                editor.setScriptPane(sprites.get(text).getScriptPane());
+            }
+        });
 
         // build up the GUI...
         final JButton saveButton = new JButton(JBlocks.getIcon("save.png"));
@@ -225,7 +241,7 @@ public class JBlocksPane extends JDesktopPane {
         app.add(eastSplit, BorderLayout.EAST);
         tabs.addTab("Scripts", scripts);
 
-        tabs.addTab("Stage", new JSwingStage());
+        tabs.addTab("Stage", stage);
 
         app.add(tabs, BorderLayout.CENTER);
 
@@ -245,23 +261,6 @@ public class JBlocksPane extends JDesktopPane {
                 frm.toFront();
             }
         });
-    }
-
-    /**
-     * Returns the JProgressBar which displays
-     * whether script are running. <br />
-     */
-    public JProgressBar getProgress() {
-        return progress;
-    }
-
-    /**
-     * Returns the context of this JBlocksPane. <br />
-     * 
-     * @see org.jblocks.JBlocks
-     */
-    public JBlocks getContext() {
-        return context;
     }
 
     /****************************************************************
@@ -288,7 +287,7 @@ public class JBlocksPane extends JDesktopPane {
 
     void openPaintEditor() {
         JPaintEditor edt = new JPaintEditor();
-        final JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, edt, "ZeroLuck's Paint-Editor");
+        final JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, edt, "Paint-Editor (by ZeroLuck)");
         frm.setFrameIcon(JBlocks.getIcon("paint-editor.png"));
         edt.addPaintEditorListener(new JPaintEditor.PaintEditorListener() {
 
@@ -299,15 +298,19 @@ public class JBlocksPane extends JDesktopPane {
 
             @Override
             public void finishSelected(BufferedImage img) {
-                spriteChooser.addSpriteView(null, "Test", img);
                 frm.dispose();
+                
+                ImageSprite sprite = new ImageSprite();
+                sprite.addCostume("Test", img);
+                SpriteData data = new SpriteData("Test", sprite);
+                addSprite(data);
             }
         });
     }
 
     void openSoundEditor() {
         JSoundEditor edt = new JSoundEditor();
-        JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, edt, "ZeroLuck's Sound-Editor",
+        JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, edt, "Sound-Editor (by ZeroLuck)",
                 new Dimension((int) (getWidth() / 1.3), (int) (getHeight() / 1.3)));
         frm.setResizable(true);
         frm.setFrameIcon(JBlocks.getIcon("speaker.png"));
@@ -319,7 +322,7 @@ public class JBlocksPane extends JDesktopPane {
 
     void openCyobEditor() {
         Icon icn = JBlocks.getIcon("cyob.png");
-        JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, new JCyobEditor(), "ZeroLuck's CYOB-Editor",
+        JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, new JCyobEditor(), "CYOB-Editor (by ZeroLuck)",
                 new Dimension((int) (getWidth() * 0.8), (int) (getHeight() * 0.8)));
         frm.setFrameIcon(icn);
         frm.setResizable(true);
@@ -328,6 +331,49 @@ public class JBlocksPane extends JDesktopPane {
     }
 
     /***********************************************************/
+    /**
+     * Adds a <code>Sprite</code> to the <code>JSpriteChooser</code>.
+     * @param s the sprite
+     */
+    public void addSprite(SpriteData s) {
+        String name = s.getName();
+        
+        sprites.put(name, s);
+        spriteChooser.addSpriteView(name, s.getPreviewImage());
+        stage.add(s.getView());
+    }
+
+    /**
+     * Removes a <code>Sprite</code> from the <code>JSpriteChooser</code>.
+     * @param s the sprite
+     */
+    public void removeSprite(SpriteData s) {
+        spriteChooser.removeSpriteView(s.getName());
+        sprites.remove(s.getName());
+    }
+
+    /**
+     * Returns a unmodifiable Map of <code>Sprite</code>s. <br />
+     */
+    public Map<String, SpriteData> getSprites() {
+        return Collections.unmodifiableMap(sprites);
+    }
+    
+    /**
+     * Removes all <code>Sprite</code>s from the editor. <br />
+     */
+    public final void resetEditor() {
+        for (SpriteData d : sprites.values()) {
+            Sprite s = d.getView();
+            if (s != null) {
+                stage.remove(s);
+            }
+        }
+        spriteChooser.removeAll();
+        sprites.clear();
+        editor.setScriptPane(new JScriptPane());
+    }
+
     private JBlockEditor createBlockEditor() {
         final JBlockEditor edt = new JBlockEditor();
 
@@ -392,6 +438,9 @@ public class JBlocksPane extends JDesktopPane {
         return edt;
     }
 
+    /**
+     * Shows or hides the toolbar. <br />
+     */
     public void setToolbarVisible(boolean b) {
         if (b && tools.getParent() == null) {
             app.add(tools, BorderLayout.NORTH);
@@ -406,32 +455,11 @@ public class JBlocksPane extends JDesktopPane {
     private void removeVariable(final String name) {
         final IScriptEngine engine = context.getScriptEngine();
         final Map variables = engine.getGlobalVariables();
-        /*      final Map<Long, BlockModel> blocks = context.getInstalledBlocks();
-        final Block READ_GLOBAL_VAR = engine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE).clone();
-        
-        for (final BlockModel model : blocks.values()) {
-        final String content = model.getContent();
-        final Block code = model.getCode();
-        if (content != null && code != null && code.equals(READ_GLOBAL_VAR) && content.equals(name)) {
-        System.out.println("TODO: removeVariable()");
-        break;
-        }
-        }
-         */
         variables.remove(name);
-        //     repaint();
     }
 
     private void addVariable(final String name) {
         final IScriptEngine engine = context.getScriptEngine();
-        /*    final JBlockEditor blockEditor = getEditor();
-        final Block readVar = engine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE).clone();
-        readVar.setParameter(0, name);
-        
-        final BlockModel var = BlockModel.createModel("reporter", "Variables", BlockFactory.enquote(name), readVar);
-        var.setContent(name);
-        
-        blockEditor.addBlock(BlockFactory.createBlock(var)); */
         engine.getGlobalVariables().put(name, 0);
     }
 
@@ -464,5 +492,30 @@ public class JBlocksPane extends JDesktopPane {
      */
     public JBlockEditor getEditor() {
         return editor;
+    }
+
+    /**
+     * Returns the <code>Stage</code>. <br />
+     */
+    public Stage getStage() {
+        return stage;
+    }
+    
+    
+    /**
+     * Returns the JProgressBar which displays
+     * whether script are running. <br />
+     */
+    public JProgressBar getProgress() {
+        return progress;
+    }
+
+    /**
+     * Returns the context of this JBlocksPane. <br />
+     * 
+     * @see org.jblocks.JBlocks
+     */
+    public JBlocks getContext() {
+        return context;
     }
 }

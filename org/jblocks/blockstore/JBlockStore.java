@@ -355,7 +355,7 @@ public class JBlockStore extends JPanel {
     }
 
     public static void openBlockStore(JDesktopPane desktop, Icon icon) {
-        JInternalFrame frm = SwingUtils.showInternalFrame(desktop, new JBlockStore(), "ZeroLuck's Block-Store", new Dimension(600, 400));
+        JInternalFrame frm = SwingUtils.showInternalFrame(desktop, new JBlockStore(), "Block-Store (by ZeroLuck)", new Dimension(600, 400));
         if (icon != null) {
             frm.setFrameIcon(icon);
         }

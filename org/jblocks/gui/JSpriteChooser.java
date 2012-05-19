@@ -14,6 +14,7 @@ import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import java.util.EventListener;
 import javax.swing.JComponent;
 
 /**
@@ -26,6 +27,11 @@ import javax.swing.JComponent;
  */
 public class JSpriteChooser extends JComponent {
 
+    public static interface SpriteChooserSelectionListener extends EventListener {
+
+        public void selected(String text);
+    }
+    
     // <global>
     private static final int SV_LEFT = 10;
     private static final int SV_RIGHT = 10;
@@ -44,22 +50,29 @@ public class JSpriteChooser extends JComponent {
         setBackground(Color.GRAY);
     }
 
-    public JComponent addSpriteView(Object key, String text, Image img) {
-        SpriteView v = new SpriteView(key, text, img);
+    public void addSelectionListener(SpriteChooserSelectionListener s) {
+        this.listenerList.add(SpriteChooserSelectionListener.class, s);
+    }
+
+    public void removeSelectionListener(SpriteChooserSelectionListener s) {
+        this.listenerList.remove(SpriteChooserSelectionListener.class, s);
+    }
+    
+    public void addSpriteView(String text, Image img) {
+        SpriteView v = new SpriteView(text, img);
         if (getComponentCount() == 0) {
             add(v);
             selectSpriteView(v);
         } else {
             add(v);
         }
-        return v;
     }
 
-    public void removeSpriteView(Object key) {
+    public void removeSpriteView(String currentText) {
         for (Component c : getComponents()) {
             if (c instanceof SpriteView) {
                 SpriteView view = (SpriteView) c;
-                if (view.key == key) {
+                if (view.text.equals(currentText)) {
                     remove(view);
                     return;
                 }
@@ -67,20 +80,20 @@ public class JSpriteChooser extends JComponent {
         }
     }
 
-    public void setSpriteViewData(Object key, String text, Image img) {
+    public void setSpriteViewData(String currentText, String newText, Image img) {
         for (Component c : getComponents()) {
             if (c instanceof SpriteView) {
                 SpriteView view = (SpriteView) c;
-                if (view.key == key) {
+                if (view.text.equals(currentText)) {
                     view.img = img;
-                    view.text = text;
+                    view.text = newText;
                     view.repaint();
                     return;
                 }
             }
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -110,7 +123,7 @@ public class JSpriteChooser extends JComponent {
 
         setPreferredSize(new Dimension(Math.max(xoff, 270), yoff));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -134,6 +147,10 @@ public class JSpriteChooser extends JComponent {
         }
         v.selected = true;
         v.repaint();
+        
+        for (SpriteChooserSelectionListener s : this.listenerList.getListeners(SpriteChooserSelectionListener.class)) {
+            s.selected(v.text);
+        }
     }
 
     private static String filterLength(String str, FontMetrics fm) {
@@ -168,7 +185,6 @@ public class JSpriteChooser extends JComponent {
         private Image img;
         private boolean highlight;
         private boolean selected;
-        private Object key;
 
         /**
          * Creates a new SpriteView for the JSpriteChooser. <br />
@@ -176,10 +192,8 @@ public class JSpriteChooser extends JComponent {
          * @throws IllegalArgumentException - if txt or img is null.
          * @param txt - the text to display.
          * @param img - the image to display.
-         * @param key - the key of this sprite-view.
          */
-        public SpriteView(Object key, String txt, Image img) {
-            this.key = key;
+        public SpriteView(String txt, Image img) {
             setText(txt);
             setImage(img);
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -261,7 +275,7 @@ public class JSpriteChooser extends JComponent {
             g.setFont(getFont());
             FontMetrics fm = g.getFontMetrics();
 
-            g.drawImage(img, SV_LEFT, SV_TOP, SV_WIDTH , SV_HEIGHT - fm.getHeight(), this);
+            g.drawImage(img, SV_LEFT, SV_TOP, SV_WIDTH, SV_HEIGHT - fm.getHeight(), this);
             g.setColor(Color.WHITE);
 
             String name = filterLength(text, fm);
@@ -276,7 +290,7 @@ public class JSpriteChooser extends JComponent {
             }
             g.setStroke(new BasicStroke(2, BasicStroke.JOIN_ROUND, BasicStroke.CAP_ROUND));
             g.drawRoundRect(0, 0, SV_LEFT + SV_WIDTH + SV_RIGHT - 1,
-                    SV_TOP + SV_HEIGHT + SV_BOTTOM -1, 10, 10);
+                    SV_TOP + SV_HEIGHT + SV_BOTTOM - 1, 10, 10);
 
 
 

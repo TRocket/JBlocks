@@ -1,15 +1,23 @@
 package org.jblocks.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 
 /**
  *
@@ -49,7 +57,7 @@ public class JDragPane extends JPanel {
             }
         });
     }
-    
+
     /**
      * Returns the displayed component in the background. <br />
      * (Setted in the constructor) <br />
@@ -124,7 +132,7 @@ public class JDragPane extends JPanel {
         }
         return p;
     }
-    
+
     /**
      * Sets the JDragPane's curent drag. <br />
      * 
@@ -141,7 +149,7 @@ public class JDragPane extends JPanel {
         if (drag != null) {
             return;
         }
-        
+
         Point loc = getLocationOnDragPane(cont);
         loc.translate(relLocation.x, relLocation.y);
 
@@ -152,7 +160,7 @@ public class JDragPane extends JPanel {
         add(c, 0);
         c.setLocation(loc);
         c.setSize(c.getPreferredSize());
-        
+
         final MouseMotionListener motion = new MouseMotionListener() {
 
             @Override
@@ -188,6 +196,62 @@ public class JDragPane extends JPanel {
         handler.dragFinished(this, drag, p);
         drag = null;
         repaint();
+    }
+
+    public void showRect(final Rectangle src, final Rectangle end) {
+        class RectPane extends JComponent {
+
+            private Rectangle toDraw = src;
+
+            public RectPane() {
+                setOpaque(false);
+            }
+
+            @Override
+            public void paintComponent(Graphics g) {
+                g.setColor(Color.WHITE);
+                g.drawRect(toDraw.x, toDraw.y, toDraw.width, toDraw.height);
+            }
+        }
+        final RectPane rect = new RectPane();
+        rect.toDraw = new Rectangle(src);
+
+        class RectRepaintSwingWorker<Void> extends SwingWorker {
+
+            private float f = 0;
+
+            @Override
+            protected Void doInBackground() throws Exception {
+                while (f < 1) {
+                    this.publish();
+                    f += 0.1f;
+                    publish(f);
+                    Thread.sleep(30);
+                }
+                return null;
+            }
+
+            @Override
+            protected void process(List list) {
+                rect.toDraw.x = (int) (src.x + (end.x - src.x) * f);
+                rect.toDraw.y = (int) (src.y + (end.y - src.y) * f);
+                rect.toDraw.width = (int) (src.width + (end.width - src.width) * f);
+                rect.toDraw.height = (int) (src.height + (end.height - src.height) * f);
+                rect.repaint();
+            }
+            
+            @Override
+            protected void done() {
+                remove(rect);
+                repaint();
+            }
+        }
+        add(rect, 0);
+        rect.setBounds(0, 0, getWidth(), getHeight());
+
+        
+        new RectRepaintSwingWorker<Void>().execute();
+
     }
 
     private class DragGlassPane extends JPanel {

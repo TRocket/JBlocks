@@ -27,7 +27,6 @@ public class JBlocksLauncher implements Runnable {
      */
     public static void main(String[] args) {
         Repainter.install();
-        // TODO run JBlocks
         SwingUtils.run(new JBlocksLauncher());
     }
 

@@ -15,9 +15,9 @@ import org.jblocks.scriptengine.Block;
  * @see org.jblocks.scriptengine
  * @author ZeroLuck
  */
-public class ScriptGrabber {
+public class ScriptToCode {
 
-    private ScriptGrabber() {
+    private ScriptToCode() {
         // don't let anyone make an instance of this class.
     }
 
@@ -83,7 +83,7 @@ public class ScriptGrabber {
                 parameter++;
             } else if (c instanceof JBlockSequence) {
                 JBlockSequence seq = (JBlockSequence) c;
-                AbstrBlock[] stack = JBlockSequence.getPuzzlePieces((Puzzle) seq.getStack(), PuzzleAdapter.TYPE_TOP);
+                AbstrBlock[] stack = JBlockSequence.getPuzzlePieces((Puzzle) seq.getStack(), PuzzleAdapter.TYPE_DOWN);
                 Block[] codeSeq = new Block[stack.length];
                 for (int i = 0; i < codeSeq.length; i++) {
                     codeSeq[i] = getCodeFromBlock(stack[i]);

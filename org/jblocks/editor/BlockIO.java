@@ -30,7 +30,7 @@ import org.xml.sax.SAXException;
  * The output format is XML.
  * </p>
  *
- * @see ScriptGrabber 
+ * @see ScriptToCode 
  * @author ZeroLuck
  */
 public class BlockIO {
@@ -321,16 +321,16 @@ public class BlockIO {
      * Converts "GUI blocks" to code. <br />
      * The opposite of this method is {@link #createScript(org.jblocks.JBlocks, org.jblocks.scriptengine.Block[]) }. <br />
      * 
-     * @see ScriptGrabber
+     * @see ScriptToCode
      * @param ctx the context of JBlocks
      * @param block the block (or the puzzle) which should be converted
      * @return the converted script
      */
     public static Block[] createCode(JBlocks ctx, AbstrBlock block) {
         if (block instanceof Puzzle) {
-            return ScriptGrabber.getCodeFromScript(block);
+            return ScriptToCode.getCodeFromScript(block);
         } else {
-            return new Block[]{ScriptGrabber.getCodeFromBlock(block)};
+            return new Block[]{ScriptToCode.getCodeFromBlock(block)};
         }
     }
 }

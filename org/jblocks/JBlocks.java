@@ -3,13 +3,12 @@ package org.jblocks;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -24,17 +23,17 @@ import org.jblocks.editor.BlockModel;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.editor.JBlockEditor.Category;
 import org.jblocks.editor.JScriptPane;
-import org.jblocks.editor.ScriptGrabber;
 import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.JBubble;
 import org.jblocks.gui.JDragPane;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.Block.Default;
-import org.jblocks.scriptengine.IScript;
 import org.jblocks.scriptengine.IScriptEngine;
 import org.jblocks.scriptengine.IScriptEngine.ScriptEngineListener;
 import org.jblocks.scriptengine.IScriptThread;
 import org.jblocks.scriptengine.NativeBlock;
+import org.jblocks.stage.ImageSprite;
+import org.jblocks.stage.SpriteData;
 
 /**
  * The context of JBlocks: <br />
@@ -111,6 +110,21 @@ public final class JBlocks {
 
         scriptEngine.addListener(defaultListener);
         initDefaultBlocks();
+        initDefaultSprites();
+    }
+
+    /**
+     * Initialises the default sprites. <br />
+     */
+    private void initDefaultSprites() {
+        Dimension size = gui.getStage().getStageSize();
+
+        ImageSprite test = new ImageSprite();
+        test.setLocation(size.width / 2, size.height / 2);
+        test.addCostume("Test", org.jblocks.JBlocks.getImage("splash.png"));
+
+        SpriteData data = new SpriteData("Logo", test);
+        gui.addSprite(data);
     }
 
     /**
@@ -125,28 +139,38 @@ public final class JBlocks {
                 return null;
             }
         }));
-        installBlock(BlockModel.createModel("boolean", "Operators", "true", new NativeBlock(0, 200 + 2) {
 
-            @Override
-            public Object evaluate(Object ctx, Object... param) {
-                return true;
-            }
-        }));
-        installBlock(BlockModel.createModel("boolean", "Operators", "false", new NativeBlock(0, 200 + 3) {
-
-            @Override
-            public Object evaluate(Object ctx, Object... param) {
-                return false;
-            }
-        }));
         installBlock(BlockModel.createModel("cap", "Control", "return %{t}", scriptEngine.getDefaultBlock(Default.RETURN)));
         installBlock(BlockModel.createModel("command", "Control", "while %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.WHILE)));
         installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.IF)));
         installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}%{br}else%{br}%{s}", scriptEngine.getDefaultBlock(Default.IF_ELSE)));
         installBlock(BlockModel.createModel("command", "Control", "repeat %{t}%{br}%{s}", scriptEngine.getDefaultBlock(Default.FOR)));
-
         installBlock(BlockModel.createModel("reporter", "Variables", "%{v}", scriptEngine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE)));
         installBlock(BlockModel.createModel("command", "Variables", "set %{v} to %{t}", scriptEngine.getDefaultBlock(Default.WRITE_GLOBAL_VARIABLE)));
+
+
+        installBlock(BlockModel.createModel("reporter", "Operators", "%{t}+%{t}",
+                scriptEngine.getDefaultBlock(Default.ADD)));
+        installBlock(BlockModel.createModel("reporter", "Operators", "%{t}-%{t}",
+                scriptEngine.getDefaultBlock(Default.SUB)));
+        installBlock(BlockModel.createModel("reporter", "Operators", "%{t}*%{t}",
+                scriptEngine.getDefaultBlock(Default.MUL)));
+        installBlock(BlockModel.createModel("reporter", "Operators", "%{t}/%{t}",
+                scriptEngine.getDefaultBlock(Default.DIV)));
+        installBlock(BlockModel.createModel("boolean", "Operators", "true", scriptEngine.getDefaultBlock(Default.TRUE)));
+        installBlock(BlockModel.createModel("boolean", "Operators", "false", scriptEngine.getDefaultBlock(Default.FALSE)));
+        installBlock(BlockModel.createModel("reporter", "Operators", "%{t}mod%{t}",
+                scriptEngine.getDefaultBlock(Default.MOD)));
+        installBlock(BlockModel.createModel("boolean", "Operators", "%{t}<%{t}",
+                scriptEngine.getDefaultBlock(Default.SMALLER)));
+        installBlock(BlockModel.createModel("boolean", "Operators", "%{t}>%{t}",
+                scriptEngine.getDefaultBlock(Default.BIGGER)));
+        installBlock(BlockModel.createModel("boolean", "Operators", "%{t}=%{t}",
+                scriptEngine.getDefaultBlock(Default.EQUALS)));
+        installBlock(BlockModel.createModel("boolean", "Operators", "%{b}and%{b}",
+                scriptEngine.getDefaultBlock(Default.AND)));
+        installBlock(BlockModel.createModel("boolean", "Operators", "%{b}or%{b}",
+                scriptEngine.getDefaultBlock(Default.OR)));
     }
 
     /**
@@ -321,15 +345,15 @@ public final class JBlocks {
      * Starts all "green flag" hat blocks. <br />
      */
     public synchronized void startScripts() {
-        // TODO: Run all JScriptPanes (=> JSpriteChooser)
-        
-        JScriptPane pane = gui.getEditor().getScriptPane();
-        for (Component c : pane.getComponents()) {
-            if (c instanceof AbstrBlock) {
-                AbstrBlock block = (AbstrBlock) c;
-                BlockModel model = block.getModel();
-                if (model != null && model.getID() == GREEN_FLAG_PRESSED_ID) {
-                    block.tryToExecute();
+        for (SpriteData sprite : gui.getSprites().values()) {
+            JScriptPane pane = sprite.getScriptPane();
+            for (Component c : pane.getComponents()) {
+                if (c instanceof AbstrBlock) {
+                    AbstrBlock block = (AbstrBlock) c;
+                    BlockModel model = block.getModel();
+                    if (model != null && model.getID() == GREEN_FLAG_PRESSED_ID) {
+                        block.tryToExecute();
+                    }
                 }
             }
         }

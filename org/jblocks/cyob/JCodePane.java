@@ -1,7 +1,7 @@
 package org.jblocks.cyob;
 
+import java.util.Map;
 import javax.swing.JScrollPane;
-import javax.swing.text.ViewFactory;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.undo.UndoManager;
@@ -20,12 +20,12 @@ import static org.jblocks.cyob.MultiSyntaxDocument.*;
  *
  * @author ZeroLuck
  */
-class JCodePane extends JPanel {
+public class JCodePane extends JPanel {
 
-    private final JTextPane textPane;
+    public static final Map<String, MutableAttributeSet> javaKeywords;
 
-    public JCodePane() {
-        final HashMap<String, MutableAttributeSet> javaKeywords = new HashMap<String, MutableAttributeSet>(16);
+    static {
+        javaKeywords = new HashMap<String, MutableAttributeSet>(100);
         javaKeywords.put("public", DEFAULT_KEYWORD);
         javaKeywords.put("private", DEFAULT_KEYWORD);
         javaKeywords.put("abstract", DEFAULT_KEYWORD);
@@ -87,11 +87,19 @@ class JCodePane extends JPanel {
         javaKeywords.put("void", DEFAULT_KEYWORD);
         javaKeywords.put("volatile", DEFAULT_KEYWORD);
         javaKeywords.put("while", DEFAULT_KEYWORD);
+    }
+    private final JTextPane textPane;
+
+    public JCodePane() {
+        this(javaKeywords, true);
+    }
+
+    public JCodePane(final Map<String, MutableAttributeSet> keywords, boolean edit) {
         EditorKit editorKit = new StyledEditorKit() {
 
             @Override
             public Document createDefaultDocument() {
-                MultiSyntaxDocument doc = new MultiSyntaxDocument(javaKeywords);
+                MultiSyntaxDocument doc = new MultiSyntaxDocument(keywords);
                 doc.setTabs(4);
                 doc.addUndoableEditListener(new UndoListener());
                 return doc;
@@ -100,10 +108,11 @@ class JCodePane extends JPanel {
         textPane = new JTextPane();
         textPane.setEditorKitForContentType("text/java", editorKit);
         textPane.setContentType("text/java");
+        textPane.setEditable(edit);
 
         JScrollPane scroll = new JScrollPane(textPane);
         scroll.setRowHeaderView(new TextLineNumber(textPane));
-        
+
         setLayout(new BorderLayout());
         add(scroll, BorderLayout.CENTER);
     }

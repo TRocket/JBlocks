@@ -20,6 +20,14 @@ public class ImageSprite extends Sprite {
         images.add(new Costume(name, img));
     }
 
+    public List<Costume> getCostumes() {
+        return images;
+    }
+    
+    public int getCurrentCostume() {
+        return costume;
+    }
+
     @Override
     public Rectangle getClipBounds() {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -37,7 +45,7 @@ public class ImageSprite extends Sprite {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    static class Costume {
+    public static class Costume {
 
         private String name;
         private Image img;
@@ -45,6 +53,14 @@ public class ImageSprite extends Sprite {
         public Costume(String name, Image img) {
             this.name = name;
             this.img = img;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Image getImage() {
+            return img;
         }
     }
 }

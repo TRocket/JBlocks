@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.jblocks.scriptengine.impl;
 
 import java.io.PrintStream;
@@ -43,7 +39,7 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
         globalVariables = new HashMap<String, Object>(100);
         listeners = new ArrayList<ScriptEngineListener>(1);
     }
-    
+
     @Override
     public IScript compile(Block[] blocks) {
         return new DefaultScript(blocks);
@@ -123,28 +119,7 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
 
     @Override
     public Block getDefaultBlock(Default def) {
-        switch (def) {
-            case FOR:
-                return DefaultBlocks.FOR;
-            case WHILE:
-                return DefaultBlocks.WHILE;
-            case RETURN:
-                return DefaultBlocks.RETURN;
-            case READ_GLOBAL_VARIABLE:
-                return DefaultBlocks.READ_GLOBAL_VARIABLE;
-            case READ_PARAM_VARIABLE:
-                return DefaultBlocks.READ_PARAM_VARIABLE;
-            case WRITE_GLOBAL_VARIABLE:
-                return DefaultBlocks.WRITE_GLOBAL_VARIABLE;
-            case WRITE_PARAM_VARIABLE:
-                return DefaultBlocks.WRITE_PARAM_VARIABLE;
-            case IF:
-                return DefaultBlocks.IF;
-            case IF_ELSE:
-                return DefaultBlocks.IF_ELSE;
-            default:
-                return null;
-        }
+        return DefaultBlocks.getDefaultBlock(def);
     }
 
     private void fireFinishedEvent(IScriptThread t, Throwable error) {

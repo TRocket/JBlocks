@@ -50,12 +50,12 @@ class MultiSyntaxDocument extends DefaultStyledDocument {
     private MutableAttributeSet normal = DEFAULT_NORMAL;
     private MutableAttributeSet comment = DEFAULT_COMMENT;
     private MutableAttributeSet quote = DEFAULT_STRING;
-    private HashMap<String, MutableAttributeSet> keywords;
+    private Map<String, MutableAttributeSet> keywords;
     private int fontSize = DEFAULT_FONT_SIZE;
     private String fontName = DEFAULT_FONT_FAMILY;
 
     @SuppressWarnings("LeakingThisInConstructor")
-    public MultiSyntaxDocument(final HashMap<String, MutableAttributeSet> keywords) {
+    public MultiSyntaxDocument(final Map<String, MutableAttributeSet> keywords) {
         doc = this;
         rootElement = doc.getDefaultRootElement();
         putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");

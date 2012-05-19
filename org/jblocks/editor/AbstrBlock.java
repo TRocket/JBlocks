@@ -430,11 +430,11 @@ public abstract class AbstrBlock extends JComponent {
             try {
                 IScriptEngine eng = context.getScriptEngine();
                 if (!(this instanceof Puzzle)) {
-                    Block b = ScriptGrabber.getCodeFromBlock(this);
+                    Block b = ScriptToCode.getCodeFromBlock(this);
                     setHighlight(true);
                     context.addHighlight(eng.execute(eng.compile(new Block[]{b})), new AbstrBlock[]{this});
                 } else {
-                    Block[] b = ScriptGrabber.getCodeFromScript(this);
+                    Block[] b = ScriptToCode.getCodeFromScript(this);
                     AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) this, PuzzleAdapter.TYPE_DOWN);
                     for (AbstrBlock toHighlight : blocks) {
                         toHighlight.setHighlight(true);

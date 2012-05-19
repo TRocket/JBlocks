@@ -1,6 +1,7 @@
 package org.jblocks.scriptengine.impl;
 
 import org.jblocks.scriptengine.Block;
+import org.jblocks.scriptengine.Block.Default;
 import org.jblocks.scriptengine.ByobBlock;
 import org.jblocks.scriptengine.NativeBlock;
 import org.jblocks.scriptengine.impl.DefaultScriptThread.StackElement;
@@ -9,28 +10,52 @@ import org.jblocks.scriptengine.impl.DefaultScriptThread.StackElement;
  *
  * @author ZeroLuck
  */
-class DefaultBlocks {
+public class DefaultBlocks {
 
     // <global>
-    static final NativeBlock FOR;                     // 0: count                 1: sequence
-    static final NativeBlock RETURN;                  // 0: value to return
-    static final NativeBlock WHILE;                   // 0: expression (sequence) 1: sequence
-    static final NativeBlock IF;                      // 0: expression            1: sequence
-    static final NativeBlock IF_ELSE;                 // 0: expression            1: sequence1    2: sequence2
-    static final NativeBlock READ_GLOBAL_VARIABLE;    // 0: name
-    static final NativeBlock READ_PARAM_VARIABLE;     // 0: index
-    static final NativeBlock WRITE_GLOBAL_VARIABLE;   // 0: name                  1: value
-    static final NativeBlock WRITE_PARAM_VARIABLE;    // 0: index                 1: value
-    static final long PREFIX = 100;
-    static final long FOR_ID = PREFIX + 1;
-    static final long RETURN_ID = PREFIX + 2;
-    static final long WHILE_ID = PREFIX + 3;
-    static final long IF_ID = PREFIX + 4;
-    static final long IF_ELSE_ID = PREFIX + 5;
-    static final long READ_GLOBAL_VARIABLE_ID = PREFIX + 6;
-    static final long READ_PARAM_VARIABLE_ID = PREFIX + 7;
-    static final long WRITE_GLOBAL_VARIABLE_ID = PREFIX + 8;
-    static final long WRITE_PARAM_VARIABLE_ID = PREFIX + 9;
+    public static final NativeBlock FOR;                     // 0: count                 1: sequence
+    public static final NativeBlock RETURN;                  // 0: value to return
+    public static final NativeBlock WHILE;                   // 0: expression (sequence) 1: sequence
+    public static final NativeBlock IF;                      // 0: expression            1: sequence
+    public static final NativeBlock IF_ELSE;                 // 0: expression            1: sequence1    2: sequence2
+    public static final NativeBlock READ_GLOBAL_VARIABLE;    // 0: name
+    public static final NativeBlock READ_PARAM_VARIABLE;     // 0: index
+    public static final NativeBlock WRITE_GLOBAL_VARIABLE;   // 0: name                  1: value
+    public static final NativeBlock WRITE_PARAM_VARIABLE;    // 0: index                 1: value
+    public static final NativeBlock TRUE;                    // ---
+    public static final NativeBlock FALSE;                   // ---
+    public static final NativeBlock ADD;
+    public static final NativeBlock SUB;
+    public static final NativeBlock MUL;
+    public static final NativeBlock DIV;
+    public static final NativeBlock MOD;
+    public static final NativeBlock SMALLER;
+    public static final NativeBlock BIGGER;
+    public static final NativeBlock EQUALS;
+    public static final NativeBlock OR;
+    public static final NativeBlock AND;
+    public static final long PREFIX = 100;
+    public static final long FOR_ID = PREFIX + 1;
+    public static final long RETURN_ID = PREFIX + 2;
+    public static final long WHILE_ID = PREFIX + 3;
+    public static final long IF_ID = PREFIX + 4;
+    public static final long IF_ELSE_ID = PREFIX + 5;
+    public static final long READ_GLOBAL_VARIABLE_ID = PREFIX + 6;
+    public static final long READ_PARAM_VARIABLE_ID = PREFIX + 7;
+    public static final long WRITE_GLOBAL_VARIABLE_ID = PREFIX + 8;
+    public static final long WRITE_PARAM_VARIABLE_ID = PREFIX + 9;
+    public static final long TRUE_ID = PREFIX + 10;
+    public static final long FALSE_ID = PREFIX + 11;
+    public static final long ADD_ID = PREFIX + 12;
+    public static final long SUB_ID = PREFIX + 13;
+    public static final long MUL_ID = PREFIX + 14;
+    public static final long DIV_ID = PREFIX + 15;
+    public static final long MOD_ID = PREFIX + 16;
+    public static final long SMALLER_ID = PREFIX + 17;
+    public static final long BIGGER_ID = PREFIX + 18;
+    public static final long EQUALS_ID = PREFIX + 19;
+    public static final long OR_ID = PREFIX + 20;
+    public static final long AND_ID = PREFIX + 21;
     // <private global>
     private final static Object[] empty = new Object[0];
 
@@ -251,10 +276,147 @@ class DefaultBlocks {
                 return null;
             }
         };
+        TRUE = new NativeBlock(0, TRUE_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                return true;
+            }
+        };
+        FALSE = new NativeBlock(0, FALSE_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                return false;
+            }
+        };
+        ADD = new NativeBlock(2, ADD_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                if (isInt(param[0]) && isInt(param[1])) {
+                    return toInt(param[0]) + toInt(param[1]);
+                } else {
+                    return toDouble(param[0]) + toDouble(param[1]);
+                }
+            }
+        };
+        SUB = new NativeBlock(2, SUB_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                if (isInt(param[0]) && isInt(param[1])) {
+                    return toInt(param[0]) - toInt(param[1]);
+                } else {
+                    return toDouble(param[0]) - toDouble(param[1]);
+                }
+            }
+        };
+        MUL = new NativeBlock(2, MUL_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                if (isInt(param[0]) && isInt(param[1])) {
+                    return toInt(param[0]) * toInt(param[1]);
+                } else {
+                    return toDouble(param[0]) * toDouble(param[1]);
+                }
+            }
+        };
+        DIV = new NativeBlock(2, DIV_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                if (isInt(param[0]) && isInt(param[1])) {
+                    return toInt(param[0]) / toInt(param[1]);
+                } else {
+                    return toDouble(param[0]) / toDouble(param[1]);
+                }
+            }
+        };
+        MOD = new NativeBlock(2, MOD_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                if (isInt(param[0]) && isInt(param[1])) {
+                    return toInt(param[0]) % toInt(param[1]);
+                } else {
+                    return toDouble(param[0]) % toDouble(param[1]);
+                }
+            }
+        };
+        SMALLER = new NativeBlock(2, SMALLER_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                return toDouble(param[0]) < toDouble(param[1]);
+            }
+        };
+        BIGGER = new NativeBlock(2, BIGGER_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                return toDouble(param[0]) > toDouble(param[1]);
+            }
+        };
+        EQUALS = new NativeBlock(2, EQUALS_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                if (isInt(param[0]) && isInt(param[1])) {
+                    return toInt(param[0]) == toInt(param[2]);
+                } else {
+                    return param[0].equals(param[1]);
+                }
+            }
+        };
+        OR = new NativeBlock(2, OR_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                return toBoolean(param[0]) || toBoolean(param[1]);
+            }
+        };
+        AND = new NativeBlock(2, AND_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                return toBoolean(param[0]) && toBoolean(param[1]);
+            }
+        };
     }
 
     private static boolean toBoolean(Object o) {
         return o == null ? false : Boolean.parseBoolean(o + "");
+    }
+
+    private static double toDouble(Object o) {
+        if (o instanceof Float) {
+            return (Float) o;
+        }
+        if (o instanceof Double) {
+            return (Double) o;
+        }
+        if (o instanceof Integer) {
+            return (Integer) o;
+        }
+        try {
+            return (Double.valueOf(("" + o).replace(',', '.')));
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
+    }
+
+    private static boolean isInt(Object o) {
+        if (o instanceof Integer) {
+            return true;
+        }
+        try {
+            Integer.parseInt("" + o);
+            return true;
+        } catch (NumberFormatException ex) {
+            return false;
+        }
     }
 
     private static int toInt(Object o) {
@@ -262,6 +424,55 @@ class DefaultBlocks {
             return (Double.valueOf(("" + o).replace(',', '.'))).intValue();
         } catch (NumberFormatException ex) {
             return 0;
+        }
+    }
+
+    public static Block getDefaultBlock(Default def) {
+        switch (def) {
+            case FOR:
+                return DefaultBlocks.FOR;
+            case WHILE:
+                return DefaultBlocks.WHILE;
+            case RETURN:
+                return DefaultBlocks.RETURN;
+            case READ_GLOBAL_VARIABLE:
+                return DefaultBlocks.READ_GLOBAL_VARIABLE;
+            case READ_PARAM_VARIABLE:
+                return DefaultBlocks.READ_PARAM_VARIABLE;
+            case WRITE_GLOBAL_VARIABLE:
+                return DefaultBlocks.WRITE_GLOBAL_VARIABLE;
+            case WRITE_PARAM_VARIABLE:
+                return DefaultBlocks.WRITE_PARAM_VARIABLE;
+            case IF:
+                return DefaultBlocks.IF;
+            case IF_ELSE:
+                return DefaultBlocks.IF_ELSE;
+            case TRUE:
+                return DefaultBlocks.TRUE;
+            case FALSE:
+                return DefaultBlocks.FALSE;
+            case ADD:
+                return DefaultBlocks.ADD;
+            case SUB:
+                return DefaultBlocks.SUB;
+            case MUL:
+                return DefaultBlocks.MUL;
+            case DIV:
+                return DefaultBlocks.DIV;
+            case MOD:
+                return DefaultBlocks.MOD;
+            case SMALLER:
+                return DefaultBlocks.SMALLER;
+            case BIGGER:
+                return DefaultBlocks.BIGGER;
+            case EQUALS:
+                return DefaultBlocks.EQUALS;
+            case OR:
+                return DefaultBlocks.OR;
+            case AND:
+                return DefaultBlocks.AND;
+            default:
+                return null;
         }
     }
 }

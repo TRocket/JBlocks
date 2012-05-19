@@ -116,6 +116,34 @@ public class SwingUtils {
     }
 
     /**
+     * Shows a specified JInternalFrame in the middle of the specified JDesktopPane. <br />
+     * The size of the JInternalFrame will be <code>frameSize</code>. <br />
+     * The frame is <i>just</i> closeable. <br />
+     * 
+     * @param desktop the JDesktopPane
+     * @param frm the JInternalFrame
+     * @param content the component which will be added to the JInternalFrame
+     * @param frameSize the size of the JInternalFrame
+     */
+    public static void showInternalFrame(JDesktopPane desktop, JInternalFrame frm, JComponent content,  Dimension frameSize) {
+        frm.setClosable(true);
+        frm.setLayout(new BorderLayout());
+        frm.add(content, BorderLayout.CENTER);
+        frm.setSize(frameSize);
+        frm.setVisible(true);
+
+        Dimension size = frm.getSize();
+        frm.setLocation(desktop.getWidth() / 2 - size.width / 2,
+                desktop.getHeight() / 2 - size.height / 2);
+        desktop.add(frm, 0);
+
+        try {
+            frm.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+        }
+    }
+
+    /**
      * Creates (and displays) a JInternalFrame for a specified component. <br />
      * The size of the JInternalFrame will be <code>frameSize</code>. <br />
      * The frame is <i>just</i> closeable. <br />

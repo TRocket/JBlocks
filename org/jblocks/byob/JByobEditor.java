@@ -37,7 +37,7 @@ import org.jblocks.editor.JScriptPane;
 import org.jblocks.editor.JScriptVariableInput;
 import org.jblocks.editor.Puzzle;
 import org.jblocks.editor.PuzzleAdapter;
-import org.jblocks.editor.ScriptGrabber;
+import org.jblocks.editor.ScriptToCode;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.ByobBlock;
 import org.jblocks.utils.SwingUtils;
@@ -342,7 +342,7 @@ public class JByobEditor extends JPanel {
             @Override
             public void finished(final BlockModel model, final AbstrBlock script) {
                 try {
-                    final Block[] code = ScriptGrabber.getCodeFromScript(script);
+                    final Block[] code = ScriptToCode.getCodeFromScript(script);
                     JBlocks ctx = JBlocks.getContextForComponent(edt);
                     model.setCode(new ByobBlock(BlockFactory.countParameters(model.getSyntax()), model.getID(), code));
                     ctx.installBlock(model);
