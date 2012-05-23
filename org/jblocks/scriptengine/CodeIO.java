@@ -105,8 +105,8 @@ public class CodeIO {
 
         writer.writeStartElement("code");
         if (b instanceof NativeBlock) {
-            if (b instanceof StoreableNativeBlock) {
-                StoreableNativeBlock snb = (StoreableNativeBlock) b;
+            if (b instanceof StorableNativeBlock) {
+                StorableNativeBlock snb = (StorableNativeBlock) b;
                 writer.writeText(snb.getData());
             } else {
                 throw new UnsupportedOperationException("the block isn't storeable!");
@@ -171,7 +171,7 @@ public class CodeIO {
             b = new ByobBlock(parameters, model.getID(), BlockIO.readFromXML(ctx, nodeForName(root.getChildNodes(), "code")));
         } else if (type.equals("native")) {
             try {
-                b = StoreableNativeBlock.load(nodeForName(root.getChildNodes(), "code").getTextContent());
+                b = StorableNativeBlock.load(nodeForName(root.getChildNodes(), "code").getTextContent());
             } catch (Exception ex) {
                 throw new IOException("Couldn't load the code of the NativeBlock.", ex);
             }

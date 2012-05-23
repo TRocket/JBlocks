@@ -15,16 +15,17 @@ import java.util.jar.Manifest;
 import org.jblocks.utils.Base64;
 import org.jblocks.utils.StreamUtils;
 
+
 /**
  *
  * @author ZeroLuck
  */
-public class StoreableNativeBlock extends NativeBlock {
+public class StorableNativeBlock extends NativeBlock {
 
     private final NativeBlock block;
     private final String data;
 
-    private StoreableNativeBlock(NativeBlock block, String data) {
+    private StorableNativeBlock(NativeBlock block, String data) {
         super(block.getParameterCount(), block.getID());
         this.data = data;
         this.block = block;
@@ -48,7 +49,7 @@ public class StoreableNativeBlock extends NativeBlock {
         return Base64.encode(StreamUtils.jarPack(classFiles, m));
     }
 
-    public static StoreableNativeBlock load(String data) throws
+    public static StorableNativeBlock load(String data) throws
             IOException, ClassNotFoundException,
             IllegalAccessException, InstantiationException {
 
@@ -59,10 +60,9 @@ public class StoreableNativeBlock extends NativeBlock {
         loader.addJar(in);
         Class<?> clazz = loader.loadClass(main);
 
-        return new StoreableNativeBlock((NativeBlock) clazz.newInstance(), data);
+        return new StorableNativeBlock((NativeBlock) clazz.newInstance(), data);
     }
 }
-
 /**
  *
  * @author ZeroLuck

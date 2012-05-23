@@ -39,7 +39,6 @@ import org.jblocks.editor.BlockModel;
 import org.jblocks.gui.JHintingTextField;
 import org.jblocks.scriptengine.NativeBlock;
 import org.jblocks.utils.SwingUtils;
-import org.jblocks.utils.XMLSwingLoader;
 
 /**
  *
@@ -58,20 +57,24 @@ public class JBlockStore extends JPanel {
         JPanel intro = new JPanel(new FlowLayout(FlowLayout.CENTER));
         progress = new JProgressBar();
         blocks = new ArrayList<Long>();
-        blockFilter = new JSimpleComboBox<JComponent>();// new JComboBox<JComponent>();
+        blockFilter = new JSimpleComboBox<JComponent>();
 
         intro.add(new JLabel(JBlocks.getIcon("welcome-to-the-blockstore.png")));
         intro.setBackground(Color.WHITE);
         swt.setView(intro);
-
-      //  blockFilter.setRenderer(new ComponentCellRenderer<JComponent>(true));
 
         AbstrBlock reporterBlock = BlockFactory.createPreviewBlock("reporter", "reporter");
         AbstrBlock booleanBlock = BlockFactory.createPreviewBlock("boolean", "boolean");
         AbstrBlock commandBlock = BlockFactory.createPreviewBlock("command", "command");
         AbstrBlock capBlock = BlockFactory.createPreviewBlock("cap", "cap block");
 
-        blockFilter.addItem(new JLabel("any block"));
+        JPanel anyBlock = new JPanel(new FlowLayout());
+        anyBlock.add(BlockFactory.createPreviewBlock("command", "command"));
+        anyBlock.add(BlockFactory.createPreviewBlock("reporter", "reporter"));
+        anyBlock.add(BlockFactory.createPreviewBlock("boolean", "boolean"));
+        anyBlock.add(BlockFactory.createPreviewBlock("cap", "cap block"));
+        
+        blockFilter.addItem(anyBlock);
         blockFilter.addItem(commandBlock);
         blockFilter.addItem(reporterBlock);
         blockFilter.addItem(booleanBlock);

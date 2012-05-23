@@ -57,6 +57,8 @@ public class JScriptPane extends JPanel {
     private static final int CLEANUP_TOP = 10;
     // <member>
     private Image scrp = scriptpane;
+    private int rightGap = 10, bottomGap = 50;
+    private boolean drag = true;
 
     /**
      * Creates a new JScriptPane with an JPopupMenu. <br />
@@ -182,8 +184,16 @@ public class JScriptPane extends JPanel {
             }
         }
     }
-    // <member>
-    private boolean drag = true;
+    
+    /**
+     * Sets the default gap. <br />
+     * @param rightGap the new right gap
+     * @param bottomGap the new bottom gap
+     */
+    public void setDefaultGap(int rightGap, int bottomGap) {
+        this.rightGap = rightGap;
+        this.bottomGap = bottomGap;
+    }
 
     /**
      * Enables/Disables dragging of blocks/scripts in this JScriptPane. <br />
@@ -235,7 +245,7 @@ public class JScriptPane extends JPanel {
             }
         }
 
-        return new Dimension(w + 10, h + 100);
+        return new Dimension(w + rightGap, h + bottomGap);
     }
 
     /**

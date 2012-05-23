@@ -15,9 +15,9 @@ import org.jblocks.scriptengine.Block;
  * @see org.jblocks.scriptengine
  * @author ZeroLuck
  */
-public class ScriptToCode {
+public class Script2Code {
 
-    private ScriptToCode() {
+    private Script2Code() {
         // don't let anyone make an instance of this class.
     }
 
@@ -47,7 +47,6 @@ public class ScriptToCode {
      */
     public static Block getCodeFromBlock(final AbstrBlock block) {
         final BlockModel model = block.getModel();
-
         final String syntax = model.getSyntax();
         Block b = model.getCode();
         if (b == null) {
@@ -69,7 +68,7 @@ public class ScriptToCode {
                         AbstrBlock paramBlock = (AbstrBlock) comp;
                         Block paramCode = getCodeFromBlock(paramBlock);
                         // this should be fixed:
-                        boolean doPreExec = !(syntax.equals("while %{b}%{br}%{s}"));
+                        boolean doPreExec = !(syntax.equals("while%{b}%{br}%{s}"));
                         
                         if (doPreExec) {
                             b.setParameter(parameter, paramCode);
@@ -77,7 +76,7 @@ public class ScriptToCode {
                             b.setParameter(parameter, new Block[]{paramCode});
                         }
                     } else {
-                        System.out.println("Warning: ScriptGrabber: What to do with: \"" + c + "\"?");
+                        System.out.println("Warning: Script2Code: What to do with: \"" + c + "\"?");
                     }
                 }
                 parameter++;

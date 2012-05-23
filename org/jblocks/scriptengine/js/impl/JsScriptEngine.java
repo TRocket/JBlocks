@@ -6,13 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.Block.Default;
 import org.jblocks.scriptengine.ByobBlock;
@@ -33,7 +31,8 @@ public class JsScriptEngine implements IScriptEngine {
     private final Map<Long, NativeBlock> natives = new HashMap<Long, NativeBlock>(100);
     private final List<IScriptEngine.ScriptEngineListener> listeners = new ArrayList<IScriptEngine.ScriptEngineListener>();
     private final ScriptEngine eng;
-
+    private Set<String> varnames;
+    
     public JsScriptEngine() {
         this(true);
     }
@@ -46,10 +45,10 @@ public class JsScriptEngine implements IScriptEngine {
             eng = null;
         }
     }
-
+    
     private String compileSequence(Object[] blocks, Set<Long> byobs, StringBuilder functions,
             String del, boolean delAtEnd) {
-
+        
         final StringBuilder sb = new StringBuilder();
         int cnt = 0;
         for (final Object obj : blocks) {
@@ -80,10 +79,10 @@ public class JsScriptEngine implements IScriptEngine {
                 final NativeBlock n = (NativeBlock) obj;
                 final long ID = n.getID();
                 if (ID == DefaultBlocks.FOR_ID) {
-                    String rn = "tmp_" + (int) (Math.random() * 100000);
-                    sb.append("for(var ").append(rn).append(" = 0; ").append(rn).append(" < (");
+                    String rn = nextVarName();
+                    sb.append("for(var ").append(rn).append(" = 0; ").append(rn).append(" < ");
                     sb.append(compileSequence(new Object[]{n.getParameter(0)}, byobs, functions, ",", false));
-                    sb.append(");").append(rn).append("++) {");
+                    sb.append(";").append(rn).append("++) {");
                     sb.append(compileSequence((Object[]) n.getParameter(1), byobs, functions, ";", true));
                     sb.append("}");
                 } else if (ID == DefaultBlocks.IF_ID) {
@@ -175,6 +174,20 @@ public class JsScriptEngine implements IScriptEngine {
                     sb.append(" && ");
                     sb.append(compileSequence(new Object[]{n.getParameter(1)}, byobs, functions, ",", false));
                     sb.append(")");
+                } else if (ID == DefaultBlocks.NOT_ID) {
+                    sb.append("!(").append(compileSequence(new Object[]{n.getParameter(0)}, byobs, functions, ",", false)).append(")");
+                } else if (ID == DefaultBlocks.RUN_ID) { // TODO
+                    sb.append("eval(");
+                    if (n.getParameter(0) != null) {
+                        sb.append(compileSequence(new Object[]{n.getParameter(0)}, byobs, functions, ",", false));
+                    } else {
+                        sb.append("null");
+                    }
+                    sb.append(")");
+                } else if (ID == DefaultBlocks.THE_SCRIPT_ID) { // TODO
+                    sb.append("\"");
+                    sb.append(compileSequence((Object[]) n.getParameter(0), byobs, functions, ";", true).replace("\"", "\\\""));
+                    sb.append("\"");
                 } else {
                     if (!natives.containsKey(ID)) {
                         natives.put(ID, n);
@@ -212,7 +225,26 @@ public class JsScriptEngine implements IScriptEngine {
         return sb.toString();
     }
 
-    public String compileToJavaScriptCode(Block[] blocks) {
+    private String nextVarName() {
+        final String names = "ijkx";
+        for (int i = 0; i < names.length(); i++) {
+            String c = "" + names.charAt(i);
+            if (!varnames.contains(c)) {
+                varnames.add(c);
+                return c;
+            }
+        }
+        for (int i = 0;;i++) {
+            String c = "v" + i;
+            if (!varnames.contains(c)) {
+                varnames.add(c);
+                return c;
+            }
+        }
+    }
+    
+    public synchronized String compileToJavaScriptCode(Block[] blocks) {
+        varnames = new HashSet<String>(50);
         StringBuilder sb = new StringBuilder();
         StringBuilder end = new StringBuilder();
         if (blocks.length > 1) {

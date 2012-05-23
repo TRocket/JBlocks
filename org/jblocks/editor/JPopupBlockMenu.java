@@ -12,8 +12,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JDesktopPane;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
@@ -23,11 +26,17 @@ import javax.swing.JPopupMenu;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.text.MutableAttributeSet;
 import org.jblocks.JBlocks;
 import org.jblocks.cyob.JCodePane;
+import org.jblocks.cyob.JCyobEditor;
+import org.jblocks.cyob.MultiSyntaxDocument;
+import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.JDragPane;
 import org.jblocks.scriptengine.Block;
+import org.jblocks.scriptengine.ByobBlock;
 import org.jblocks.scriptengine.NativeBlock;
+import org.jblocks.scriptengine.StorableNativeBlock;
 import org.jblocks.scriptengine.js.impl.JsBeautifier;
 import org.jblocks.scriptengine.js.impl.JsScriptEngine;
 import org.jblocks.utils.StreamUtils;
@@ -47,7 +56,7 @@ import org.jblocks.utils.SwingUtils;
  */
 public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
 
-    private AbstrBlock parent;
+    private final AbstrBlock parent;
 
     /**
      * Creates a new <code>JPopupBlockMenu</code> for a specified block. <br />
@@ -81,10 +90,18 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
         }
 
         this.add("save picture of script").addActionListener(this);
-
-        this.addSeparator();
         this.add("save script").addActionListener(this);
+        this.addSeparator();
         this.add("view JavaScript").addActionListener(this);
+
+        BlockModel model = parent.getModel();
+        if (model != null) {
+            Block code = model.getCode();
+            if (code instanceof ByobBlock || code instanceof StorableNativeBlock) {
+                this.addSeparator();
+                this.add("edit").addActionListener(this);
+            }
+        }
     }
 
     private void deleteBlock() {
@@ -125,15 +142,19 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
             final JsScriptEngine tmpEngine = new JsScriptEngine(false); // <- not for executing, just compiling
             final Block[] blocks;
             if (parent instanceof Puzzle) {
-                blocks = ScriptToCode.getCodeFromScript(parent);
+                blocks = Script2Code.getCodeFromScript(parent);
             } else {
-                blocks = new Block[]{ScriptToCode.getCodeFromBlock(parent)};
+                blocks = new Block[]{Script2Code.getCodeFromBlock(parent)};
             }
             final String code = JsBeautifier.work(tmpEngine.compileToJavaScriptCode(blocks));
             final JInternalFrame frm = new JInternalFrame("JavaScript-Viewer (by ZeroLuck)");
-
             final JPanel pane = new JPanel(new BorderLayout());
-            final JCodePane codePane = new JCodePane(JCodePane.javaKeywords, false);
+
+            Map<String, MutableAttributeSet> jsKeywords = new HashMap<String, MutableAttributeSet>();
+            jsKeywords.putAll(JCodePane.javaKeywords);
+            jsKeywords.put("function", MultiSyntaxDocument.DEFAULT_KEYWORD);
+
+            final JCodePane codePane = new JCodePane(jsKeywords, false);
             final JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             final JButton cancel = new JButton("Cancel");
             cancel.addActionListener(new ActionListener() {
@@ -143,6 +164,9 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
                     frm.dispose();
                 }
             });
+            frm.setResizable(true);
+            frm.setMaximizable(true);
+            frm.setIconifiable(true);
             codePane.setText(code);
             bottom.add(cancel);
             pane.add(codePane, BorderLayout.CENTER);
@@ -150,6 +174,7 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
 
             SwingUtils.showInternalFrame(JBlocks.getContextForComponent(parent).getDesktop(), frm, pane, new Dimension(620, 360));
         } catch (Exception ex) {
+            ex.printStackTrace();
             JOptionPane.showInternalMessageDialog(JBlocks.getContextForComponent(parent).getDesktop(),
                     "Couldn't compile to JavaScript: \n" + ex, "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -302,6 +327,24 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
             }
         });
     }
+    
+    private void editBlock() {
+        BlockModel model = parent.getModel();
+        Block code = model.getCode();
+        JDesktopPane desktop = JBlocks.getContextForComponent(parent).getDesktop();
+        
+        if (code instanceof ByobBlock) {
+            
+        } else if (code instanceof StorableNativeBlock) {
+            StorableNativeBlock st = (StorableNativeBlock) code;
+            JCyobEditor edt = JCyobEditor.createEditEditor(model.getSyntax(), st);
+            if (edt == null) {
+                JOptionPane.showMessageDialog(desktop, "Error: Couldn't open block!", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JBlocksPane.showCyobEditorFrame(desktop, edt);
+            }
+        }
+    }
 
     @Override
     public void actionPerformed(ActionEvent evt) {
@@ -318,6 +361,8 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
             saveScript();
         } else if (command.equals("view JavaScript")) {
             viewJavaScript();
+        } else if (command.equals("edit")) {
+            editBlock();
         }
     }
 }

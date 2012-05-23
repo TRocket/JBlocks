@@ -11,6 +11,7 @@ public abstract class NativeBlock extends Block implements Executable {
     public NativeBlock(int paramCount, long id) {
         super(paramCount, id);
     }
+
     /**
      * This has to be executed <b>fast</b>. <br />
      * This code can block the thread-scheduler. <br />
@@ -31,20 +32,15 @@ public abstract class NativeBlock extends Block implements Executable {
             public Object evaluate(Object ctx, Object... params) {
                 return src.evaluate(ctx, params);
             }
-            
+
             @Override
             public Block clone() {
-                return src.clone();
+                Block b = (NativeBlock) src.clone();
+                Block.copyParameters(this, b);
+                return b;
             }
         };
-        for (int i = 0; i < len; i++) {
-            Object o = getParameter(i);
-            if (o instanceof Block) {
-                n.setParameter(i, ((Block) o).clone());
-            } else {
-                n.setParameter(i, o);
-            }
-        }
+        Block.copyParameters(this, n);
         return n;
     }
 

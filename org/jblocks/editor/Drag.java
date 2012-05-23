@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import javax.swing.undo.UndoManager;
 import org.jblocks.gui.JDragPane;
 import org.jblocks.gui.Repainter;
 
@@ -19,7 +20,7 @@ import org.jblocks.gui.Repainter;
  * @author ZeroLuck
  */
 class Drag {
-    
+
     private static void getDragTargets0(List<JScriptPane> panes, Container cont) {
         for (Component c : cont.getComponents()) {
             if (c instanceof JScriptPane) {
@@ -60,22 +61,25 @@ class Drag {
         }
         return target;
     }
-    
+
     static void dragPuzzle(JDragPane root, final Container cont, Point p, final AbstrBlock puzzle) {
         try {
+            final Container blockParent = puzzle.getParent();
+            final Point blockLocation = puzzle.getLocation();
+
             Repainter.disable(root);
-            
+
             JDragPane.DragFinishedHandler handler = new JDragPane.DragFinishedHandler() {
-                
+
                 @Override
                 public void dragFinished(JDragPane jdrag, Component c, Point location) {
                     JScriptPane target = getTarget(jdrag, cont, new Rectangle(location, c.getSize()));
                     if (target != null) {
                         Point p = SwingUtilities.convertPoint(jdrag, location, target);
-                        
+
                         AbstrBlock dragBlock = (AbstrBlock) puzzle;
                         dragBlock.setLocation(p);
-                        
+
                         AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) puzzle, PuzzleAdapter.TYPE_DOWN);
                         for (AbstrBlock b : blocks) {
                             Container parent = b.getParent();
@@ -85,7 +89,7 @@ class Drag {
                             target.add(b, 0);
                         }
                         ((Puzzle) puzzle).layoutPuzzle();
-                        
+
                         target.invalidate();
                         target.validate();
                         target.repaint();
@@ -100,10 +104,14 @@ class Drag {
                                 parent.remove(b);
                             }
                         }
+                        if (blockParent != null && blockLocation != null) {
+                            puzzle.setLocation(blockLocation);
+                            addUndoEdit(blockParent, puzzle);
+                        }
                     }
                 }
             };
-            
+
             root.setDrag(puzzle, cont, puzzle.getLocation(), p, handler);
             AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) puzzle, PuzzleAdapter.TYPE_DOWN);
             for (AbstrBlock b : blocks) {
@@ -119,20 +127,32 @@ class Drag {
         }
     }
 
-    static void drag(final JDragPane root, final Container cont, Point p, AbstrBlock block) {
+    private static void addUndoEdit(Container blockParent, AbstrBlock block) {
+        JBlockEditor editor = (JBlockEditor) SwingUtilities.getAncestorOfClass(JBlockEditor.class, blockParent);
+
+        if (editor != null) {
+            UndoManager mng = editor.getUndoManager();
+            JScriptPane scripts = editor.getScriptPane();
+            mng.addEdit(new JBlockEditor.UndoableBlockEdit(block, scripts));
+        }
+    }
+
+    static void drag(final JDragPane root, final Container cont, Point p, final AbstrBlock block) {
         try {
+            final Container blockParent = block.getParent();
+            final Point blockLocation = block.getLocation();
             Repainter.disable(root);
-            
+
             JDragPane.DragFinishedHandler handler = new JDragPane.DragFinishedHandler() {
-                
+
                 @Override
                 public void dragFinished(JDragPane jdrag, Component c, Point location) {
                     JScriptPane target = getTarget(jdrag, cont, new Rectangle(location, c.getSize()));
                     if (target != null) {
                         Point p = SwingUtilities.convertPoint(jdrag, location, target);
-                        
+
                         AbstrBlock dragBlock = (AbstrBlock) c;
-                        
+
                         target.add(c);
                         c.setLocation(p);
                         target.invalidate();
@@ -142,6 +162,11 @@ class Drag {
                         // this can be a problem in future.
                         dragBlock.releasedEvent(null);
                         dragBlock.toFront();
+                    } else {
+                        if (blockParent != null && blockLocation != null) {
+                            block.setLocation(blockLocation);
+                            addUndoEdit(blockParent, block);
+                        }
                     }
                 }
             };

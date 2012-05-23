@@ -12,7 +12,7 @@ import org.jblocks.scriptengine.impl.DefaultScriptThread.StackElement;
  */
 public class DefaultBlocks {
 
-    // <global>
+    // <global: blocks>
     public static final NativeBlock FOR;                     // 0: count                 1: sequence
     public static final NativeBlock RETURN;                  // 0: value to return
     public static final NativeBlock WHILE;                   // 0: expression (sequence) 1: sequence
@@ -34,6 +34,10 @@ public class DefaultBlocks {
     public static final NativeBlock EQUALS;
     public static final NativeBlock OR;
     public static final NativeBlock AND;
+    public static final NativeBlock NOT;
+    public static final NativeBlock RUN;
+    public static final NativeBlock THE_SCRIPT;
+    // <global: id>
     public static final long PREFIX = 100;
     public static final long FOR_ID = PREFIX + 1;
     public static final long RETURN_ID = PREFIX + 2;
@@ -56,6 +60,9 @@ public class DefaultBlocks {
     public static final long EQUALS_ID = PREFIX + 19;
     public static final long OR_ID = PREFIX + 20;
     public static final long AND_ID = PREFIX + 21;
+    public static final long NOT_ID = PREFIX + 22;
+    public static final long RUN_ID = PREFIX + 23;
+    public static final long THE_SCRIPT_ID = PREFIX + 24;
     // <private global>
     private final static Object[] empty = new Object[0];
 
@@ -86,16 +93,13 @@ public class DefaultBlocks {
             @Override
             public Object evaluate(Object ctx, Object... params) {
                 if (params[0] == null) {
-                    System.out.println("read param => null");
                     return null;
                 }
-
                 int index = (Integer) params[0];
                 StackElement byob = ((StackElement) ctx);
                 while (!(byob.perform instanceof ByobBlock)) {
                     byob = byob.parent;
                 }
-                System.out.println("read param =>>> " + byob.param[index]);
                 return byob.param[index];
             }
         };
@@ -363,6 +367,10 @@ public class DefaultBlocks {
 
             @Override
             public Object evaluate(Object ctx, Object... param) {
+                if (param[0] == null || param[1] == null) {
+                    return param[0] == param[1];
+                }
+
                 if (isInt(param[0]) && isInt(param[1])) {
                     return toInt(param[0]) == toInt(param[2]);
                 } else {
@@ -382,6 +390,31 @@ public class DefaultBlocks {
             @Override
             public Object evaluate(Object ctx, Object... param) {
                 return toBoolean(param[0]) && toBoolean(param[1]);
+            }
+        };
+        NOT = new NativeBlock(1, NOT_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                return !toBoolean(param[0]);
+            }
+        };
+        RUN = new NativeBlock(1, RUN_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... params) {
+                if (params[0] instanceof Block[]) {
+                    ((StackElement) ctx).parent = new StackElement(((StackElement) ctx).parent, this, (Block[]) params[0], false,
+                            ((StackElement) ctx).global);
+                }
+                return null;
+            }
+        };
+        THE_SCRIPT = new NativeBlock(1, THE_SCRIPT_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                return param[0];
             }
         };
     }
@@ -471,6 +504,12 @@ public class DefaultBlocks {
                 return DefaultBlocks.OR;
             case AND:
                 return DefaultBlocks.AND;
+            case NOT:
+                return DefaultBlocks.NOT;
+            case RUN:
+                return DefaultBlocks.RUN;
+            case THE_SCRIPT:
+                return DefaultBlocks.THE_SCRIPT;
             default:
                 return null;
         }

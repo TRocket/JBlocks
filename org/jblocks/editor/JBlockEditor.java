@@ -14,6 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.UndoManager;
 import org.jblocks.JBlocks;
 import org.jblocks.gui.JCategoryChooser;
 import org.jblocks.gui.JDragPane;
@@ -38,13 +40,14 @@ import org.jblocks.gui.JDragPane;
 public class JBlockEditor extends JPanel {
 
     // <member>
-    private JPanel ctgPanel;
     private JScriptPane pane;
     private JScrollPane paneScroll;
     private Category curr;
     private JScrollPane currScroll;
-    private JCategoryChooser chooser;
-    private HashMap<String, Category> ctgs = new HashMap<String, Category>(30);
+    private final JCategoryChooser chooser;
+    private final HashMap<String, Category> ctgs = new HashMap<String, Category>(30);
+    private final UndoManager undoManager;
+    private final JPanel ctgPanel;
 
     public static class Category {
 
@@ -90,6 +93,7 @@ public class JBlockEditor extends JPanel {
         chooser = new JCategoryChooser(2);
         ctgPanel = new JPanel();
         ctgPanel.setLayout(new BorderLayout());
+        undoManager = new UndoManager();
 
         chooser.addCategoryChooserSelectionListener(new JCategoryChooser.CategoryChooserSelectionListener() {
 
@@ -289,6 +293,55 @@ public class JBlockEditor extends JPanel {
     public void cleanup() {
         for (Category c : ctgs.values()) {
             c.blocks.cleanup();
+        }
+    }
+
+    /**
+     * Returns the editor's UndoManager.
+     * @see UndoableBlockEdit
+     * @return the editor's UndoManager
+     */
+    public UndoManager getUndoManager() {
+        return undoManager;
+    }
+
+    static class UndoableBlockEdit extends AbstractUndoableEdit {
+
+        private final AbstrBlock hat;
+        private final JScriptPane scripts;
+
+        public UndoableBlockEdit(AbstrBlock h, JScriptPane p) {
+            this.hat = h;
+            this.scripts = p;
+        }
+
+        @Override
+        public String getPresentationName() {
+            return "Block Addition";
+        }
+
+        @Override
+        public void undo() {
+            super.undo();
+            if (hat instanceof Puzzle) {
+                scripts.addScript((Puzzle) hat);
+                scripts.repaint();
+            } else {
+                scripts.add(hat);
+                hat.repaint();
+            }
+        }
+
+        @Override
+        public void redo() {
+            super.redo();
+            if (hat instanceof Puzzle) {
+                scripts.removeScript((Puzzle) hat);
+                scripts.repaint();
+            } else {
+                scripts.remove(hat);
+                hat.repaint();
+            }
         }
     }
 }

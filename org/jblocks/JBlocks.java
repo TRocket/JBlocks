@@ -17,12 +17,15 @@ import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 
+import javax.swing.JScrollPane;
 import org.jblocks.editor.AbstrBlock;
 import org.jblocks.editor.BlockFactory;
+import org.jblocks.editor.BlockIO;
 import org.jblocks.editor.BlockModel;
 import org.jblocks.editor.JBlockEditor;
 import org.jblocks.editor.JBlockEditor.Category;
 import org.jblocks.editor.JScriptPane;
+import org.jblocks.editor.Puzzle;
 import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.JBubble;
 import org.jblocks.gui.JDragPane;
@@ -88,8 +91,20 @@ public final class JBlocks {
                 } else {
                     Object ret = t.getReturnValue();
                     if (ret != null) {
-                        JLabel infoLabel = new JLabel("" + ret);
-                        JBubble.showBubble(blocks[0], infoLabel);
+                        if (ret instanceof Block[]) {
+                            Block[] blockReturn = (Block[]) ret;
+                            if (blockReturn.length > 0) {
+                                JScriptPane scr = new JScriptPane();
+                                scr.setDefaultGap(0, 0);
+                                scr.setDragEnabled(false);
+                                scr.addScript((Puzzle) (BlockIO.createScript(JBlocks.this, blockReturn)[0]));
+                                scr.invalidate();
+                                JBubble.showBubble(blocks[0], new JScrollPane(scr));
+                            }
+                        } else {
+                            JLabel infoLabel = new JLabel("" + ret);
+                            JBubble.showBubble(blocks[0], infoLabel);
+                        }
                     }
                 }
                 if (blocks != null) {
@@ -140,13 +155,14 @@ public final class JBlocks {
             }
         }));
 
-        installBlock(BlockModel.createModel("cap", "Control", "return %{t}", scriptEngine.getDefaultBlock(Default.RETURN)));
-        installBlock(BlockModel.createModel("command", "Control", "while %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.WHILE)));
-        installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.IF)));
-        installBlock(BlockModel.createModel("command", "Control", "if %{b}%{br}%{s}%{br}else%{br}%{s}", scriptEngine.getDefaultBlock(Default.IF_ELSE)));
-        installBlock(BlockModel.createModel("command", "Control", "repeat %{t}%{br}%{s}", scriptEngine.getDefaultBlock(Default.FOR)));
+        installBlock(BlockModel.createModel("cap", "Control", "return%{t}", scriptEngine.getDefaultBlock(Default.RETURN)));
+        installBlock(BlockModel.createModel("command", "Control", "while%{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.WHILE)));
+        installBlock(BlockModel.createModel("command", "Control", "if%{b}%{br}%{s}", scriptEngine.getDefaultBlock(Default.IF)));
+        installBlock(BlockModel.createModel("command", "Control", "if%{b}%{br}%{s}%{br}else%{br}%{s}", scriptEngine.getDefaultBlock(Default.IF_ELSE)));
+        installBlock(BlockModel.createModel("command", "Control", "repeat%{t}%{br}%{s}", scriptEngine.getDefaultBlock(Default.FOR)));
         installBlock(BlockModel.createModel("reporter", "Variables", "%{v}", scriptEngine.getDefaultBlock(Default.READ_GLOBAL_VARIABLE)));
-        installBlock(BlockModel.createModel("command", "Variables", "set %{v} to %{t}", scriptEngine.getDefaultBlock(Default.WRITE_GLOBAL_VARIABLE)));
+        installBlock(BlockModel.createModel("command", "Variables", "set%{v}to%{t}", scriptEngine.getDefaultBlock(Default.WRITE_GLOBAL_VARIABLE)));
+        installBlock(BlockModel.createModel("command", "Control", "run%{r}", scriptEngine.getDefaultBlock(Default.RUN)));
 
 
         installBlock(BlockModel.createModel("reporter", "Operators", "%{t}+%{t}",
@@ -171,6 +187,9 @@ public final class JBlocks {
                 scriptEngine.getDefaultBlock(Default.AND)));
         installBlock(BlockModel.createModel("boolean", "Operators", "%{b}or%{b}",
                 scriptEngine.getDefaultBlock(Default.OR)));
+        installBlock(BlockModel.createModel("boolean", "Operators", "not%{b}",
+                scriptEngine.getDefaultBlock(Default.NOT)));
+        installBlock(BlockModel.createModel("reporter", "Operators", "script%{s}", scriptEngine.getDefaultBlock(Default.THE_SCRIPT)));
     }
 
     /**

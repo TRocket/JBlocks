@@ -10,7 +10,7 @@ import javax.swing.text.*;
  * @author David Underhill
  * @author ZeroLuck
  */
-class MultiSyntaxDocument extends DefaultStyledDocument {
+public class MultiSyntaxDocument extends DefaultStyledDocument {
 
     public static final String DEFAULT_FONT_FAMILY = "Courier New";
     public static final int DEFAULT_FONT_SIZE = 12;

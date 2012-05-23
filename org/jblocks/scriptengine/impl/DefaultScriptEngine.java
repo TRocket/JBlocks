@@ -73,11 +73,15 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
 
     private void printStackTrace(StackElement elm, PrintStream str) {
         str.println("\t--- stack ---");
+        int cnt = 0;
         while (elm != null) {
             str.println("\tat StackElement [doParam: " + elm.doParam + ", off: " + elm.off + " block: " + elm.perform + "]"
                     + ", param: " + Arrays.toString(elm.param));
 
             elm = elm.parent;
+            
+            if (cnt ++ > 40)
+                str.println("\t...");
         }
     }
 

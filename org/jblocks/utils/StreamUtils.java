@@ -2,11 +2,15 @@ package org.jblocks.utils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import java.util.HashMap;
 import java.util.Map;
+import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.zip.Deflater;
@@ -40,7 +44,33 @@ public class StreamUtils {
         zip.close();
         return out.toByteArray();
     }
-    
+
+    /**
+     * Unpacks a JAR <code>JAR byte[]</code> to a <code>{@literal Map<String, byte[]>}</code>. <br />
+     * 
+     * @param data the byte[]
+     * @return the files of the JAR
+     * @throws IOException 
+     */
+    public static Map<String, byte[]> jarUnpack(byte[] data) throws IOException {
+        Map<String, byte[]> files = new HashMap<String, byte[]>(100);
+        ByteArrayInputStream in = new ByteArrayInputStream(data);
+        JarInputStream zip = new JarInputStream(in);
+        ZipEntry entry;
+        byte[] buf = new byte[1024];
+        while ((entry = zip.getNextEntry()) != null) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            int len;
+            while ((len = zip.read(buf)) != -1) {
+                out.write(buf, 0, len);
+            }
+            files.put(entry.getName(), out.toByteArray());
+            zip.closeEntry();
+        }
+        zip.close();
+        return files;
+    }
+
     /**
      * Adds the file extension to a file-name if it is necessary. <br />
      * 

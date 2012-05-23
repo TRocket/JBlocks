@@ -266,9 +266,6 @@ public abstract class AbstrBlock extends JComponent {
     protected void pressedEvent(MouseEvent evt) {
         if (SwingUtilities.isLeftMouseButton(evt)) {
             Drag.drag(JDragPane.getDragPane(this), getParent(), evt.getPoint(), this);
-        } else if (SwingUtilities.isRightMouseButton(evt)) {
-            JPopupBlockMenu menu = new JPopupBlockMenu(this);
-            menu.show(this, evt.getX(), evt.getY());
         }
     }
 
@@ -430,11 +427,11 @@ public abstract class AbstrBlock extends JComponent {
             try {
                 IScriptEngine eng = context.getScriptEngine();
                 if (!(this instanceof Puzzle)) {
-                    Block b = ScriptToCode.getCodeFromBlock(this);
+                    Block b = Script2Code.getCodeFromBlock(this);
                     setHighlight(true);
                     context.addHighlight(eng.execute(eng.compile(new Block[]{b})), new AbstrBlock[]{this});
                 } else {
-                    Block[] b = ScriptToCode.getCodeFromScript(this);
+                    Block[] b = Script2Code.getCodeFromScript(this);
                     AbstrBlock[] blocks = JBlockSequence.getPuzzlePieces((Puzzle) this, PuzzleAdapter.TYPE_DOWN);
                     for (AbstrBlock toHighlight : blocks) {
                         toHighlight.setHighlight(true);
@@ -442,14 +439,14 @@ public abstract class AbstrBlock extends JComponent {
                     context.addHighlight(eng.execute(eng.compile(b)), blocks);
                 }
             } catch (RuntimeException ex) {
-                // fixme:
-                System.out.println("couldn't run: " + ex);
+                // FIXME:
+                System.out.println("ERROR: Couldn't run block: " + ex);
             }
         }
     }
 
     private class BlockMouseListener extends MouseAdapter {
-
+        
         private boolean veto() {
             JScriptPane pne = getScriptPane();
             if (pne == null || !pne.isDragEnabled() || !draggable) {
@@ -467,7 +464,10 @@ public abstract class AbstrBlock extends JComponent {
 
         @Override
         public void mousePressed(MouseEvent evt) {
-            if (!veto()) {
+            if (SwingUtilities.isRightMouseButton(evt)) {
+                JPopupBlockMenu menu = new JPopupBlockMenu(AbstrBlock.this);
+                menu.show(AbstrBlock.this, evt.getX(), evt.getY());
+            } else if (!veto()) {
                 pressedEvent(evt);
             }
         }

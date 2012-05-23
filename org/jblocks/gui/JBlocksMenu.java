@@ -1,6 +1,7 @@
 package org.jblocks.gui;
 
 import java.awt.Frame;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
@@ -14,6 +15,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.undo.UndoManager;
 
 /**
  * The {@code JMenuBar} of the {@link JBlocksPane}. <br />
@@ -31,7 +33,9 @@ class JBlocksMenu extends JMenuBar {
         this.jblocks = pane;
 
         JMenu fileMenu = new JMenu("File");
-        fileMenu.add("Save").addActionListener(new ActionListener() {
+        JMenuItem saveItem = fileMenu.add("Save");
+        saveItem.setAccelerator(KeyStroke.getKeyStroke("control S"));
+        saveItem.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -45,7 +49,9 @@ class JBlocksMenu extends JMenuBar {
                 jblocks.saveProject(true);
             }
         });
-        fileMenu.add("New Project").addActionListener(new ActionListener() {
+        JMenuItem newProject = fileMenu.add("New Project");
+        newProject.setAccelerator(KeyStroke.getKeyStroke("control shift N"));
+        newProject.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -120,17 +126,62 @@ class JBlocksMenu extends JMenuBar {
                 }
             });
         }
-        
+
         JMenu helpMenu = new JMenu("Help");
-        
+
+        JMenu editMenu = new JMenu("Edit");
+        JMenuItem undoItem = editMenu.add("Undo");
+        undoItem.setAccelerator(KeyStroke.getKeyStroke("control Z"));
+        undoItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                UndoManager mng = jblocks.getEditor().getUndoManager();
+                if (mng != null) {
+                    if (mng.canUndo()) {
+                        mng.undo();
+                    } else {
+                        Toolkit.getDefaultToolkit().beep();
+                    }
+                }
+            }
+        });
+        JMenuItem redoItem = editMenu.add("Redo");
+        redoItem.setAccelerator(KeyStroke.getKeyStroke("control Y"));
+        redoItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                UndoManager mng = jblocks.getEditor().getUndoManager();
+                if (mng != null) {
+                    if (mng.canRedo()) {
+                        mng.redo();
+                    } else {
+                        Toolkit.getDefaultToolkit().beep();
+                    }
+                }
+            }
+        });
+        editMenu.addSeparator();
+        JMenuItem cleanupItem = editMenu.add("Cleanup All");
+        cleanupItem.setAccelerator(KeyStroke.getKeyStroke("control shift C"));
+        cleanupItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                jblocks.getEditor().cleanup();
+            }
+        });
         settingsMenu.add(lookAndFeels);
 
         fileMenu.setMnemonic('F');
         toolMenu.setMnemonic('T');
         settingsMenu.setMnemonic('S');
         helpMenu.setMnemonic('H');
-        
+        editMenu.setMnemonic('E');
+
         add(fileMenu);
+        add(editMenu);
         add(toolMenu);
         add(settingsMenu);
         add(helpMenu);

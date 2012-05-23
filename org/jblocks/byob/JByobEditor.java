@@ -37,7 +37,7 @@ import org.jblocks.editor.JScriptPane;
 import org.jblocks.editor.JScriptVariableInput;
 import org.jblocks.editor.Puzzle;
 import org.jblocks.editor.PuzzleAdapter;
-import org.jblocks.editor.ScriptToCode;
+import org.jblocks.editor.Script2Code;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.ByobBlock;
 import org.jblocks.utils.SwingUtils;
@@ -121,12 +121,12 @@ public class JByobEditor extends JPanel {
         script.cleanup();
 
         block.addContainerListener(new ContainerListener() {
-
+            
             @Override
             public void componentAdded(ContainerEvent ce) {
                 varCheck();
             }
-
+            
             @Override
             public void componentRemoved(ContainerEvent ce) {
                 plusCheck();
@@ -269,6 +269,8 @@ public class JByobEditor extends JPanel {
     }
 
     private void fireFinishEvent() {
+        varCheck();
+        
         final AbstrBlock[] pieces = JBlockSequence.getPuzzlePieces((Puzzle) hat, PuzzleAdapter.TYPE_DOWN);
         if (pieces.length <= 1) {
             Toolkit.getDefaultToolkit().beep();
@@ -342,7 +344,7 @@ public class JByobEditor extends JPanel {
             @Override
             public void finished(final BlockModel model, final AbstrBlock script) {
                 try {
-                    final Block[] code = ScriptToCode.getCodeFromScript(script);
+                    final Block[] code = Script2Code.getCodeFromScript(script);
                     JBlocks ctx = JBlocks.getContextForComponent(edt);
                     model.setCode(new ByobBlock(BlockFactory.countParameters(model.getSyntax()), model.getID(), code));
                     ctx.installBlock(model);

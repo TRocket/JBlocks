@@ -1,6 +1,7 @@
 package org.jblocks.editor;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
@@ -123,12 +124,13 @@ public class BlockFactory {
      * @return the created block
      */
     public static AbstrBlock createBlock(final BlockModel model) {
+        final Color textColor = Color.BLACK;
+        
         final String type = model.getType();
         final String syntax = model.getSyntax();
         final AbstrBlock block = createBlock(type);
         block.setModel(model);
 
-        final Color textColor = Color.BLACK;
         final StringBuilder currentLabel = new StringBuilder();
         final int len = syntax.length();
         int off = 0;
@@ -147,7 +149,7 @@ public class BlockFactory {
                 } else {
                     final String label = currentLabel.toString();
                     if (!label.trim().isEmpty()) {
-                        final JLabel lab = new JLabel(label);
+                        final JComponent lab = new JLabel(label);
                         lab.setForeground(textColor);
                         block.add(lab);
                     }
@@ -172,7 +174,7 @@ public class BlockFactory {
         }
         final String str = currentLabel.toString();
         if (!str.trim().isEmpty()) {
-            JLabel lab = new JLabel(str);
+            JComponent lab = new JLabel(str);
             lab.setForeground(textColor);
             block.add(lab);
         }

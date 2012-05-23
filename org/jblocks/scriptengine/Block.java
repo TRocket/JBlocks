@@ -78,6 +78,18 @@ public abstract class Block {
         return super.equals(o);
     }
 
+    protected static void copyParameters(Block src, Block dest) {
+        int len = src.getParameterCount();
+        for (int i = 0; i < len; i++) {
+            Object o = src.getParameter(i);
+            if (o instanceof Block) {
+                dest.setParameter(i, ((Block) o).clone());
+            } else {
+                dest.setParameter(i, o);
+            }
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -92,6 +104,6 @@ public abstract class Block {
 
         FOR, RETURN, WHILE, IF, IF_ELSE, READ_GLOBAL_VARIABLE, READ_PARAM_VARIABLE,
         WRITE_GLOBAL_VARIABLE, WRITE_PARAM_VARIABLE, TRUE, FALSE, ADD, SUB, MUL, DIV, MOD, SMALLER,
-        BIGGER, EQUALS, OR, AND
+        BIGGER, EQUALS, OR, AND, NOT, RUN, THE_SCRIPT
     }
 }

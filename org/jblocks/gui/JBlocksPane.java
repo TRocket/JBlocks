@@ -299,7 +299,7 @@ public class JBlocksPane extends JDesktopPane {
             @Override
             public void finishSelected(BufferedImage img) {
                 frm.dispose();
-                
+
                 ImageSprite sprite = new ImageSprite();
                 sprite.addCostume("Test", img);
                 SpriteData data = new SpriteData("Test", sprite);
@@ -321,9 +321,13 @@ public class JBlocksPane extends JDesktopPane {
     }
 
     void openCyobEditor() {
+        showCyobEditorFrame(this, new JCyobEditor());
+    }
+
+    public static void showCyobEditorFrame(JDesktopPane desktop, JCyobEditor cyob) {
         Icon icn = JBlocks.getIcon("cyob.png");
-        JInternalFrame frm = SwingUtils.showInternalFrame(JBlocksPane.this, new JCyobEditor(), "CYOB-Editor (by ZeroLuck)",
-                new Dimension((int) (getWidth() * 0.8), (int) (getHeight() * 0.8)));
+        JInternalFrame frm = SwingUtils.showInternalFrame(desktop, cyob, "CYOB-Editor (by ZeroLuck)",
+                new Dimension((int) (desktop.getWidth() * 0.8), (int) (desktop.getHeight() * 0.8)));
         frm.setFrameIcon(icn);
         frm.setResizable(true);
         frm.setMaximizable(true);
@@ -337,7 +341,7 @@ public class JBlocksPane extends JDesktopPane {
      */
     public void addSprite(SpriteData s) {
         String name = s.getName();
-        
+
         sprites.put(name, s);
         spriteChooser.addSpriteView(name, s.getPreviewImage());
         stage.add(s.getView());
@@ -358,7 +362,7 @@ public class JBlocksPane extends JDesktopPane {
     public Map<String, SpriteData> getSprites() {
         return Collections.unmodifiableMap(sprites);
     }
-    
+
     /**
      * Removes all <code>Sprite</code>s from the editor. <br />
      */
@@ -500,8 +504,7 @@ public class JBlocksPane extends JDesktopPane {
     public Stage getStage() {
         return stage;
     }
-    
-    
+
     /**
      * Returns the JProgressBar which displays
      * whether script are running. <br />

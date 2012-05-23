@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -14,7 +15,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+
 import java.util.Map;
+
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
@@ -24,11 +27,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
+
 import org.jblocks.JBlocks;
 import org.jblocks.byob.BlockTypeChooser;
 import org.jblocks.byob.BlockTypeChooser.BlockTypeChooserListener;
 import org.jblocks.editor.BlockModel;
-import org.jblocks.scriptengine.StoreableNativeBlock;
+import org.jblocks.scriptengine.StorableNativeBlock;
+import org.jblocks.utils.Base64;
 import org.jblocks.utils.StreamUtils;
 import org.jblocks.utils.SwingUtils;
 
@@ -42,8 +47,14 @@ public class JCyobEditor extends JPanel {
     private final CloseableJTabbedPane tabs;
     private final JToolBar tools;
     private final JTextArea output;
+    private int blockCounter = 1;
+    private JFileChooser chooser;
 
     public JCyobEditor() {
+        this(true);
+    }
+    
+    public JCyobEditor(boolean defaultTab) {
         super(new BorderLayout());
         tabs = new CloseableJTabbedPane();
         tools = new JToolBar();
@@ -123,9 +134,6 @@ public class JCyobEditor extends JPanel {
         tools.add(redo);
         tools.addSeparator();
 
-
-        newBlock();
-
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         split.setTopComponent(tabs);
         split.setBottomComponent(new JScrollPane(output));
@@ -145,13 +153,15 @@ public class JCyobEditor extends JPanel {
         add(south, BorderLayout.SOUTH);
         add(tools, BorderLayout.NORTH);
         add(split, BorderLayout.CENTER);
+        
+        if (defaultTab) {
+            newBlock();
+        }
     }
 
     private void out(String s) {
         output.append(s + "\n");
     }
-    private int blockCounter = 1;
-    private JFileChooser chooser;
 
     private void newBlock() {
         JCodePane code = new JCodePane();
@@ -199,9 +209,9 @@ public class JCyobEditor extends JPanel {
                         cancel();
                         try {
                             files.put("source.java", text.getBytes());
-                            String block = StoreableNativeBlock.createData(files, getFullClassName(ID, getClassName(text)));
+                            String block = StorableNativeBlock.createData(files, getFullClassName(ID, getClassName(text)));
                             BlockModel model = BlockModel.createModel(type, category, label, ID);
-                            model.setCode(StoreableNativeBlock.load(block));
+                            model.setCode(StorableNativeBlock.load(block));
                             JBlocks.getContextForComponent(JCyobEditor.this).installBlock(model);
                             tabs.removeTabAt(tabs.getSelectedIndex());
                             JOptionPane.showInternalMessageDialog(JCyobEditor.this, "The block is now finished!\n(Look in the Block-Editor)");
@@ -348,6 +358,28 @@ public class JCyobEditor extends JPanel {
             return defaultText = sb.toString().replace("${user.name}", userName);
         } catch (Exception io) {
             return "// Couldn't load the default template.";
+        }
+    }
+
+    /**
+     * @param title the title of the block
+     * @param st the block
+     * @return the created JCyobEditor or null if an erros occurs 
+     */
+    public static JCyobEditor createEditEditor(String title, StorableNativeBlock st) {
+        try {
+            JCyobEditor edt = new JCyobEditor(false);
+            JCodePane codePane = new JCodePane();
+            Map<String, byte[]> files = StreamUtils.jarUnpack(Base64.decode(st.getData()));
+            byte[] source = files.get("source.java");
+            if (source == null) {
+                return null;
+            }
+            codePane.setText(new String(source));
+            edt.tabs.add(title, codePane);
+            return edt;
+        } catch (IOException io) {
+            return null;
         }
     }
 }

@@ -102,12 +102,14 @@ public class JBubble extends JComponent {
     public static void showBubble(Component c, JComponent toDisplay) {
         final JDragPane drag = JDragPane.getDragPane(c);
         final JBubble bubble = new JBubble(toDisplay);
-        bubble.setSize(bubble.getPreferredSize());
-        bubble.setLocation(SwingUtilities.convertPoint(c, c.getWidth(), -bubble.getHeight(), drag));
         drag.add(bubble, 0);
+  
+        bubble.setSize(bubble.getPreferredSize());
+        bubble.setLocation(SwingUtilities.convertPoint(c, c.getWidth(), -bubble.getHeight(), drag));     
+        
         bubble.validate();
         bubble.repaint();
-
+        
         entries.add(new QueueEntry(drag, bubble));
 
         Toolkit.getDefaultToolkit().getSystemEventQueue().push(new EventQueue() {
