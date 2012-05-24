@@ -30,19 +30,24 @@ public class ImageSprite extends Sprite {
 
     @Override
     public Rectangle getClipBounds() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Point.Float loc = getLocation();
+        Image img = images.get(costume).img;
+        return new Rectangle((int) loc.x - img.getWidth(null) / 2, (int) loc.y - img.getHeight(null) / 2,
+                img.getWidth(null), img.getHeight(null));
     }
 
     @Override
     public void paint(Graphics2D g) {
         Point.Float loc = getLocation();
         Image img = images.get(costume).img;
+        g.setColor(java.awt.Color.LIGHT_GRAY);
+        g.draw(getClipBounds().getBounds2D());
         g.drawImage(img, (int) loc.x - img.getWidth(null) / 2, (int) loc.y - img.getHeight(null) / 2, null);
     }
 
     @Override
     public boolean contains(int x, int y) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return getClipBounds().contains(x, y);
     }
 
     public static class Costume {

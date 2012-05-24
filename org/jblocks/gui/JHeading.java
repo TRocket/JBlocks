@@ -1,5 +1,6 @@
 package org.jblocks.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -27,11 +28,15 @@ public class JHeading extends JPanel {
      * @param text the heading's text.
      */
     public JHeading(String text) {
-        super(new FlowLayout(FlowLayout.LEFT));
+        super(new BorderLayout(10, 10));
         label = new JLabel(text);
         label.setFont(label.getFont().deriveFont(Font.BOLD, 16));
         label.setForeground(new Color(0xff2c4885));
-        add(label);
+        
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        p.add(label);
+        p.setOpaque(false);
+        add(p, BorderLayout.WEST);
     }
 
     /**

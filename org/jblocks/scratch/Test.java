@@ -7,41 +7,38 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-import org.jblocks.scratch.ObjReader.Ref;
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
-
 public class Test {
-	static BufferedOutputStream out;
-	static OutputStreamWriter write;
-	static Object[][] table = null;
-	static int indent = 0;
-public static void main(String[] args) throws IOException{
-	//Reader r = new Reader(new DataInputStream(new FileInputStream(new File("C:\\Users\\Thomas\\Documents\\Scratch Projects\\Chat.py.sb"))));
-	//r.read();
-	out = new BufferedOutputStream(new FileOutputStream(new File("C:\\JTest\\log.txt")));
-	ObjReader reader= new ObjReader(new FileInputStream(new File("C:\\JTest\\test.sb")));
-	write = new OutputStreamWriter(out);
-	//reader.readInfo();
-	Object[][] info = reader.readObjects();
-	Object[][] contents;
-	contents = reader.objTable;
-	
-	table = info;
-	for (int i = 0; i < info.length; i++) {
-		System.out.println(i);
 
-	}
-	for (int i = 0; i < 50; i++) {
-		write.write("\n");
-	}
-	table = contents;
-	for (int i = 0; i < contents.length; i++) {
-		System.out.println(i);
-		
-	}
-	
+    static BufferedOutputStream out;
+    static OutputStreamWriter write;
+    static Object[][] table = null;
+    static int indent = 0;
+
+    public static void main(String[] args) throws IOException {
+        //Reader r = new Reader(new DataInputStream(new FileInputStream(new File("C:\\Users\\Thomas\\Documents\\Scratch Projects\\Chat.py.sb"))));
+        //r.read();
+        out = new BufferedOutputStream(new FileOutputStream(new File("C:\\JTest\\log.txt")));
+        ObjReader reader = new ObjReader(new FileInputStream(new File("C:\\JTest\\test.sb")));
+        write = new OutputStreamWriter(out);
+        //reader.readInfo();
+        Object[][] info = reader.readObjects();
+        Object[][] contents;
+        contents = reader.objTable;
+
+        table = info;
+        for (int i = 0; i < info.length; i++) {
+            System.out.println(i);
+
+        }
+        for (int i = 0; i < 50; i++) {
+            write.write("\n");
+        }
+        table = contents;
+        for (int i = 0; i < contents.length; i++) {
+            System.out.println(i);
+
+        }
+
 //	reader.objTable = info;
 //	for (int i = 0; i < info.length; i++) {
 //		System.out.println(i);
@@ -99,7 +96,5 @@ public static void main(String[] args) throws IOException{
 //	}
 //	System.out.println(reader.objTable);
 //	*/
-}
-
-
+    }
 }

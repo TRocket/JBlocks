@@ -3,20 +3,27 @@ package org.jblocks.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultDesktopManager;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
+import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -224,7 +231,19 @@ public class JBlocksPane extends JDesktopPane {
 
         JSplitPane eastSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         JPanel east = new JPanel(new BorderLayout());
-        east.add(new JHeading("Sprites"), BorderLayout.NORTH);
+
+        JHeading spriteHeading = new JHeading("Sprites");
+        JButton openSpriteButton = new JButton(JBlocks.getIcon("open16x16.png"));
+        openSpriteButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                openSprite();
+            }
+        });
+        spriteHeading.add(openSpriteButton, BorderLayout.EAST);
+
+        east.add(spriteHeading, BorderLayout.NORTH);
         east.add(chScroll, BorderLayout.CENTER);
 
         JPanel bp = new JPanel(new BorderLayout());
@@ -279,6 +298,47 @@ public class JBlocksPane extends JDesktopPane {
     void newProject() {
         // TODO
         JOptionPane.showInternalMessageDialog(this, "Not yet implemented!");
+    }
+    private JFileChooser openSpriteChooser;
+
+    private String createSpriteName() {
+        for (int i = 1;; i++) {
+            if (!sprites.containsKey("Sprite " + i)) {
+                return "Sprite " + i;
+            }
+        }
+    }
+
+    void openSpriteFile(File f) throws IOException {
+        ImageSprite is = new ImageSprite();
+        is.addCostume(f.getName(), ImageIO.read(f));
+        addSprite(new SpriteData(createSpriteName(), is));
+    }
+
+    void openSprite() {
+        if (openSpriteChooser == null) {
+            openSpriteChooser = new JFileChooser();
+            openSpriteChooser.setMultiSelectionEnabled(false);
+            openSpriteChooser.setDialogTitle("Open a sprite");
+            openSpriteChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+            openSpriteChooser.setFileFilter(SwingUtils.createFilter(new String[]{"png", "gif", "bmp", "jpg", "jpeg"},
+                    "Image files: png, gif, jpg/jpeg, bmp"));
+            openSpriteChooser.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    if (SwingUtils.isApproveSelection(ae)) {
+                        File f = openSpriteChooser.getSelectedFile();
+                        try {
+                            openSpriteFile(f);
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(app, "Couldn't open image file:\n" + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+            });
+        }
+        SwingUtils.showInternalFileChooser(this, openSpriteChooser);
     }
 
     void openBlockStore() {
@@ -342,9 +402,13 @@ public class JBlocksPane extends JDesktopPane {
     public void addSprite(SpriteData s) {
         String name = s.getName();
 
+        Dimension stageSize = stage.getStageSize();
+        Sprite spr = s.getView();
+        spr.setLocation(stageSize.width / 2, stageSize.height / 2);
+        
         sprites.put(name, s);
         spriteChooser.addSpriteView(name, s.getPreviewImage());
-        stage.add(s.getView());
+        stage.add(spr);
     }
 
     /**
