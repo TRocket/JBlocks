@@ -1,12 +1,15 @@
 package org.jblocks.scratch;
 
 public class InlineValue<T> extends SerializedObject {
+	T value;
 
-    Class<T> value;
+	@Override
+	T getValue() {
+		return value;
+	}
 
-    @Override
-    Class<T> getValue() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	public InlineValue(T value) {
+		this.value = value;
+	}
+
 }
