@@ -113,12 +113,14 @@ class ObjReader {
 		int i = this.in.readInt();
 		readObjTable();
 
-		Object[] table = (Object[]) this.objTable[0][0];
-		HashMap<Object, Object> info = new HashMap<Object, Object>(table.length);
-		for (int j = 0; j < table.length - 1; j += 2) {
-			info.put(table[j], table[(j + 1)]);
-		}
-		return info;
+		//Object[] table = (Object[]) this.objTable[0][0];
+		//HashMap<Object, Object> info = new HashMap<Object, Object>(table.length);
+		//for (int j = 0; j < table.length - 1; j += 2) {
+		//	info.put(table[j], table[(j + 1)]);
+		//}
+		//return info;
+		resolveReferences(this.objTable);
+		return null;
 	}
 
 	private void readObjTable() throws IOException {
@@ -182,7 +184,7 @@ class ObjReader {
 		return readFixedFormat(classID);
 	}
 
-	private Object readFixedFormat(int paramInt) throws IOException {
+	private SerializedObject readFixedFormat(int paramInt) throws IOException {
 		int objectData1;
 		int objectdata2;
 		int objectData3;
@@ -192,19 +194,23 @@ class ObjReader {
 		switch (paramInt) {
 		case 1:
 			// null
-			return empty;
+			return new InlineValue<Object>(empty, "null");
 		case 2:
 			// true
-			return Boolean.TRUE;
+			return new InlineValue<Boolean>(Boolean.TRUE, "true");
+			//return Boolean.TRUE;
 		case 3:
 			// false
-			return Boolean.FALSE;
+			return new InlineValue<Boolean>(Boolean.FALSE, "false");
+			//return Boolean.FALSE;
 		case 4:
 			// SmallInt
-			return new Integer(this.in.readInt());
+			return new InlineValue<Integer>(this.in.readInt(), "smallInt");
+			//return new Integer(this.in.readInt());
 		case 5:
 			// SmallInt16
-			return new Integer(this.in.readShort());
+			return new InlineValue<Integer>(new Integer(this.in.readShort()), "smallInt16");
+			//return new Integer(this.in.readShort());
 		case 6:
 		case 7:
 			// LargeNegativeInt
@@ -219,10 +225,12 @@ class ObjReader {
 			if (paramInt == 7) {
 				d1 = -d1;
 			}
-			return new Double(d1);
+			return new InlineValue<Double>(d1, "largenegativeInt");
+			//return new Double(d1);
 		case 8:
 			// Float
-			return new Double(this.in.readDouble());
+			return new InlineValue<Double>(this.in.readDouble(), "float");
+			//return new Double(this.in.readDouble());
 		case 9:
 			// String
 		case 10:
@@ -236,20 +244,24 @@ class ObjReader {
 				objectData[objectdata2] = macRomanToISOLatin[(objectData[objectdata2] + 128)];
 			}
 			try {
-				return new String(objectData, "ISO-8859-1");
+				return new InlineValue<String>(new String(objectData, "ISO-8859-1"), "symbol");
+				//return new String(objectData, "ISO-8859-1");
 			} catch (UnsupportedEncodingException ex) {
-				return new String(objectData);
+				return new InlineValue<String>(new String(objectData), "symbol");
+				//return new String(objectData);
 			}
 		case 11:
 			// ByteArray
 			objectData1 = this.in.readInt();
 			this.in.read(objectData = new byte[objectData1]);
-			return objectData;
+			return new InlineValue<byte[]>(objectData, "byteArray");
+			//return objectData;
 		case 12:
 			// SoundBuffer
 			objectData1 = this.in.readInt();
 			this.in.read(objectData = new byte[2 * objectData1]);
-			return objectData;
+			return new InlineValue<byte[]>(objectData, "soundBuffer");
+			//return objectData;
 		case 13:
 			// Bitmap
 			objectData1 = this.in.readInt();
@@ -257,15 +269,18 @@ class ObjReader {
 			for (objectData3 = 0; objectData3 < arrayOfInt.length; objectData3++) {
 				arrayOfInt[objectData3] = this.in.readInt();
 			}
-			return arrayOfInt;
+			return new InlineValue<int[]>(arrayOfInt, "bitmap");
+			//return arrayOfInt;
 		case 14:
 			// UTF-8
 			objectData1 = this.in.readInt();
 			this.in.read(objectData = new byte[objectData1]);
 			try {
-				return new String(objectData, "UTF-8");
+				return new InlineValue<String>(new String(objectData, "UTF-8"), "UTF-8");
+				//return new String(objectData, "UTF-8");
 			} catch (UnsupportedEncodingException localUnsupportedEncodingException2) {
-				return new String(objectData);
+				return new InlineValue<String>(new String(objectData), "UTF-8");
+				//return new String(objectData);
 			}
 		case 20:
 		case 21:
@@ -277,7 +292,8 @@ class ObjReader {
 			for (m = 0; m < object.length; m++) {
 				object[m] = readField();
 			}
-			return object;
+			return new InlineValue<Object[]>(object, "identitiySet");
+			//return object;
 		case 24:
 		case 25:
 			// IdentityDictionary
@@ -286,7 +302,8 @@ class ObjReader {
 			for (m = 0; m < object.length; m++) {
 				object[m] = readField();
 			}
-			return object;
+			return new InlineValue<Object[]>(object, "indentityDictionary");
+			//return object;
 		case 30:
 		case 31:
 			// Color
@@ -295,13 +312,15 @@ class ObjReader {
 			if (paramInt == 31) {
 				n = this.in.readUnsignedByte();
 			}
-			return new Color(m >> 22 & 0xFF, m >> 12 & 0xFF, m >> 2 & 0xFF, n);
+			return new InlineValue<Color>(new Color(m >> 22 & 0xFF, m >> 12 & 0xFF, m >> 2 & 0xFF, n), "color");
+			//return new Color(m >> 22 & 0xFF, m >> 12 & 0xFF, m >> 2 & 0xFF, n);
 		case 32:
 			// Point
 			object = new Object[2];
 			object[0] = readField();
 			object[1] = readField();
-			return object;
+			return new InlineValue<Object[]>(object, "point");
+			//return object;
 		case 33:
 			// Rectangle
 			object = new Object[4];
@@ -309,7 +328,8 @@ class ObjReader {
 			object[1] = readField();
 			object[2] = readField();
 			object[3] = readField();
-			return object;
+			return new InlineValue<Object[]>(object, "recatangle");
+			//return object;
 		case 34:
 		case 35:
 			// ColorForm
@@ -320,8 +340,10 @@ class ObjReader {
 
 			if (paramInt == 35) {
 				arrayOfObject2[5] = readField();
+				
 			}
-			return arrayOfObject2;
+			return new InlineValue<Object[]>(arrayOfObject2, "colorForm");
+			//return arrayOfObject2;
 		case 15:
 		case 16:
 		case 17:
@@ -343,27 +365,22 @@ class ObjReader {
 		return Math.round(d) == d;
 	}
 
-	private void resolveReferences() throws IOException {
-		for (int i = 0; i < this.objTable.length; i++) {
-			int j = ((Number) this.objTable[i][1]).intValue();
-
-			if ((j >= 20) && (j <= 29)) {
-				Object[] arrayOfObject = (Object[]) this.objTable[i][0];
-				for (int m = 0; m < arrayOfObject.length; m++) {
-					Object localObject2 = arrayOfObject[m];
-					if ((localObject2 instanceof Ref)) {
-						arrayOfObject[m] = deRef((Ref) localObject2);
-					}
-				}
+	private void resolveReferences(Object[] tbl) throws IOException {
+		for (int i = 0; i < tbl.length; i++) {
+			System.out.println("derefing: " + i);
+		if (tbl[i] instanceof Ref) {
+			tbl[i] = deRef((Ref) tbl[i]);
+		}
+		if (tbl[i] instanceof Object[]) {
+			resolveReferences((Object[]) tbl[i]);
+		}
+		if (tbl[i] instanceof SerializedObject) {
+			if (((SerializedObject)tbl[i]).getValue() instanceof Object[]) {
+				resolveReferences((Object[]) ((SerializedObject) tbl[i]).getValue());
 			}
-			if (j > 99) {
-				for (int k = 3; k < this.objTable[i].length; k++) {
-					Object localObject1 = this.objTable[i][k];
-					if ((localObject1 instanceof Ref)) {
-						this.objTable[i][k] = deRef((Ref) localObject1);
-					}
-				}
-			}
+		}
+			
+			
 		}
 	}
 

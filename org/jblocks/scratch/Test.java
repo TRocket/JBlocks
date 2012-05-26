@@ -30,7 +30,24 @@ public class Test {
 		table = info;
 		for (int i = 0; i < info.length; i++) {
 			System.out.println(i);
-
+			if (info[i][0] instanceof SerializedObject) {
+				SerializedObject value = (SerializedObject) info[i][0];
+				if (value.getValue() instanceof Object[]) {
+					Object[] arry = (Object[]) value.getValue();
+					for (int j = 0; j < arry.length; j++) {
+						if (arry[j] instanceof SerializedObject) {
+							System.out.println(((SerializedObject)arry[j]).getScratchType());
+							System.out.println(((SerializedObject)arry[j]).getValue());
+						}
+					
+					}
+					System.out.println("n: " + arry.length);
+				}
+				System.out.println("number of fields " + info[i].length);
+				System.out.println(value.getScratchType());
+				System.out.println(value.getValue());
+			}
+			System.out.println(info[i][0]);
 		}
 		for (int i = 0; i < 50; i++) {
 			write.write("\n");
