@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import org.jblocks.scratch.ObjReader.Ref;
+
 public class Test {
 	static BufferedOutputStream out;
 	static OutputStreamWriter write;
@@ -28,35 +30,36 @@ public class Test {
 		contents = reader.objTable;
 
 		table = info;
-		for (int i = 0; i < info.length; i++) {
-			System.out.println(i);
-			if (info[i][0] instanceof SerializedObject) {
-				SerializedObject value = (SerializedObject) info[i][0];
-				if (value.getValue() instanceof Object[]) {
-					Object[] arry = (Object[]) value.getValue();
-					for (int j = 0; j < arry.length; j++) {
-						if (arry[j] instanceof SerializedObject) {
-							System.out.println(((SerializedObject)arry[j]).getScratchType());
-							System.out.println(((SerializedObject)arry[j]).getValue());
-						}
-					
-					}
-					System.out.println("n: " + arry.length);
-				}
-				System.out.println("number of fields " + info[i].length);
-				System.out.println(value.getScratchType());
-				System.out.println(value.getValue());
-			}
-			System.out.println(info[i][0]);
-		}
-		for (int i = 0; i < 50; i++) {
-			write.write("\n");
-		}
-		table = contents;
-		for (int i = 0; i < contents.length; i++) {
-			System.out.println(i);
-
-		}
+		printTable(table[0]);
+//		for (int i = 0; i < info.length; i++) {
+//			System.out.println(i);
+//			if (info[i][0] instanceof SerializedObject) {
+//				SerializedObject value = (SerializedObject) info[i][0];
+//				if (value.getValue() instanceof Object[]) {
+//					Object[] arry = (Object[]) value.getValue();
+//					for (int j = 0; j < arry.length; j++) {
+//						if (arry[j] instanceof SerializedObject) {
+//							System.out.println(((SerializedObject)arry[j]).getScratchType());
+//							System.out.println(((SerializedObject)arry[j]).getValue());
+//						}
+//					
+//					}
+//					System.out.println("n: " + arry.length);
+//				}
+//				System.out.println("number of fields " + info[i].length);
+//				System.out.println(value.getScratchType());
+//				System.out.println(value.getValue());
+//			}
+//			System.out.println(info[i][0]);
+//		}
+//		for (int i = 0; i < 50; i++) {
+//			write.write("\n");
+//		}
+//		table = contents;
+//		for (int i = 0; i < contents.length; i++) {
+//			System.out.println(i);
+//
+//		}
 
 		// reader.objTable = info;
 		// for (int i = 0; i < info.length; i++) {
@@ -118,6 +121,26 @@ public class Test {
 		// }
 		// System.out.println(reader.objTable);
 		// */
+	}
+	
+	static void printTable(Object[] tbl) throws IOException {
+		for (int i = 0; i < tbl.length; i++) {
+			System.out.println("printing: " + i);
+		if (tbl[i] instanceof SerializedObject) {
+			System.out.println(((SerializedObject)tbl[i]).getScratchType());
+			System.out.println(((SerializedObject)tbl[i]).getValue());
+		}
+		if (tbl[i] instanceof Object[]) {
+			printTable((Object[]) tbl[i]);
+		}
+		if (tbl[i] instanceof SerializedObject) {
+			if (((SerializedObject)tbl[i]).getValue() instanceof Object[]) {
+				printTable((Object[]) ((SerializedObject) tbl[i]).getValue());
+			}
+		}
+			
+			
+		}
 	}
 
 }
