@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+
 public class Reader {
 	DataInputStream in;
 	String version;
@@ -56,6 +57,7 @@ public class Reader {
 		 for (int i = 0; i < objtablesize; i++) {
 			 System.out.println(i);
 			 Object obj = readObj();
+			 objtable[i] = obj;
 			System.out.println(obj);
 			if (obj instanceof Object[]) {
 				Object[] arry = (Object[])obj;
@@ -64,7 +66,9 @@ public class Reader {
 				}
 			
 			}
+
 		}
+			Images.bitmapFromByteArray(objtable[15]);
 	     //if ((!"ObjS".equals(new String(arrayOfByte))) || (this.s.readByte() != 1)) throw new IOException();
 
 	    // if ((!"Stch".equals(new String(arrayOfByte))) || (this.s.readByte() != 1)) throw new IOException();
