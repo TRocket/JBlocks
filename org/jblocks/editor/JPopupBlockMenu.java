@@ -35,6 +35,7 @@ import org.jblocks.gui.JBlocksPane;
 import org.jblocks.gui.JDragPane;
 import org.jblocks.scriptengine.Block;
 import org.jblocks.scriptengine.ByobBlock;
+import org.jblocks.scriptengine.CodeIO;
 import org.jblocks.scriptengine.NativeBlock;
 import org.jblocks.scriptengine.StorableNativeBlock;
 import org.jblocks.scriptengine.js.impl.JsBeautifier;
@@ -100,6 +101,7 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
             if (code instanceof ByobBlock || code instanceof StorableNativeBlock) {
                 this.addSeparator();
                 this.add("edit").addActionListener(this);
+                this.add("save block").addActionListener(this);
             }
         }
     }
@@ -304,8 +306,8 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
 
     private void saveScript() {
         final JBlocks ctx = JBlocks.getContextForComponent(parent);
-        final JFileChooser ch = showFileChooser("Save script");
-        ch.setFileFilter(SwingUtils.createFilter(new String[]{"jbs"}, "JBlocks script files (JBS)"));
+        final JFileChooser ch = showFileChooser("Save script...");
+        ch.setFileFilter(SwingUtils.createFilter(new String[]{"jbs"}, "JBlocks script files (.jbs)"));
         ch.addActionListener(new ActionListener() {
 
             @Override
@@ -327,14 +329,39 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
             }
         });
     }
-    
+
+    private void saveBlock() {
+        final JBlocks ctx = JBlocks.getContextForComponent(parent);
+        final JFileChooser ch = showFileChooser("Save block...");
+        ch.setFileFilter(SwingUtils.createFilter(new String[]{"jbb"}, "JBlocks block files (.jbb)"));
+        ch.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                if (SwingUtils.isApproveSelection(ae)) {
+                    File f = ch.getSelectedFile();
+                    if (f != null) {
+                        try {
+                            CodeIO.writeBlock(ctx, new FileOutputStream(
+                                    StreamUtils.addFileExtension(f.getAbsolutePath(), "jbb")),
+                                    parent.getModel());
+                        } catch (Exception io) {
+                            JOptionPane.showInternalMessageDialog(ctx.getDesktop(),
+                                    "Error: Can't save the block!\n" + io, "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     private void editBlock() {
         BlockModel model = parent.getModel();
         Block code = model.getCode();
         JDesktopPane desktop = JBlocks.getContextForComponent(parent).getDesktop();
-        
+
         if (code instanceof ByobBlock) {
-            
         } else if (code instanceof StorableNativeBlock) {
             StorableNativeBlock st = (StorableNativeBlock) code;
             JCyobEditor edt = JCyobEditor.createEditEditor(model.getSyntax(), st);
@@ -363,6 +390,8 @@ public class JPopupBlockMenu extends JPopupMenu implements ActionListener {
             viewJavaScript();
         } else if (command.equals("edit")) {
             editBlock();
+        } else if (command.equals("save block")) {
+            saveBlock();
         }
     }
 }

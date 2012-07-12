@@ -1,6 +1,5 @@
 package org.jblocks.scriptengine.impl;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import org.jblocks.editor.BlockModel;
@@ -47,12 +46,12 @@ public class DefaultScriptThread implements IScriptThread {
                 }
             } else if (stack.perform instanceof NativeBlock) {    // NATIVE
                 NativeBlock nat = (NativeBlock) stack.perform;
-                StackElement cp = stack.parent;
+                StackElement parentBackup = stack.parent;
                 Object val = nat.evaluate(stack, stack.param);
 
                 stack = stack.parent;
 
-                if (stack == cp) {
+                if (stack == parentBackup) {
                     if (stack.doParam) {
                         stack.param[stack.off - 1] = val;
                     }
@@ -112,6 +111,10 @@ public class DefaultScriptThread implements IScriptThread {
             this.param = new Object[perform.getParameterCount()];
             this.doParam = doParam;
             this.global = global;
+        }
+        
+        public Map<String, Object> getVariables() {
+            return global;
         }
     }
 }

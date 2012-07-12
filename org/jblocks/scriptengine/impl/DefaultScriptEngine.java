@@ -55,13 +55,13 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
 
     @Override
     public IScriptThread execute(IScript s) {
+        DefaultScriptThread thrd = new DefaultScriptThread(globalVariables, ((DefaultScript) s).getCommands());
         synchronized (threads) {
-            DefaultScriptThread thrd = new DefaultScriptThread(globalVariables, ((DefaultScript) s).getCommands());
             threads.add(thrd);
-            startThreadIfNecessary();
-            fireStartedEvent(thrd);
-            return thrd;
         }
+        startThreadIfNecessary();
+        fireStartedEvent(thrd);
+        return thrd;
     }
 
     @Override
@@ -79,9 +79,10 @@ public class DefaultScriptEngine implements IScriptEngine, Runnable {
                     + ", param: " + Arrays.toString(elm.param));
 
             elm = elm.parent;
-            
-            if (cnt ++ > 40)
+
+            if (cnt++ > 40) {
                 str.println("\t...");
+            }
         }
     }
 

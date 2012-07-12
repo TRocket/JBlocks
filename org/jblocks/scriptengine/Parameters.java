@@ -1,5 +1,7 @@
 package org.jblocks.scriptengine;
 
+import java.util.Map;
+
 /**
  * The NativeBlock "API" for parsing parameters. <br />
  * 
@@ -15,6 +17,16 @@ public class Parameters {
             return "";
         }
         return o.toString();
+    }
+
+    public static Map<String, Object> getVariablesForContext(Object context) {
+        if (context instanceof Map) {
+            return (Map<String, Object>) context;
+        }
+        if (context instanceof org.jblocks.scriptengine.impl.DefaultScriptThread.StackElement) {
+            return ((org.jblocks.scriptengine.impl.DefaultScriptThread.StackElement) context).getVariables();
+        }
+        return null;
     }
 
     public static boolean asBoolean(Object o) {

@@ -423,7 +423,7 @@ public abstract class AbstrBlock extends JComponent {
      */
     public void tryToExecute() {
         JBlocks context = JBlocks.getContextForComponent(this);
-        if (context != null) {
+        if (context != null && model != null && model.getCode() != null) {
             try {
                 IScriptEngine eng = context.getScriptEngine();
                 if (!(this instanceof Puzzle)) {

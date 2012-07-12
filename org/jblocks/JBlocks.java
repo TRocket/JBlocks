@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +35,7 @@ import org.jblocks.scriptengine.IScriptEngine;
 import org.jblocks.scriptengine.IScriptEngine.ScriptEngineListener;
 import org.jblocks.scriptengine.IScriptThread;
 import org.jblocks.scriptengine.NativeBlock;
+import org.jblocks.scriptengine.Parameters;
 import org.jblocks.stage.ImageSprite;
 import org.jblocks.stage.SpriteData;
 
@@ -58,6 +57,7 @@ import org.jblocks.stage.SpriteData;
 public final class JBlocks {
 
     private static final int GREEN_FLAG_PRESSED_ID = 200 + 1;
+    private static final int CHANGE_VARIABLE_BY_ID = 200 + 2;
     private final JBlocksPane gui;
     private final JDragPane drag;
     private final Map<Long, BlockModel> blockLib;
@@ -192,6 +192,25 @@ public final class JBlocks {
         installBlock(BlockModel.createModel("boolean", "Operators", "not%{b}",
                 scriptEngine.getDefaultBlock(Default.NOT)));
         installBlock(BlockModel.createModel("reporter", "Operators", "script%{s}", scriptEngine.getDefaultBlock(Default.THE_SCRIPT)));
+
+        installBlock(BlockModel.createModel("command", "Variables", "change %{v} by %{t}", new NativeBlock(2, CHANGE_VARIABLE_BY_ID) {
+
+            @Override
+            public Object evaluate(Object ctx, Object... param) {
+                Map vars = Parameters.getVariablesForContext(ctx);
+                Object val = vars.get(param[0]);
+                Object add = param[1];
+                
+                if (val != null && add != null) {
+                    if (val instanceof Integer && add instanceof Integer) {
+                        vars.put(param[0], (Integer) val + (Integer) add);
+                    } else {
+                        vars.put(param[0], Parameters.asDouble(val) + Parameters.asDouble(add));
+                    }
+                }
+                return null;
+            }
+        }));
     }
 
     /**

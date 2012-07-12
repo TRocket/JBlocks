@@ -196,7 +196,6 @@ public class JSpriteChooser extends JComponent {
         public SpriteView(String txt, Image img) {
             setText(txt);
             setImage(img);
-            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
             addMouseListener(new MouseListener() {
 

@@ -3,19 +3,17 @@ package org.jblocks.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -38,6 +36,7 @@ import javax.swing.JToolBar;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 
+import javax.swing.filechooser.FileFilter;
 import org.jblocks.JBlocks;
 import org.jblocks.blockstore.JBlockStore;
 import org.jblocks.byob.JByobEditor;
@@ -49,6 +48,7 @@ import org.jblocks.painteditor2.JPaintEditor;
 import org.jblocks.scriptengine.IScriptEngine;
 import org.jblocks.soundeditor.JSoundEditor;
 import org.jblocks.stage.ImageSprite;
+import org.jblocks.stage.ImageSprite.Costume;
 import org.jblocks.stage.JSwingStage;
 import org.jblocks.stage.Sprite;
 import org.jblocks.stage.SpriteData;
@@ -75,7 +75,10 @@ public class JBlocksPane extends JDesktopPane {
     private final JProgressBar progress;
     private final JScriptPane backpack;
     private final JSwingStage stage;
+    private final JSpriteChooser soundChooser;
+    private final JSpriteChooser costumeChooser;
     private final Map<String, SpriteData> sprites;
+    private String selectedSprite;
 
     public JBlocksPane(JBlocks ctx) {
         // initialise final variables...
@@ -89,11 +92,15 @@ public class JBlocksPane extends JDesktopPane {
         this.spriteChooser = new JSpriteChooser();
         this.stage = new JSwingStage();
 
+        this.soundChooser = new JSpriteChooser();
+        this.costumeChooser = new JSpriteChooser();
+
         this.resetEditor();
         this.spriteChooser.addSelectionListener(new SpriteChooserSelectionListener() {
 
             @Override
             public void selected(String text) {
+                selectedSprite = text;
                 editor.setScriptPane(sprites.get(text).getScriptPane());
             }
         });
@@ -260,6 +267,49 @@ public class JBlocksPane extends JDesktopPane {
         app.add(eastSplit, BorderLayout.EAST);
         tabs.addTab("Scripts", scripts);
 
+        JSplitPane resPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        JPanel costumePanel = new JPanel(new BorderLayout());
+        JPanel soundPanel = new JPanel(new BorderLayout());
+
+        JHeading costumesHeading = new JHeading("Costumes");
+        JHeading soundsHeading = new JHeading("Sounds");
+
+        JButton openCostumeButton = new JButton(JBlocks.getIcon("open16x16.png"));
+        JButton openSoundButton = new JButton(JBlocks.getIcon("open16x16.png"));
+
+        openCostumeButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                openCostume();
+            }
+        });
+        openSoundButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                openSound();
+            }
+        });
+
+        costumesHeading.add(openCostumeButton, BorderLayout.EAST);
+        soundsHeading.add(openSoundButton, BorderLayout.EAST);
+
+        costumePanel.add(costumesHeading, BorderLayout.NORTH);
+        soundPanel.add(soundsHeading, BorderLayout.NORTH);
+        costumePanel.add(costumeChooser, BorderLayout.CENTER);
+        soundPanel.add(soundChooser, BorderLayout.CENTER);
+
+        costumeChooser.setBackground(new Color(0x909090));
+        soundChooser.setBackground(costumeChooser.getBackground());
+        costumeChooser.addSpriteView("Image 1", JBlocks.getImage("jblocks-icon.png"));
+        soundChooser.addSpriteView("Beep", JBlocks.getImage("speaker.png"));
+
+        resPane.setResizeWeight(0.6);
+        resPane.setTopComponent(costumePanel);
+        resPane.setBottomComponent(soundPanel);
+        tabs.addTab("Ressources", resPane);
+
         tabs.addTab("Stage", stage);
 
         app.add(tabs, BorderLayout.CENTER);
@@ -299,12 +349,23 @@ public class JBlocksPane extends JDesktopPane {
         // TODO
         JOptionPane.showInternalMessageDialog(this, "Not yet implemented!");
     }
-    private JFileChooser openSpriteChooser;
+    private JFileChooser fileChooser;
 
     private String createSpriteName() {
         for (int i = 1;; i++) {
             if (!sprites.containsKey("Sprite " + i)) {
                 return "Sprite " + i;
+            }
+        }
+    }
+
+    void updateRessources(SpriteData targ) {
+        costumeChooser.removeAll();
+        Sprite view;
+        if ((view = targ.getView()) instanceof ImageSprite) {
+            ImageSprite img = (ImageSprite) view;
+            for (Costume c : img.getCostumes()) {
+                costumeChooser.addSpriteView(c.getName(), c.getImage());
             }
         }
     }
@@ -315,30 +376,79 @@ public class JBlocksPane extends JDesktopPane {
         addSprite(new SpriteData(createSpriteName(), is));
     }
 
-    void openSprite() {
-        if (openSpriteChooser == null) {
-            openSpriteChooser = new JFileChooser();
-            openSpriteChooser.setMultiSelectionEnabled(false);
-            openSpriteChooser.setDialogTitle("Open a sprite");
-            openSpriteChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-            openSpriteChooser.setFileFilter(SwingUtils.createFilter(new String[]{"png", "gif", "bmp", "jpg", "jpeg"},
-                    "Image files: png, gif, jpg/jpeg, bmp"));
-            openSpriteChooser.addActionListener(new ActionListener() {
+    void openCostumeFile(File f) throws IOException {
+        SpriteData data = sprites.get(selectedSprite);
+        Sprite view;
+        if (data != null && (view = data.getView()) != null && view instanceof ImageSprite) {
+            System.out.println("open costume...");
+            ImageSprite img = (ImageSprite) view;
 
-                @Override
-                public void actionPerformed(ActionEvent ae) {
-                    if (SwingUtils.isApproveSelection(ae)) {
-                        File f = openSpriteChooser.getSelectedFile();
-                        try {
-                            openSpriteFile(f);
-                        } catch (IOException ex) {
-                            JOptionPane.showMessageDialog(app, "Couldn't open image file:\n" + ex, "Error", JOptionPane.ERROR_MESSAGE);
-                        }
+            String costumeName = f.getName();
+            int lastIndex = costumeName.lastIndexOf('.');
+            if (lastIndex != -1) {
+                costumeName = costumeName.substring(0, lastIndex);
+            }
+
+            img.addCostume(costumeName, ImageIO.read(f));
+            updateRessources(data);
+        }
+    }
+
+    private void initFileChooser(String title, FileFilter filter, ActionListener action) {
+        if (fileChooser == null) {
+            fileChooser = new JFileChooser();
+            fileChooser.setMultiSelectionEnabled(false);
+            fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+        } else {
+            if (fileChooser.isShowing()) {
+                return;
+            }
+        }
+        fileChooser.setDialogTitle(title);
+        fileChooser.setFileFilter(filter);
+        for (ActionListener listener : fileChooser.getActionListeners()) {
+            fileChooser.removeActionListener(listener);
+        }
+        fileChooser.addActionListener(action);
+        SwingUtils.showInternalFileChooser(this, fileChooser);
+    }
+
+    void openCostume() {
+        initFileChooser("Select a costume...", SwingUtils.createFilter(ImageIO.getReaderFileSuffixes(), Arrays.toString(ImageIO.getReaderFileSuffixes())), new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                if (SwingUtils.isApproveSelection(ae)) {
+                    File f = fileChooser.getSelectedFile();
+                    try {
+                        openCostumeFile(f);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(app, "Couldn't open image file:\n" + ex, "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
-            });
-        }
-        SwingUtils.showInternalFileChooser(this, openSpriteChooser);
+            }
+        });
+    }
+
+    void openSound() {
+        // TODO
+    }
+
+    void openSprite() {
+        initFileChooser("Select a sprite...", SwingUtils.createFilter(ImageIO.getReaderFileSuffixes(), Arrays.toString(ImageIO.getReaderFileSuffixes())), new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                if (SwingUtils.isApproveSelection(ae)) {
+                    File f = fileChooser.getSelectedFile();
+                    try {
+                        openSpriteFile(f);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(app, "Couldn't open image file:\n" + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
     }
 
     void openBlockStore() {
@@ -405,7 +515,7 @@ public class JBlocksPane extends JDesktopPane {
         Dimension stageSize = stage.getStageSize();
         Sprite spr = s.getView();
         spr.setLocation(stageSize.width / 2, stageSize.height / 2);
-        
+
         sprites.put(name, s);
         spriteChooser.addSpriteView(name, s.getPreviewImage());
         stage.add(spr);

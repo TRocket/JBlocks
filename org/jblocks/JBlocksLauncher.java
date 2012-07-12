@@ -18,7 +18,7 @@ import org.jblocks.utils.SwingUtils;
  */
 public class JBlocksLauncher implements Runnable {
 
-    private static final String VERSION = "0.5.105";
+    private static final String VERSION = "0.5.118";
 
     /**
      * This is the standalone main method
@@ -36,7 +36,6 @@ public class JBlocksLauncher implements Runnable {
         splash.setTitle("JBlocks is loading...");
         splash.setAlwaysOnTop(true);
         splash.setText("JBlocks " + VERSION + " is starting...");
-        splash.setVisible(true);
         
         JBlocksPane.setLaF();
 
