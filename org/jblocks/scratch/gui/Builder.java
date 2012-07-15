@@ -120,7 +120,10 @@ public class Builder {
 	static Object buildIdentSet(DataInputStream in, Reader context) throws IOException{
 		int size = in.readInt();
 	     Hashtable<Integer, Object> set = new Hashtable<>(size);
-	     for (int i = 0; i < size; i++){set.put(i, context.readObj());};
+	     for (int i = 0; i < size; i++){
+	    	 Object o =  context.readObj();
+	    	 set.put(i, o);
+	    	 };
 	     return set;
 	}
 	 
@@ -166,11 +169,8 @@ public class Builder {
 	}
 	
 	static Object buildColorForm(DataInputStream in, Reader context) throws IOException{
-		Object[] arrayOfObject2 = new Object[6];
-	    for (int i1 = 0; i1 < 6; i1++) arrayOfObject2[i1] = context.readObj();
-
-	    
-	    return arrayOfObject2;
+		return new UnBuiltColorForm(context.readObj(), context.readObj(), context.readObj(), context.readObj(), context.readObj(), context.readObj())
+;
 	}
 	
 	

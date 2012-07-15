@@ -3,6 +3,7 @@ package org.jblocks.scratch.gui;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Hashtable;
 
 
 public class Reader {
@@ -68,7 +69,38 @@ public class Reader {
 			}
 
 		}
-			Images.bitmapFromByteArray(objtable[15]);
+		 for (int i = 0; i < this.objtable.length; i++) {
+			 System.out.println(i);
+			 System.out.println(objtable[i].getClass().getName());
+			 if (objtable[i] instanceof Hashtable) {
+				 System.out.println("hashtable");
+				 Hashtable table = (Hashtable) objtable[i];
+				for (int j = 0; j < table.size(); j++) {
+					try{Object o =table.get(j);
+					
+					if (table.get(j) instanceof Ref) {
+						System.out.println(table.get(j).getClass());
+						Object newval = deref((Ref) table.get(j), objtable);
+						table.remove(j);
+						table.put(j, newval);
+					}
+					}catch (Exception e) {
+					e.printStackTrace();
+					}
+				}
+			}
+			
+			
+		}	
+		 for (int i = 0; i < objtable.length; i++) {
+			 if (objtable[i] instanceof UnBuiltColorForm) {
+					UnBuiltColorForm ubcf = (UnBuiltColorForm) objtable[i];
+					ubcf.setBits(deref((Ref) ubcf.getBits(), objtable));
+					ubcf.setColors(deref((Ref) ubcf.getColors(), objtable));
+					new ScratchFrame(ubcf.build());
+				}
+		}
+			//Images.UnHibernate(objtable[15]);
 	     //if ((!"ObjS".equals(new String(arrayOfByte))) || (this.s.readByte() != 1)) throw new IOException();
 
 	    // if ((!"Stch".equals(new String(arrayOfByte))) || (this.s.readByte() != 1)) throw new IOException();
@@ -131,5 +163,9 @@ public class Reader {
 		}
 		throw new IOException("unknown class id " + objId);
 		
+	}
+	
+	static Object deref(Ref ref, Object[] objtable){
+		return objtable[ref.pos-1];
 	}
 }
